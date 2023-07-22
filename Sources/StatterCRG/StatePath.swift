@@ -17,12 +17,12 @@ import Foundation
 ///  - __uuid__ identifier
 ///  - __string__ enumeration
 ///
-struct StatePath : Codable, Hashable {
+public struct StatePath : Codable, Hashable {
     internal init(components: [StatePath.PathComponent]) {
         self.components = components
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let fullString = try container.decode(String.self)
         self.init(from: fullString)
@@ -80,7 +80,7 @@ struct StatePath : Codable, Hashable {
         // and get thing that ended with string
         appendComponent()
     }
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         let fullString = components.map {
             $0.description
         }
@@ -88,13 +88,13 @@ struct StatePath : Codable, Hashable {
         try container.encode(fullString.joined(separator: "."))
     }
     
-    enum PathComponent : Hashable, CustomStringConvertible {
+    public enum PathComponent : Hashable, CustomStringConvertible {
         case plain(String)
         case wild(String)
         case number(String, param: Int)
         case id(String, id: UUID)
         case name(String, name: String)
-        var description: String {
+        public var description: String {
             switch self {
             case .plain(let s): return s
             case .id(let s, id: let id): return "\(s)(\(id.uuidString.lowercased()))"
@@ -106,10 +106,13 @@ struct StatePath : Codable, Hashable {
     }
     var components: [PathComponent]
     
-    func adding(_ component: PathComponent) -> StatePath {
+    public func adding(_ component: PathComponent) -> StatePath {
         .init(components: components + [component])
     }
-    var description: String {
+    public func adding(_ plain: String) -> StatePath {
+        .init(components: components + [.plain(plain)])
+    }
+    public var description: String {
         .init(components.map {
             $0.description
         }.joined(separator: "."))
@@ -118,29 +121,34 @@ struct StatePath : Codable, Hashable {
 
 /// A variable who is represented in the data tree.  These are essentially proxies between a
 /// data representation and where it is stored in a data store on the connection
-protocol PathSpecified {
+public protocol PathSpecified {
+    /// The scoreboard connection
     var connection: Connection { get }
+    /// A path into the server state
     var statePath: StatePath { get }
 }
-extension PathSpecified {
+public extension PathSpecified {
     func adding(_ component: StatePath.PathComponent) -> StatePath {
         statePath.adding(component)
+    }
+    func adding(_ plain: String) -> StatePath {
+        statePath.adding(.plain(plain))
     }
 }
 
 /// A child of a parent variable where both are in the data tree
-protocol PathNode : PathSpecified {
+public protocol PathNode : PathSpecified {
     associatedtype Parent : PathSpecified
     var parent: Parent { get }
 }
-extension PathNode {
+public extension PathNode {
     var connection: Connection { parent.connection }
 }
 
 /// An actual value that is contained in the data tree.  We currently support
 /// strings, integers, uuids, and booleans
 @propertyWrapper
-struct Leaf<T:JSONTypeable>: PathSpecified {
+public struct Leaf<T:JSONTypeable>: PathSpecified {
     public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
         self.connection = connection
         self.component = component
@@ -157,13 +165,13 @@ struct Leaf<T:JSONTypeable>: PathSpecified {
         self.parentPath = parent.statePath
     }
 
-    var connection: Connection
-    var component: StatePath.PathComponent
-    var parentPath: StatePath
-    var statePath: StatePath {
+    public var connection: Connection
+    public var component: StatePath.PathComponent
+    public var parentPath: StatePath
+    public var statePath: StatePath {
         parentPath.adding(component)
     }
-    var wrappedValue: T? {
+    public var wrappedValue: T? {
         get {
             if let value = connection.state[statePath] {
                 return T(value)

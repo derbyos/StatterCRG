@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StatterCRG
 
 @ViewBuilder
 func FlipGroup<V1: View, V2: View>(if value: Bool,
@@ -28,7 +29,11 @@ func FlipGroup<V1: View, V2: View, V3: View>(if value: Bool,
     }
 }
 
-struct SB: View {
+public struct SB: View {
+    public init(game: Game) {
+        self.game = game
+    }
+    
     struct TeamNameLogo : View {
         @EnvironmentObject var connection: Connection
         var team: Team
@@ -152,7 +157,7 @@ struct SB: View {
         }
     }
     #if os(watchOS)
-    var body: some View {
+    public var body: some View {
         List {
             VStack(alignment: .center) {
                 TimeDisplay(game: game)
@@ -163,7 +168,7 @@ struct SB: View {
         .listStyle(.carousel)
     }
     #else
-    var body: some View {
+    public var body: some View {
         VStack {
             HStack {
                 TeamDisplay(team: game.teamOne, leftSide: true, showJammer: game.inJam == true)

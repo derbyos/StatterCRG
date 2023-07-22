@@ -5,11 +5,20 @@ import PackageDescription
 
 let package = Package(
     name: "StatterCRG",
+    platforms: [
+        .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "StatterCRG",
-            targets: ["StatterCRG"]),
+            targets: ["StatterCRG", "StatterCRGUI", "StatterCRGActions"]),
+        // these are private to the package
+//        .executable(name: "treemaker", targets: ["treemaker"]),
+//        .plugin(name: "StatterCRGTree", targets: ["CreateTree"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -20,9 +29,24 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "StatterCRG",
-            dependencies: []),
+            dependencies: [],
+            plugins: [
+                .plugin(name: "CreateTree")
+            ]),
         .testTarget(
             name: "StatterCRGTests",
             dependencies: ["StatterCRG"]),
+        .target(
+            name: "StatterCRGUI",
+            dependencies: ["StatterCRG"]),
+        .target(
+            name: "StatterCRGActions",
+            dependencies: ["StatterCRG"]),
+
+        .plugin(name: "CreateTree",
+                capability: .buildTool(),
+                dependencies: ["treemaker"]
+               ),
+        .executableTarget(name: "treemaker"),
     ]
 )

@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import StatterCRG
 
 public extension Connection {
     /// What kind of change is this
-    public enum StateChange : String {
+    enum StateChange : String {
         case change
         case action = ""
     }

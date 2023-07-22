@@ -8,7 +8,7 @@
 import Foundation
 
 extension Optional where Wrapped == Int {
-    var timeValue: String {
+    public var timeValue: String {
         guard let intValue = self else {
             return "-:--"
         }
@@ -17,4 +17,4 @@ extension Optional where Wrapped == Int {
 }
 
 // for now
-typealias Duration = String
+public typealias Duration = String

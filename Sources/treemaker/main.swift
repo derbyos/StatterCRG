@@ -33,6 +33,7 @@ class AST {
         case `enum`
         case `case`(String?)
         case `subscript`(String)
+        case action
     }
     var kind: Kind
     var name: String
@@ -133,15 +134,17 @@ import Foundation
             return [indent + name + "\n"]
         case .enum:
             lines = [
-                "enum \(name): String {",
+                "public enum \(name): String {",
             ]
         case .`case`(let value):
             return [indent + "case \(name.initialLowercase) = \"\(value ?? name)\""]
+        case .action:
+            return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: .action) }"]
         case .root:
             lines = [
-                "struct \(name) : PathSpecified {",
-                indentBy + "var connection: Connection",
-                indentBy + "var statePath: StatePath { .init(components: [.plain(\"\(name)\")])}",
+                "public struct \(name) : PathSpecified {",
+                indentBy + "public var connection: Connection",
+                indentBy + "public var statePath: StatePath { .init(components: [.plain(\"\(name)\")])}",
                 "",
             ]
         case .node(let parent2):
@@ -159,14 +162,14 @@ import Foundation
                 qparent = fullParent
             }
             lines = [
-                "struct \(qname) : PathNode {",
-                indentBy + "var parent: \(qparent)"
+                "public struct \(qname) : PathNode {",
+                indentBy + "public var parent: \(qparent)"
             ]
             // state path can either be plain, or some sort of parameter (or an optional one)
             if let key, let keyType = key.keyType {
                 if keyType.hasSuffix("?") {
                     lines += [
-                        indentBy + "var statePath: StatePath {",
+                        indentBy + "public var statePath: StatePath {",
                         indentBy + indentBy + "if let \(key.name) {",
                         indentBy + indentBy + indentBy + "return parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
                         indentBy + indentBy + "} else {",
@@ -177,18 +180,18 @@ import Foundation
                     ]
                 } else {
                     lines += [
-                        indentBy + "var statePath: StatePath { parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))}",
+                        indentBy + "public var statePath: StatePath { parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))}",
                         "",
                     ]
                 }
             } else {
                 lines += [
-                    indentBy + "var statePath: StatePath { parent.adding(.plain(\"\(name)\"))}",
+                    indentBy + "public var statePath: StatePath { parent.adding(.plain(\"\(name)\"))}",
                     "",
                 ]
             }
         case .leaf(let type):
-            return [indent + "@Leaf var \(name.initialLowercase): \(type)?\n"]
+            return [indent + "@Leaf public var \(name.initialLowercase): \(type)?\n"]
         case .subscript(let type):
             return [
                 indent + "struct \(name)_Subscript {",
@@ -202,9 +205,9 @@ import Foundation
                 indent + "var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
             ]
         case .key(let type):
-            return [indent + "var \(name.initialLowercase) : \(type)\n"]
+            return [indent + "public var \(name.initialLowercase) : \(type)\n"]
         case .var:
-            return [indent + "var \(name.initialLowercase) : \(name) { .init(parent: self) }\n"]
+            return [indent + "public var \(name.initialLowercase) : \(name) { .init(parent: self) }\n"]
         }
         // now the children
         for child in children {
@@ -229,7 +232,7 @@ import Foundation
             } else {
                 qparent = fullParent
             }
-            lines.append(indentBy + "init(parent: \(qparent)\(parameters)) {")
+            lines.append(indentBy + "public init(parent: \(qparent)\(parameters)) {")
             lines.append(indentBy + indentBy + "self.parent = parent")
             if let key = self.key {
                 lines.append(indentBy + indentBy + "self.\(key.name.initialLowercase) = \(key.name.initialLowercase)")
@@ -259,9 +262,9 @@ import Foundation
                 if let key, let keyType = key.keyType {
                     let qualified = keyType == "Kind" ? "\(name).Kind" : keyType
                     let defaultValue = keyType.hasSuffix("?") ? " = nil" : ""
-                    lines.append("\(indent)func \(name.initialLowercase)(_ \(key.name.initialLowercase): \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, \(key.name.initialLowercase): \(key.name.initialLowercase)) }")
+                    lines.append("\(indent)public func \(name.initialLowercase)(_ \(key.name.initialLowercase): \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, \(key.name.initialLowercase): \(key.name.initialLowercase)) }")
                 } else {
-                    lines.append("\(indent)var \(name.initialLowercase): \(name)\(parent) { .init(parent: self) }")
+                    lines.append("\(indent)public var \(name.initialLowercase): \(name)\(parent) { .init(parent: self) }")
                 }
             }
             if let parent2 {
@@ -437,6 +440,11 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingNodeName
             }
             astStack.last?.children.append(.init(kind: .case(nextToken()), name: name))
+        case "action":
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            astStack.last?.children.append(.init(kind: .action, name: name))
         default:
             throw Errors.syntaxError
         }
@@ -446,19 +454,23 @@ func parseAST(source: String) throws -> [AST] {
 
 do {
     let source = try String(contentsOfFile: inputFileName)
-    let destURL = URL(fileURLWithPath: outputFolder, isDirectory: true)
-    try FileManager.default.createDirectory(at: destURL, withIntermediateDirectories: true)
+    let destURL = URL(fileURLWithPath: outputFolder, isDirectory: false)
+    try FileManager.default.createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true)
     let document = try parseAST(source: source)
+    var output = ""
     for root in document {
         switch root.kind {
         case .node, .root:
             print("=========\(root.name)=======")
-            print(try root.generate())
-            try root.save(destURL: destURL)
+//            print(try root.generate())
+            output.append(try root.generate())
+            output.append("\n")
+//            try root.save(destURL: destURL)
         default:
             break
         }
     }
+    try output.data(using: .utf8)?.write(to: destURL)
 } catch {
     print("Error: \(error)")
     exit(99)

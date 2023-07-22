@@ -40,7 +40,7 @@ extension Connection {
 
 extension PathSpecified {
     
-    var binding: Binding<JSONValue> {
+    public var binding: Binding<JSONValue> {
         .init {
             connection.state[statePath] ?? .null
         } set: { newValue in
@@ -49,7 +49,7 @@ extension PathSpecified {
 
     }
     
-    var value: JSONValue {
+    public var value: JSONValue {
         if let value = connection.state[statePath] {
             return value
         }

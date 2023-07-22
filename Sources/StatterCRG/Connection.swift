@@ -1,5 +1,5 @@
 //
-//  Scoreboard.swift
+//  Connection.swift
 //  Statter
 //
 //  Created by gandreas on 7/19/23.
@@ -9,28 +9,56 @@ import Foundation
 import SwiftUI
 
 //@dynamicMemberLookup
-class Connection : ObservableObject, Equatable {
-    static func == (lhs: Connection, rhs: Connection) -> Bool {
+/// The primary connection with the scoreboard server
+public class Connection : ObservableObject, Equatable {
+    /// Create a connection to a scoreboard server.  The connection won't
+    /// be active until ``connect()`` is called
+    /// - Parameters:
+    ///   - host: The scoreboard server host
+    ///   - port: The scoreboard server port
+    ///   - operatorName: The scoreboard server name
+    ///   - source: The starting source refrence
+    ///   - urlSession: A custom urlSession
+    ///   - webSocketFailedHandler: A handler to call if websockets fail
+    public init(host: String? = "10.0.0.10", port: Int = 8000, operatorName: String = "statter", source: Connection.Source = .root, urlSession: URLSession = .shared, webSocketFailedHandler: (() -> Void)? = nil) {
+        self.host = host
+        self.port = port
+        self.operatorName = operatorName
+        self.source = source
+        self.urlSession = urlSession
+        self.webSocketFailedHandler = webSocketFailedHandler
+    }
+    
+    public static func == (lhs: Connection, rhs: Connection) -> Bool {
         lhs.webSocket == rhs.webSocket && lhs.webSocketURL == rhs.webSocketURL
     }
     
-    enum Errors : Error {
+    /// Errors that can be generated
+    public enum Errors : Error {
         case noConnection
     }
-    var host: String? = "10.0.0.10"
-    var port: Int = 8000
+    /// The scoreboard URL host
+    public var host: String? = "10.0.0.10"
+    /// The scoreboard URL port
+    public var port: Int = 8000
     
-    #if os(watchOS)
-    var operatorName: String = "statterWatch"
-    #else
-    var operatorName: String = "statter"
-    #endif
-    enum Source : String {
+    /// The name of the NSO operator (if specified).  This should be
+    /// only changed before changing source or
+    public var operatorName: String = "statter"
+    
+    /// The various kinds of "views" of the scoreboard.  This apparently
+    /// helps in the delivery of messages based on what the screen should show
+    public enum Source : String {
+        /// Root of the display
         case root
+        /// Scoreboard operator
         case sbo = "/nso/sbo"
+        /// Scoreboard view
         case sb = "/views/standard"
     }
-    @Published var source: Source = .root {
+    /// What the current source for the view should be
+    /// This will disconnect and start a new connection when changed
+    @Published public var source: Source = .root {
         didSet {
             webSocket?.cancel(with: .normalClosure, reason: nil)
             webSocket = nil
@@ -38,6 +66,7 @@ class Connection : ObservableObject, Equatable {
             connect()
         }
     }
+    /// Derived base URL based on host and port
     var baseURL: URL? {
         guard let host else {
             return nil
@@ -47,6 +76,7 @@ class Connection : ObservableObject, Equatable {
     /// The URL for the web socket API
     var webSocketURL: URL? {
         let source: String
+        // Add game and operator to the source
         if let gameID = game?.id {
             source = self.source.rawValue + "?game=\(gameID)&operator=\(operatorName)"
         } else {
@@ -67,11 +97,18 @@ class Connection : ObservableObject, Equatable {
     }
 
 
+    /// support for custom url sessions
     var urlSession : URLSession = .shared
 
     /// The current web socket task - use a single web socket if possible
     @Published var webSocket : URLSessionWebSocketTask?
-
+    
+    /// Are we currently connected (or at least do we have a socket task)
+    public var isConnected: Bool {
+        webSocket != nil
+    }
+    /// Create the websocket task, if possible (but not started yet)
+    /// - Returns: The new websocket task
     func createWebSocket() -> URLSessionWebSocketTask? {
         guard let webSocketURL else {
             return nil
@@ -88,14 +125,6 @@ class Connection : ObservableObject, Equatable {
         return retval
     }
     
-    func checkWSCloseError() {
-        guard let closeReason = webSocket?.closeReason,
-              let closeReasonString = String(data: closeReason, encoding: .utf8) else {
-            return
-        }
-        print("WS:Close Error [\(webSocket?.taskIdentifier ?? -1)]\(webSocket!.closeCode.rawValue) '\(closeReasonString)'")
-    }
-
     
     /// The first step on openning a web socket, which opens the we socket, authorizes it,
     /// and then finally calls the closure
@@ -160,9 +189,12 @@ class Connection : ObservableObject, Equatable {
 
     /// The handler to call on web socket failure
     public var webSocketFailedHandler: (()->Void)?
-
-    @Published var error: Error?
-    func connect() {
+    
+    /// An error that we ran into while dealing with the socket
+    @Published public var error: Error?
+    
+    /// Start connecting to the server and get some basic operations
+    public func connect() {
         openWebSocket { [self] result in
             switch result {
             case .failure(let error):
@@ -181,11 +213,16 @@ class Connection : ObservableObject, Equatable {
         }
     }
     
-    var ws: WS { .init(connection: self) }
-    var scoreBoard: ScoreBoard { .init(connection: self) }
+    /// The WS of the current connection
+    public var ws: WS { .init(connection: self) }
+    /// The root ScoreBoard of the current connection
+    public var scoreBoard: ScoreBoard { .init(connection: self) }
     
+    /// Used to track what paths we need to register to
     var toRegister: [PathSpecified] = []
-    func register(path: PathSpecified) {
+    /// Defer adding a path to register, allowing us to collect multiple paths into a single transaction
+    /// - Parameter path: The path to add
+    public func register(path: PathSpecified) {
 //        print("=== Register \(path.statePath.description)")
         if toRegister.contains(where: { $0.statePath.description == path.statePath.description }) {
             return
@@ -205,7 +242,7 @@ class Connection : ObservableObject, Equatable {
     /// that with the scoreboard, but those registrations won't happen
     /// until this routine is called (which will happen automatically ever time
     /// we process a message from the server)
-    func register(_ paths: PathSpecified...) {
+    public func register(_ paths: PathSpecified...) {
         guard let webSocket else {
 //            print("Defer Registering for \(paths.map{$0.statePath.description}.joined(separator: ", "))")
             toRegister.append(contentsOf: paths)
@@ -217,6 +254,16 @@ class Connection : ObservableObject, Equatable {
         }
         let command = RegisterCommand(paths: toRegister.map{$0.statePath} + paths.map{$0.statePath})
         toRegister = []
+        send(command: command)
+    }
+    
+    /// Actually send data over the websocket
+    /// - Parameter command: <#command description#>
+    public func send<Command: Encodable>(command: Command) {
+        guard let webSocket else {
+            // do we want to collect and defer this?
+            return
+        }
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         if let data = try? encoder.encode(command), let src = String(data: data, encoding: .utf8) {
@@ -234,10 +281,14 @@ class Connection : ObservableObject, Equatable {
             }
         }
     }
-    @Published var deviceName: String?
+    /// What the server thinks our device "name" is
+    @Published public var deviceName: String?
         
-    @Published var game: Game?
+    /// The current game
+    @Published public var game: Game?
     
+    /// Get the next packet and process it.  We also flush the register
+    /// Once the message is recieved we queue up another call to get the next packet
     func getPacket() {
         if toRegister.isEmpty == false {
             // we had stuff to register initially but couldn't
@@ -294,9 +345,11 @@ class Connection : ObservableObject, Equatable {
         }
     }
     
-    var state: [StatePath: JSONValue] = [:]
+    /// This is the master state that contains what the current values from the SB are
+    public var state: [StatePath: JSONValue] = [:]
     
-    subscript(path: PathSpecified) -> JSONValue? {
+    /// Convenience to fetch state via a path
+    public subscript(path: PathSpecified) -> JSONValue? {
         state[path.statePath]
     }
 }

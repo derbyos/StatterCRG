@@ -167,21 +167,21 @@ public enum JSONValue: Codable, Equatable, Hashable, CustomStringConvertible {
 }
 
 
-protocol JSONTypeable {
+public protocol JSONTypeable {
     init?(_ json: JSONValue)
     var asJSON: JSONValue { get }
 }
 extension Int : JSONTypeable {
-    init?(_ json: JSONValue) {
+    public init?(_ json: JSONValue) {
         guard let value = json.intValue else {
             return nil
         }
         self = value
     }
-    var asJSON: JSONValue { .int(self) }
+    public var asJSON: JSONValue { .int(self) }
 }
 extension Bool : JSONTypeable {
-    init?(_ json: JSONValue) {
+    public init?(_ json: JSONValue) {
         if let value = json.boolValue {
             self = value
         } else if json.stringValue?.lowercased() == "true" {
@@ -192,23 +192,23 @@ extension Bool : JSONTypeable {
             return nil
         }
     }
-    var asJSON: JSONValue { .bool(self) }
+    public var asJSON: JSONValue { .bool(self) }
 }
 extension String : JSONTypeable {
-    init?(_ json: JSONValue) {
+    public init?(_ json: JSONValue) {
         guard let value = json.stringValue else {
             return nil
         }
         self = value
     }
-    var asJSON: JSONValue { .string(self) }
+    public var asJSON: JSONValue { .string(self) }
 }
 extension UUID : JSONTypeable {
-    init?(_ json: JSONValue) {
+    public init?(_ json: JSONValue) {
         guard let value = json.stringValue.flatMap({UUID(uuidString: $0)}) else {
             return nil
         }
         self = value
     }
-    var asJSON: JSONValue { .string(self.uuidString) }
+    public var asJSON: JSONValue { .string(self.uuidString) }
 }

@@ -43,13 +43,13 @@ node Game ScoreBoard
     
     leaf Game UUID
 
-    !var teamOne: Team { team(1) }
-    !var teamTwo: Team { team(2) }
-    !var periodClock: Clock { clock(.period) }
-    !var jamClock: Clock { clock(.jam) }
-    !var lineupClock: Clock { clock(.lineup) }
-    !var timeOutClock: Clock { clock(.timeOut) }
-    !var intermissionClock: Clock { clock(.intermission) }
+    !public var teamOne: Team { team(1) }
+    !public var teamTwo: Team { team(2) }
+    !public var periodClock: Clock { clock(.period) }
+    !public var jamClock: Clock { clock(.jam) }
+    !public var lineupClock: Clock { clock(.lineup) }
+    !public var timeOutClock: Clock { clock(.timeOut) }
+    !public var intermissionClock: Clock { clock(.intermission) }
 
     leaf CurrentPeriodNumber Int
     leaf OfficialScore Bool
@@ -57,6 +57,15 @@ node Game ScoreBoard
 
     leaf InJam Bool
     leaf OfficialReview Bool
+    
+    leaf TimeoutOwner String
+    // These are commands, not state
+    action StartJam
+    action StopJam
+    action TimeOut
+    action OfficialTimeOut
+//    leaf StartJam Bool
+//    leaf StopJam Bool
 end
 
 node Team Game
