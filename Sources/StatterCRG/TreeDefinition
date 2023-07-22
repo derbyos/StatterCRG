@@ -1,0 +1,102 @@
+// The definitions for the data tree.  The treemaker script
+// will convert this to the tree data structures
+
+root WS
+    node Device
+        leaf Name String
+        leaf Id UUID
+    end
+    node Client
+        leaf RemoteAddress String
+        leaf Id String
+    end
+end
+
+root ScoreBoard
+    node CurrentGame
+        leaf Game UUID
+        leaf InJam Bool
+        leaf OfficialReview Bool
+    end
+    node Clients
+        node Device
+            key id UUID?
+            leaf Comment String
+        end
+    end
+    
+    enum Version
+        case Release
+    end
+    subscript Version String
+end
+
+node Period Game
+    key period Int?
+    leaf Team1Points Int
+    leaf Team2Points Int
+    leaf CurrentJamNumber Int
+end
+
+node Game ScoreBoard
+    key id UUID
+    
+    leaf Game UUID
+
+    !var teamOne: Team { team(1) }
+    !var teamTwo: Team { team(2) }
+    !var periodClock: Clock { clock(.period) }
+    !var jamClock: Clock { clock(.jam) }
+    !var lineupClock: Clock { clock(.lineup) }
+    !var timeOutClock: Clock { clock(.timeOut) }
+    !var intermissionClock: Clock { clock(.intermission) }
+
+    leaf CurrentPeriodNumber Int
+    leaf OfficialScore Bool
+    leaf RulesetName String
+
+    leaf InJam Bool
+    leaf OfficialReview Bool
+end
+
+node Team Game
+    key team Int
+    leaf Name String
+    leaf UniformColor String
+    leaf Score Int
+    leaf Timeouts Int
+    leaf OfficialReviews Int
+    leaf RetainedOfficialReview Bool
+    leaf DisplayLead Bool
+    leaf JamScore Int
+    leaf NoInitial Bool
+end
+
+node Clock Game
+    enum Kind
+        case timeOut Timeout
+        case Period
+        case Lineup
+        case Jam
+        case Intermission
+    end
+    key kind Kind
+    leaf Time Int
+    leaf InvertedTime Int
+    leaf MaximumTime Int
+    leaf Readonly Bool
+    leaf Running Bool
+    leaf Name String
+    leaf Direction Bool
+    leaf Number Int
+end
+
+
+node Jam <Period Game>
+    key jam Int
+    leaf WalltimeStart Int
+end
+
+node TeamJam Jam<P>
+    key team Int
+end
