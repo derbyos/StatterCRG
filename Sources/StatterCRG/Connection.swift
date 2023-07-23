@@ -53,6 +53,8 @@ public class Connection : ObservableObject, Equatable {
         case root
         /// Scoreboard operator
         case sbo = "/nso/sbo"
+        /// Jam timer
+        case jt = "/nso/jt"
         /// Scoreboard view
         case sb = "/views/standard"
     }
@@ -267,7 +269,7 @@ public class Connection : ObservableObject, Equatable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         if let data = try? encoder.encode(command), let src = String(data: data, encoding: .utf8) {
-//            print(">>> Sent \(src)")
+            print(">>> Sent \(src)")
             webSocket.send(.string(src)) { error in
                 // we use the callback version since this is self contained anyway
                 DispatchQueue.main.async {

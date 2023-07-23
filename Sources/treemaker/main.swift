@@ -26,6 +26,7 @@ class AST {
         case root
         case node(parent: String?)
         case leaf(String)
+        case flag
         case `var`
         case key(String)
         case comment // stored in name
@@ -192,6 +193,8 @@ import Foundation
             }
         case .leaf(let type):
             return [indent + "@Leaf public var \(name.initialLowercase): \(type)?\n"]
+        case .flag:
+            return [indent + "@Flag public var \(name.initialLowercase): Bool?\n"]
         case .subscript(let type):
             return [
                 indent + "struct \(name)_Subscript {",
@@ -243,13 +246,15 @@ import Foundation
                 switch child.kind {
                 case .leaf(_):
                     lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = parent.leaf(\"\(child.name)\")")
+                case .flag:
+                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = parent.flag(\"\(child.name)\")")
                 default:
                     break
                 }
             }
             for child in children {
                 switch child.kind {
-                case .leaf(_):
+                case .leaf(_), .flag:
                     lines.append(indentBy + indentBy + "_\(child.name.initialLowercase).parentPath = statePath")
                 default:
                     break
@@ -409,6 +414,11 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingLeafType
             }
             astStack.last?.children.append(.init(kind: .leaf(type), name: name))
+        case "flag":
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            astStack.last?.children.append(.init(kind: .flag, name: name))
         case "subscript":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

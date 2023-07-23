@@ -62,10 +62,8 @@ node Game ScoreBoard
     // These are commands, not state
     action StartJam
     action StopJam
-    action TimeOut
-    action OfficialTimeOut
-//    leaf StartJam Bool
-//    leaf StopJam Bool
+    action Timeout
+    action OfficialTimeout
 end
 
 node Team Game
@@ -75,10 +73,13 @@ node Team Game
     leaf Score Int
     leaf Timeouts Int
     leaf OfficialReviews Int
-    leaf RetainedOfficialReview Bool
+    flag RetainedOfficialReview
     leaf DisplayLead Bool
     leaf JamScore Int
     leaf NoInitial Bool
+    
+    flag Timeout
+    flag OfficialReview
 end
 
 node Clock Game

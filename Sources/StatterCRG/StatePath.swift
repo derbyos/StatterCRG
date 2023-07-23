@@ -146,7 +146,7 @@ public extension PathNode {
 }
 
 /// An actual value that is contained in the data tree.  We currently support
-/// strings, integers, uuids, and booleans
+/// strings, integers, uuids, and booleans, and are read-only
 @propertyWrapper
 public struct Leaf<T:JSONTypeable>: PathSpecified {
     public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
@@ -179,8 +179,46 @@ public struct Leaf<T:JSONTypeable>: PathSpecified {
             connection.register(path: self)
             return nil
         }
-        set {
-            connection.state[statePath] = newValue?.asJSON
+    }
+}
+
+@propertyWrapper
+/// A Flag is like a Leaf but it is a bool that can be set via the `set` command
+public struct Flag: PathSpecified {
+    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
+        self.connection = connection
+        self.component = component
+        self.parentPath = parentPath
+    }
+    public init<P:PathSpecified>(_ parent: P, _ name: String) {
+        self.connection = parent.connection
+        self.component = .plain(name)
+        self.parentPath = parent.statePath
+    }
+    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent) {
+        self.connection = parent.connection
+        self.component = component
+        self.parentPath = parent.statePath
+    }
+
+    public var connection: Connection
+    public var component: StatePath.PathComponent
+    public var parentPath: StatePath
+    public var statePath: StatePath {
+        parentPath.adding(component)
+    }
+    public var wrappedValue: Bool? {
+        get {
+            if let value = connection.state[statePath] {
+                return Bool(value)
+            }
+            connection.register(path: self)
+            return nil
+        }
+        nonmutating set {
+            if let newValue {
+                connection.set(key: statePath, value: .bool(newValue), kind: .action)
+            }
         }
     }
 }
@@ -191,6 +229,13 @@ extension PathSpecified {
         .init(connection: connection, component: .plain(name), parentPath: statePath)
     }
     func leaf<T:JSONTypeable> (_ component: StatePath.PathComponent) -> Leaf<T> {
+        .init(connection: connection, component: component, parentPath: statePath)
+    }
+    
+    func flag (_ name: String) -> Flag {
+        .init(connection: connection, component: .plain(name), parentPath: statePath)
+    }
+    func flag (_ component: StatePath.PathComponent) -> Flag {
         .init(connection: connection, component: component, parentPath: statePath)
     }
 }
