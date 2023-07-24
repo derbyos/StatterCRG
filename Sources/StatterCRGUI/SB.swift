@@ -8,97 +8,190 @@
 import SwiftUI
 import StatterCRG
 
-@ViewBuilder
-func FlipGroup<V1: View, V2: View>(if value: Bool,
-                @ViewBuilder _ content: @escaping () -> TupleView<(V1, V2)>) -> some View {
-    let pair = content()
-    if value {
-        TupleView((pair.value.1, pair.value.0))
-    } else {
-        TupleView((pair.value.0, pair.value.1))
+
+public struct TeamNameLogo : View {
+    public init(team: Team) {
+        self.team = team
     }
-}
-@ViewBuilder
-func FlipGroup<V1: View, V2: View, V3: View>(if value: Bool,
-                @ViewBuilder _ content: @escaping () -> TupleView<(V1, V2, V3)>) -> some View {
-    let pair = content()
-    if value {
-        TupleView((pair.value.2, pair.value.1, pair.value.0))
-    } else {
-        TupleView((pair.value.0, pair.value.1, pair.value.2))
+    
+    @EnvironmentObject var connection: Connection
+    var team: Team
+    public var body: some View {
+        Text(team.name ?? team.uniformColor ?? "Team \(team.team)")
+            .font(.largeTitle)
     }
 }
 
-public struct SB: View {
+public enum TimeoutDot {
+    case unused
+    case used
+    case retained
+}
+
+public struct Timeouts : View {
+    public init(team: Team) {
+        self.team = team
+    }
+    
+    @EnvironmentObject var connection: Connection
+    @EnvironmentObject var theme: Theme
+    var team: Team
+    #if nomore
+    @ViewBuilder var timeoutView: some View {
+        VStack {
+            ForEach(0..<3) {
+                if $0 < (team.timeouts ?? 0) {
+                    theme.timeout.view(for: TimeoutDot.unused)
+                } else {
+                    theme.timeout.view(for: TimeoutDot.used)
+                }
+            }
+            .foregroundColor(.backgroundFill)
+        }
+    }
+    @ViewBuilder var officialReviewView: some View {
+        if let officialReviews = team.officialReviews, officialReviews > 0 {
+            if team.retainedOfficialReview == true {
+                theme.timeout.view(for: TimeoutDot.retained)
+            } else {
+                theme.timeout.view(for: TimeoutDot.unused)
+            }
+        } else {
+            theme.timeout.view(for: TimeoutDot.used)
+        }
+
+    }
+    struct TimeoutBox<C:View> : View {
+        @EnvironmentObject var theme: Theme
+        var content: C
+        init(@ViewBuilder content: ()->C) {
+            self.content = content()
+        }
+        var body: some View {
+            content
+                .padding(2)
+                .background(
+                    RoundedRectangle(cornerRadius: theme.timeout.cornerRadius)
+                )
+        }
+    }
+    public var body: some View {
+        if theme.timeout.separateBoxes {
+            VStack {
+                TimeoutBox {
+                    timeoutView
+                }
+                TimeoutBox {
+                    officialReviewView
+                }
+            }
+        } else {
+            TimeoutBox {
+                VStack {
+                    timeoutView
+//                    Divider().frame(width: 16)
+//                        .foregroundColor(.black)
+                    Rectangle().frame(width: 16, height: 1)
+                        .foregroundColor(.primary)
+                    officialReviewView
+                }
+            }
+        }
+    }
+    #else
+    @Environment(\.timeoutStyle) var timeoutStyle
+    struct AnyTimeoutStyleView<TS:TimeoutStyle> : View {
+        var ts: TS
+        var team: Team
+        var body: some View {
+            ts.body(for: team)
+        }
+    }
+    public var body: some View {
+//        AnyTimeoutStyleView(ts: timeoutStyle, team: team)
+        timeoutStyle.body(for: team)
+    }
+    #endif
+}
+
+public struct TimeDisplay : View {
     public init(game: Game) {
         self.game = game
     }
     
-    struct TeamNameLogo : View {
-        @EnvironmentObject var connection: Connection
-        var team: Team
-        var body: some View {
-            Text(team.name ?? team.uniformColor ?? "Team \(team.team)")
-                .font(.largeTitle)
-        }
-    }
-    enum TimeoutDot : View {
-        case unused
-        case used
-        case retained
-        var body: some View {
-            switch self {
-            case .unused: Image(systemName: "circle.fill")
-            case .used: Image(systemName: "circle")
-            case .retained: Image(systemName: "plus.circle.fill")
-            }
-        }
-    }
-    struct Timeouts : View {
-        @EnvironmentObject var connection: Connection
-        var team: Team
-        var body: some View {
-            VStack {
-                VStack {
-                    ForEach(0..<3) {
-                        if $0 < (team.timeouts ?? 0) {
-                            TimeoutDot.unused
-                        } else {
-                            TimeoutDot.used
-                        }
-                    }
+    @EnvironmentObject var connection: Connection
+    var game: Game
+    public var body: some View {
+        if game.intermissionClock.running == true {
+            Text("Intermission \(game.intermissionClock.time.timeValue)")
+        } else if game.timeOutClock.running == true || game.lineupClock.running == true {
+            HStack {
+                Text(game.periodClock.time.timeValue)
+                if let period = game.currentPeriodNumber {
+                    Text("P\(period)")
+                    Text("J\(game.period(period).currentJamNumber ?? 0)")
                 }
-                .padding(2)
-                .border(.primary)
-                Group {
-                    if let officialReviews = team.officialReviews, officialReviews > 0 {
-                        if team.retainedOfficialReview == true {
-                            TimeoutDot.retained
-                        } else {
-                            TimeoutDot.unused
-                        }
-                    } else {
-                        TimeoutDot.used
-                    }
-                }
-                .padding(2)
-                .border(.primary)
             }
+            HStack {
+                if game.lineupClock.running == true {
+                    Text("Lineup")
+                    Text(game.lineupClock.time.timeValue)
+                } else {
+                    Text(game.officialReview == true ? "OR" : "TO")
+                    Text(game.timeOutClock.time.timeValue)
+                }
+            }
+        } else if let period = game.currentPeriodNumber {
+            #if os(watchOS)
+            HStack { Text("Period \(period)")
+                Spacer()
+                Text(game.periodClock.time.timeValue)
+            }
+            HStack { Text("Jam \(game.period(period).currentJamNumber ?? 0)")
+                Spacer()
+                Text(game.jamClock.time.timeValue)
+            }
+            #else
+            GroupBox("Period \(period)") {
+                Text(game.periodClock.time.timeValue)
+            }
+            GroupBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
+                Text(game.jamClock.time.timeValue)
+            }
+            #endif
         }
+
     }
-    struct TeamDisplay : View {
+}
+
+public struct SB: View {
+    @EnvironmentObject var theme: Theme
+
+    public init(game: Game) {
+        self.game = game
+    }
+    
+    public struct TeamDisplay : View {
+        public init(team: Team, leftSide: Bool, showJammer: Bool) {
+            self.team = team
+            self.leftSide = leftSide
+            self.showJammer = showJammer
+        }
+        
         @EnvironmentObject var connection: Connection
         var team: Team
         var leftSide: Bool
         var showJammer: Bool
-        var body: some View {
+        public var body: some View {
             VStack {
                 TeamNameLogo(team: team)
                 HStack {
                     FlipGroup(if: !leftSide) {
                         Timeouts(team: team)
+                        Spacer()
                         Text("\(team.score ?? 0)")
                             .font(.largeTitle)
+                        Spacer()
                         Text("\(team.jamScore ?? 0)")
                     }
                 }
@@ -113,49 +206,6 @@ public struct SB: View {
     @EnvironmentObject var connection: Connection
     var game: Game
     
-    struct TimeDisplay : View {
-        @EnvironmentObject var connection: Connection
-        var game: Game
-        var body: some View {
-            if game.intermissionClock.running == true {
-                Text("Intermission \(game.intermissionClock.time.timeValue)")
-            } else if game.timeOutClock.running == true || game.lineupClock.running == true {
-                HStack {
-                    Text(game.periodClock.time.timeValue)
-                    if let period = game.currentPeriodNumber {
-                        Text("P\(period)")
-                        Text("J\(game.period(period).currentJamNumber ?? 0)")
-                    }
-                }
-                HStack {
-                    if game.lineupClock.running == true {
-                        Text("Lineup")
-                        Text(game.lineupClock.time.timeValue)
-                    } else {
-                        Text(game.officialReview == true ? "OR" : "TO")
-                        Text(game.timeOutClock.time.timeValue)
-                    }
-                }
-            } else if let period = game.currentPeriodNumber {
-                #if os(watchOS)
-                HStack { Text("Period \(period)")
-                    Text(game.periodClock.time.timeValue)
-                }
-                HStack { Text("Jam \(game.period(period).currentJamNumber ?? 0)")
-                    Text(game.jamClock.time.timeValue)
-                }
-                #else
-                GroupBox("Period \(period)") {
-                    Text(game.periodClock.time.timeValue)
-                }
-                GroupBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
-                    Text(game.jamClock.time.timeValue)
-                }
-                #endif
-            }
-
-        }
-    }
     #if os(watchOS)
     public var body: some View {
         List {

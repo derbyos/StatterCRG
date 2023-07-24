@@ -13,11 +13,12 @@ root WS
 end
 
 root ScoreBoard
-    node CurrentGame
-        leaf Game UUID
-        leaf InJam Bool
-        leaf OfficialReview Bool
-    end
+//    node CurrentGame
+//        leaf Game UUID
+//        leaf InJam Bool
+//        leaf OfficialReview Bool
+//    end
+    ref CurrentGame Game
     node Clients
         node Device
             key id UUID?
@@ -68,6 +69,7 @@ end
 
 node Team Game
     key team Int
+    leaf Team Int
     leaf Name String
     leaf UniformColor String
     leaf Score Int

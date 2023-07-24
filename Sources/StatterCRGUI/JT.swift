@@ -20,11 +20,11 @@ public struct JT: View {
         VStack {
             #if os(watchOS)
             VStack {
-                SB.TimeDisplay(game: game)
+                TimeDisplay(game: game)
             }
             #else
             HStack {
-                SB.TimeDisplay(game: game)
+                TimeDisplay(game: game)
             }
             #endif
             Spacer()

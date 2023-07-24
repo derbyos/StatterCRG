@@ -79,7 +79,7 @@ public class Connection : ObservableObject, Equatable {
     var webSocketURL: URL? {
         let source: String
         // Add game and operator to the source
-        if let gameID = game?.id {
+        if let gameID = game?.game {
             source = self.source.rawValue + "?game=\(gameID)&operator=\(operatorName)"
         } else {
             source = self.source.rawValue + "?operator=\(operatorName)"
