@@ -131,21 +131,23 @@ public struct SB: View {
         public var body: some View {
             VStack {
                 TeamNameLogo(team: team)
-                    .font(.largeTitle)
+                    .formFactorFont(.title)
                 HStack {
                     FlipGroup(if: !leftSide) {
                         Timeouts(team: team)
                         Spacer()
                         Text("\(team.score ?? 0)")
-                            .font(.largeTitle)
+                            .formFactorFont(.score)
                         Spacer()
                         Text("\(team.jamScore ?? 0)")
                     }
                 }
                 if showJammer && team.displayLead == true {
                     Text("Lead")
+                        .formFactorFont(.caption)
                 } else {
                     Text("")
+                        .formFactorFont(.caption)
                 }
             }
         }

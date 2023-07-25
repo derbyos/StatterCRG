@@ -64,8 +64,8 @@ public extension FormFactor {
     }
     var lineWidth: CGFloat { 1.0 }
     
-    var score: Font { Font.title }
-    var title: Font { Font.title2 }
+    var score: Font { Font.largeTitle }
+    var title: Font { Font.title }
     var subtitle: Font { Font.subheadline }
     var body: Font { Font.body }
     var caption: Font { Font.caption }
@@ -100,7 +100,31 @@ public struct DisplayFormFactor : FormFactor {
 struct FormFactorEnvironmentKey: EnvironmentKey {
     typealias Value = FormFactor
     
-    static var defaultValue: FormFactor = RegularFormFactor()
+    // pick a default value based on the OS/user idiom
+    #if os(watchOS)
+    static var defaultValue: FormFactor = WatchFormFactor()
+    #elseif os(tvOS)
+    static var defaultValue: FormFactor = DisplayFormFactor()
+    #elseif os(iOS)
+    static var defaultValue: FormFactor = {
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            return CompactFormFactor()
+        case .pad:
+            return RegularFormFactor()
+        case .mac:
+            return WindowFormFactor()
+        case .tv:
+            return DisplayFormFactor()
+        case .carPlay:
+            return WatchFormFactor()
+        default:
+            return RegularFormFactor()
+        }
+    }()
+    #else
+    static var defaultValue: FormFactor = WindowFormFactor()
+    #endif
 }
 
 extension EnvironmentValues {
