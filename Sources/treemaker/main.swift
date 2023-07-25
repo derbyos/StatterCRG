@@ -212,17 +212,8 @@ import Foundation
             return [indent + "@Flag public var \(name.initialLowercase): Bool?\n"]
         case .map(let type):
             return [
-                indent + "public struct \(name)_Subscript {",
-                indent + indentBy + "var connection: Connection",
-                indent + indentBy + "var statePath: StatePath",
-                indent + indentBy + "public subscript(\(name.initialLowercase): UUID?) -> \(type)? {",
-                indent + indentBy + indentBy + "let compo: StatePath.PathComponent",
-                indent + indentBy + indentBy + "if let \(name.initialLowercase) { compo = .id(\"\(name)\", id:\(name.initialLowercase)) } else { compo = .wild(\"\(name)\") }",
-                indent + indentBy + indentBy + "let l = Leaf<\(type)>(connection: connection, component: compo, parentPath: statePath)",
-                indent + indentBy + indentBy + "return l.wrappedValue",
-                indent + indentBy + "}",
-                indent + "}",
-                indent + "public var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
+                indent + "public typealias \(name)_Map = MapValueCollection<\(type)>",
+                indent + "public var \(name.initialLowercase):\(name)_Map { .init(connection: connection, statePath: self.adding(.wild(\"\(name)\"))) }\n"
             ]
 
         case .subscript(let type):
@@ -302,13 +293,13 @@ import Foundation
                     ]
                 } else {
                     lines += [
-                        indentBy + "statePath = parent.adding(.plain(\"\(name)\"))",
+                        indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
                         "",
                     ]
                 }
             } else {
                 lines += [
-                    indentBy + "statePath = parent.adding(.plain(\"\(name)\"))",
+                    indentBy + indentBy + "statePath = parent.adding(.plain(\"\(name)\"))",
                     "",
                 ]
             }

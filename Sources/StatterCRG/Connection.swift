@@ -79,6 +79,7 @@ public class Connection : ObservableObject, Equatable {
             webSocket?.cancel(with: .normalClosure, reason: nil)
             webSocket = nil
             state = [:]
+            registered = []
             connect()
         }
     }
@@ -248,6 +249,10 @@ public class Connection : ObservableObject, Equatable {
         if toRegister.contains(where: { $0.statePath.description == path.statePath.description }) {
             return
         }
+        if registered.contains(path.statePath) {
+            // already registered
+            return
+        }
         toRegister.append(path)
         DispatchQueue.main.async {
             guard self.toRegister.isEmpty == false else {
@@ -274,6 +279,8 @@ public class Connection : ObservableObject, Equatable {
             var paths: [StatePath]
         }
         let command = RegisterCommand(paths: toRegister.map{$0.statePath} + paths.map{$0.statePath})
+        registered.formUnion(toRegister.map{$0.statePath})
+        registered.formUnion(paths.map{$0.statePath})
         toRegister = []
         send(command: command)
     }
@@ -345,7 +352,8 @@ public class Connection : ObservableObject, Equatable {
                                 guard let id = newStatePair.value.stringValue.flatMap({UUID(uuidString: $0)}) else {
                                     break
                                 }
-                                self.game = ScoreBoard(connection: self).game(id)
+//                                self.game = ScoreBoard(connection: self).game(id)
+                                self.game = ScoreBoard(connection: self).currentGame
                             default:
                                 break
                             }
@@ -368,6 +376,9 @@ public class Connection : ObservableObject, Equatable {
     
     /// This is the master state that contains what the current values from the SB are
     public var state: [StatePath: JSONValue] = [:]
+    
+    /// A list of everything we've registered (so we only do it once)
+    var registered = Set<StatePath>()
     
     /// Convenience to fetch state via a path
     public subscript(path: PathSpecified) -> JSONValue? {

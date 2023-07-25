@@ -257,3 +257,42 @@ struct PathLeaf<P: PathSpecified> : PathSpecified {
 }
 
 */
+
+public struct MapValueCollection<Value: JSONTypeable> : PathSpecified {
+    public var connection: Connection
+    public var statePath: StatePath
+    var lastComponentName: String
+    public init(connection: Connection, statePath: StatePath) {
+        self.connection = connection
+        if case let .wild(name) = statePath.components.last {
+            lastComponentName = name
+        } else {
+            assertionFailure("Last path component of MapValueCollection statePath must be wild")
+            lastComponentName = ""
+        }
+        self.statePath = statePath
+    }
+    public subscript(id: UUID) -> Value? {
+        if let value = connection.state[statePath] {
+            return Value(value)
+        }
+        //            connection.register(path: )
+        return nil
+    }
+    public func allValues() -> [UUID: Value] {
+        connection.register(self) // always re-register, in case
+        var retval: [UUID:Value] = [:]
+        for state in connection.state {
+            // is this "us(someID)"?
+            if state.key.components.count == statePath.components.count && state.key.components[0 ..< statePath.components.count-1] == statePath.components[0 ..< statePath.components.count-1] {
+                // yes, we want this
+                if case let .id(name, id: id) = state.key.components.last {
+                    if name == lastComponentName {
+                        retval[id] = Value(state.value)
+                    }
+                }
+            }
+        }
+        return retval
+    }
+}

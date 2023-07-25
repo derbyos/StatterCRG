@@ -142,6 +142,8 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
         case .leagueName:
             if let name = team.leagueName {
                 Text(name)
+            } else { // fallback to team name
+                TeamNameView(team: team)
             }
         case .leagueAndTeamName:
             if let name = team.fullName {
@@ -150,10 +152,9 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
         case .teamName:
             TeamNameView(team: team)
         case .color:
-//            if let name = team.uniformColor {
-//                Text(name)
-//            }
-            EmptyView()
+            if let name = team.color {
+                Text(name)
+            }
         }
     }
 }
