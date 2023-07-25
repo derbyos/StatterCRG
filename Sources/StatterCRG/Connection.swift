@@ -44,8 +44,20 @@ public class Connection : ObservableObject, Equatable {
     
     /// The name of the NSO operator (if specified).  This should be
     /// only changed before changing source or
-    public var operatorName: String = "statter"
+    public var operatorName: String? {
+        didSet {
+            operatorName = nil
+        }
+    }
+
     
+    /// If we are editing a team, we specify this
+    public var teamEditing: String? {
+        didSet {
+            operatorName = nil
+        }
+    }
+
     /// The various kinds of "views" of the scoreboard.  This apparently
     /// helps in the delivery of messages based on what the screen should show
     public enum Source : String {
@@ -57,6 +69,8 @@ public class Connection : ObservableObject, Equatable {
         case jt = "/nso/jt"
         /// Scoreboard view
         case sb = "/views/standard"
+        ///
+        //  /settings/teams/?team=Black
     }
     /// What the current source for the view should be
     /// This will disconnect and start a new connection when changed
@@ -77,12 +91,17 @@ public class Connection : ObservableObject, Equatable {
     }
     /// The URL for the web socket API
     var webSocketURL: URL? {
-        let source: String
+        var source: String
         // Add game and operator to the source
         if let gameID = game?.game {
-            source = self.source.rawValue + "?game=\(gameID)&operator=\(operatorName)"
+            source = self.source.rawValue + "?game=\(gameID)&"
         } else {
-            source = self.source.rawValue + "?operator=\(operatorName)"
+            source = self.source.rawValue + "?"
+        }
+        if let teamEditing {
+            source += "team=\(teamEditing)"
+        } else if let operatorName {
+            source += "operator=\(operatorName)"
         }
 //        #if os(watchOS)
 //        let platform = "appleWatch; ARM64 Mac OS X 10_15_7"
@@ -297,7 +316,7 @@ public class Connection : ObservableObject, Equatable {
             register()
         }
         webSocket?.receive { result in
-//            print("<<< \(result)")
+            print("<<< \(result)")
             DispatchQueue.main.async { [self] in
                 switch result {
                 case .failure(let error):

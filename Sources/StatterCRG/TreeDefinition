@@ -30,6 +30,7 @@ root ScoreBoard
         case Release
     end
     subscript Version String
+    leaf BlankStatsbookFound Bool
 end
 
 node Period Game
@@ -71,7 +72,12 @@ node Team Game
     key team Int
     leaf Team Int
     leaf Name String
-    leaf UniformColor String
+    leaf FullName String
+//    leaf AlternateName String
+    leaf LeagueName String
+    // this is actually a map of ID -> String
+    map UniformColor String
+    leaf Color String
     leaf Score Int
     leaf Timeouts Int
     leaf OfficialReviews Int
@@ -80,6 +86,15 @@ node Team Game
     leaf JamScore Int
     leaf NoInitial Bool
     
+    // these are lowercase
+    enum AlternateName
+        case operator
+        case scoreboard
+        case whiteboard
+        case overlay
+    end
+    subscript AlternateName String
+
     flag Timeout
     flag OfficialReview
 end
@@ -111,4 +126,14 @@ end
 
 node TeamJam Jam<P>
     key team Int
+end
+
+
+node Skater Team
+    key Id UUID
+    // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
+    leaf Flags String
+    leaf Name String
+    leaf Pronouns String
+    leaf RosterNumber String
 end

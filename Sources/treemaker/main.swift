@@ -34,6 +34,7 @@ class AST {
         case `enum`
         case `case`(String?)
         case `subscript`(String)
+        case map(String) // like a subscript but maps optional ids
         case action
         case ref(String)
     }
@@ -66,6 +67,9 @@ extension String {
     var initialLowercase: String {
         guard self.isEmpty == false else {
             return self
+        }
+        if self == "Operator" || self == "operator" {
+            return "`operator`"
         }
         return self.first!.lowercased() + self.dropFirst()
     }
@@ -206,17 +210,32 @@ import Foundation
 
         case .flag:
             return [indent + "@Flag public var \(name.initialLowercase): Bool?\n"]
-        case .subscript(let type):
+        case .map(let type):
             return [
-                indent + "struct \(name)_Subscript {",
+                indent + "public struct \(name)_Subscript {",
                 indent + indentBy + "var connection: Connection",
                 indent + indentBy + "var statePath: StatePath",
-                indent + indentBy + "subscript(\(name.initialLowercase):\(name)) -> \(type)? {",
+                indent + indentBy + "public subscript(\(name.initialLowercase): UUID?) -> \(type)? {",
+                indent + indentBy + indentBy + "let compo: StatePath.PathComponent",
+                indent + indentBy + indentBy + "if let \(name.initialLowercase) { compo = .id(\"\(name)\", id:\(name.initialLowercase)) } else { compo = .wild(\"\(name)\") }",
+                indent + indentBy + indentBy + "let l = Leaf<\(type)>(connection: connection, component: compo, parentPath: statePath)",
+                indent + indentBy + indentBy + "return l.wrappedValue",
+                indent + indentBy + "}",
+                indent + "}",
+                indent + "public var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
+            ]
+
+        case .subscript(let type):
+            return [
+                indent + "public struct \(name)_Subscript {",
+                indent + indentBy + "var connection: Connection",
+                indent + indentBy + "var statePath: StatePath",
+                indent + indentBy + "public subscript(\(name.initialLowercase):\(name)) -> \(type)? {",
                 indent + indentBy + indentBy + "let l = Leaf<\(type)>(connection: connection, component: .name(\"\(name)\", name: \(name.initialLowercase).rawValue), parentPath: statePath)",
                 indent + indentBy + indentBy + "return l.wrappedValue",
                 indent + indentBy + "}",
                 indent + "}",
-                indent + "var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
+                indent + "public var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
             ]
         case .key(let type):
             // this is no longer stored, we make the state path in the init
@@ -230,7 +249,29 @@ import Foundation
             lines.append(contentsOf: try child.generate(parent: name, indent: indentBy))
         }
         // now any additional init
-        
+        func declareLeafs(dummy: String = "parent") {
+            // the leaf really needs to be `self.leaf("Name")` but
+            // we can't use that until it is set, so two passes
+            for child in children {
+                switch child.kind {
+                case .leaf(_):
+                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\")")
+                case .flag:
+                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).flag(\"\(child.name)\")")
+                default:
+                    break
+                }
+            }
+            for child in children {
+                switch child.kind {
+                case .leaf(_), .flag:
+                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase).parentPath = statePath")
+                default:
+                    break
+                }
+            }
+        }
+
         func declareInit(parent2: String?) {
             let fullParent = parent2 ?? parent
             var parameters = ""
@@ -248,12 +289,6 @@ import Foundation
             }
             lines.append(indentBy + "public init(parent: \(qparent)\(parameters)) {")
             lines.append(indentBy + indentBy + "self.parent = parent")
-            // this is no longer stored, we make the state path in the init
-            #if nomore 
-            if let key = self.key {
-                lines.append(indentBy + indentBy + "self.\(key.name.initialLowercase) = \(key.name.initialLowercase)")
-            }
-            #endif
 
             if let key, let keyType = key.keyType {
                 if keyType.hasSuffix("?") {
@@ -267,7 +302,7 @@ import Foundation
                     ]
                 } else {
                     lines += [
-                        indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
+                        indentBy + "statePath = parent.adding(.plain(\"\(name)\"))",
                         "",
                     ]
                 }
@@ -277,30 +312,7 @@ import Foundation
                     "",
                 ]
             }
-
             
-            func declareLeafs() {
-                // the leaf really needs to be `self.leaf("Name")` but
-                // we can't use that until it is set, so two passes
-                for child in children {
-                    switch child.kind {
-                    case .leaf(_):
-                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = parent.leaf(\"\(child.name)\")")
-                    case .flag:
-                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = parent.flag(\"\(child.name)\")")
-                    default:
-                        break
-                    }
-                }
-                for child in children {
-                    switch child.kind {
-                    case .leaf(_), .flag:
-                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase).parentPath = statePath")
-                    default:
-                        break
-                    }
-                }
-            }
             declareLeafs()
             lines.append(indentBy + "}")
             // now make the generic version
@@ -352,6 +364,11 @@ import Foundation
         case .node(let parent2):
             declareInit(parent2: parent2)
         case .root:
+            lines.append(indentBy + "public init(connection: Connection) {")
+            lines.append(indentBy + indentBy + "self.connection = connection")
+            lines.append(indentBy + indentBy + "let dummy = Leaf<Bool>(connection: connection, component: .wild(\"\"), parentPath: .init(components: []))")
+            declareLeafs(dummy: "dummy")
+            lines.append(indentBy + "}")
             lines.append("}")
         default:
             break
@@ -491,6 +508,14 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingLeafType
             }
             astStack.last?.children.append(.init(kind: .subscript(type), name: name))
+        case "map":
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            guard let type = nextToken() else {
+                throw Errors.missingLeafType
+            }
+            astStack.last?.children.append(.init(kind: .map(type), name: name))
         case "var":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

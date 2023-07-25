@@ -15,10 +15,12 @@ public struct TeamNameLogo : View {
     }
     
     @EnvironmentObject var connection: Connection
+    @Environment(\.teamNameLogoStyle) var style
     var team: Team
     public var body: some View {
-        Text(team.name ?? team.uniformColor ?? "Team \(team.team)")
-            .font(.largeTitle)
+//        Text(team.name ?? team.uniformColor ?? "Team \(team.team)")
+//            .font(.largeTitle)
+        style.body(for: team)
     }
 }
 
@@ -185,6 +187,7 @@ public struct SB: View {
         public var body: some View {
             VStack {
                 TeamNameLogo(team: team)
+                    .font(.largeTitle)
                 HStack {
                     FlipGroup(if: !leftSide) {
                         Timeouts(team: team)

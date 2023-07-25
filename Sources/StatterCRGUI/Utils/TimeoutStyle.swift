@@ -14,10 +14,10 @@ public protocol TimeoutStyle {
     func body(for: Team) -> Result
 }
 
-public protocol AbstractTimeoutStyle {
+protocol AbstractTimeoutStyle {
     func body(for: Team) -> AnyView
 }
-public struct WrappedTimeoutStyle<T:TimeoutStyle>: AbstractTimeoutStyle {
+struct WrappedTimeoutStyle<T:TimeoutStyle>: AbstractTimeoutStyle {
     var style: T
     init(style: T) {
         self.style = style
