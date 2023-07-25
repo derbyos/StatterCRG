@@ -145,7 +145,7 @@ import Foundation
         case .`case`(let value):
             return [indent + "case \(name.initialLowercase) = \"\(value ?? name)\""]
         case .action:
-            return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: .action) }"]
+            return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: .set) }"]
         case .root:
             lines = [
                 "public struct \(name) : PathSpecified {",

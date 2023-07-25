@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 /// StatePath encapsulates the keys that are passed in the state dictionary, reflecting where
 /// the data lives in the tree.
@@ -148,26 +149,30 @@ public extension PathNode {
 /// An actual value that is contained in the data tree.  We currently support
 /// strings, integers, uuids, and booleans, and are read-only
 @propertyWrapper
-public struct Leaf<T:JSONTypeable>: PathSpecified {
-    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
+public struct Leaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
+    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath, change: Connection.StateChange = .change) {
         self.connection = connection
         self.component = component
         self.parentPath = parentPath
+        self.change = change
     }
-    public init<P:PathSpecified>(_ parent: P, _ name: String) {
+    public init<P:PathSpecified>(_ parent: P, _ name: String, change: Connection.StateChange = .change) {
         self.connection = parent.connection
         self.component = .plain(name)
         self.parentPath = parent.statePath
+        self.change = change
     }
-    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent) {
+    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent, change: Connection.StateChange = .change) {
         self.connection = parent.connection
         self.component = component
         self.parentPath = parent.statePath
+        self.change = change
     }
 
-    public var connection: Connection
+    @ObservedObject public var connection: Connection
     public var component: StatePath.PathComponent
     public var parentPath: StatePath
+    public var change: Connection.StateChange = .change
     public var statePath: StatePath {
         parentPath.adding(component)
     }
@@ -179,12 +184,15 @@ public struct Leaf<T:JSONTypeable>: PathSpecified {
             connection.register(path: self)
             return nil
         }
+        nonmutating set {
+            connection.set(key: statePath, value: newValue?.asJSON ?? .null, kind: change)
+        }
     }
 }
 
 @propertyWrapper
 /// A Flag is like a Leaf but it is a bool that can be set via the `set` command
-public struct Flag: PathSpecified {
+public struct Flag: PathSpecified, DynamicProperty {
     public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
         self.connection = connection
         self.component = component
@@ -201,7 +209,7 @@ public struct Flag: PathSpecified {
         self.parentPath = parent.statePath
     }
 
-    public var connection: Connection
+    @ObservedObject public var connection: Connection
     public var component: StatePath.PathComponent
     public var parentPath: StatePath
     public var statePath: StatePath {
@@ -217,7 +225,7 @@ public struct Flag: PathSpecified {
         }
         nonmutating set {
             if let newValue {
-                connection.set(key: statePath, value: .bool(newValue), kind: .action)
+                connection.set(key: statePath, value: .bool(newValue), kind: .set)
             }
         }
     }
