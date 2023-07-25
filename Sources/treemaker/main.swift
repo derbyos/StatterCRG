@@ -136,8 +136,10 @@ import Foundation
     func generate(parent: String, indent: String) throws -> [String] {
         var lines : [String]
         switch kind {
-        case .comment, .code:
+        case .comment:
             return [indent + name + "\n"]
+        case .code: // since the newline will be added
+            return [indent + name]
         case .enum:
             lines = [
                 "public enum \(name): String {",

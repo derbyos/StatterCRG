@@ -77,7 +77,26 @@ node Team Game
     leaf LeagueName String
     // this is actually a map of ID -> String
     map UniformColor String
-    leaf Color String
+//    leaf Color String
+    // A custom color for differnt roles
+    !public struct Color {
+    !   public init(role: Team.AlternateName? = nil, component: Component) {
+    !       self.role = role
+    !       self.component = component
+    !   }
+    !   var role: Team.AlternateName?
+    !   public enum Component : String {
+    !       case fg
+    !       case bg
+    !       case glow
+    !   }
+    !   var component: Component
+    !   var rawValue: String {
+    !       if let role { return role.rawValue + "_" + component.rawValue }
+    !       else { return component.rawValue }
+    !   }
+    !}
+    subscript Color String
     leaf Score Int
     leaf Timeouts Int
     leaf OfficialReviews Int

@@ -26,37 +26,6 @@ public enum TeamNameStyle {
     case color
 }
 
-/// An enum specifying what sort of presention we are for.  This is used to support
-/// the alternate name style
-public enum AlternateNameType : Equatable {
-    /// Display the alternate name for operator
-    case `operator`
-    /// Display the alternate name for overlay
-    case overlay
-    /// Display the alternate name for scoreboard
-    case scoreboard
-    /// Display the alternate name for whiteboard
-    case whiteboard
-    /// Display the standard (no alternate) name
-    case database
-}
-struct AlternateNameTypeEnvironmentKey: EnvironmentKey {
-    typealias Value = AlternateNameType
-    
-    static var defaultValue: AlternateNameType = .database
-}
-
-extension EnvironmentValues {
-    var alternateNameType : AlternateNameType {
-        get {
-            self[AlternateNameTypeEnvironmentKey.self]
-        }
-        set {
-            self[AlternateNameTypeEnvironmentKey.self] = newValue
-        }
-    }
-}
-
 
 protocol AbstractTeamNameLogoStyle {
     func body(for: Team) -> AnyView
@@ -96,9 +65,6 @@ public extension View {
         self.environment(\.teamNameLogoStyle, WrappedTeamNameLogoStyle(style: style))
     }
     
-    func alternateNameType(_ alternateNameType: AlternateNameType) -> some View {
-        self.environment(\.alternateNameType, alternateNameType)
-    }
 }
 
 public extension TeamNameLogoStyle where Self == DefaultTeamNameLogoStyle {
@@ -167,7 +133,7 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
         case .teamName:
             TeamNameView(team: team)
         case .color:
-            if let name = team.color {
+            if let name = team.color[.init(role: nil, component: .fg)] {
                 Text(name)
             } else { // fallback to team name
                 TeamNameView(team: team)

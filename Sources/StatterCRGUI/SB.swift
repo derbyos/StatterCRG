@@ -21,6 +21,7 @@ public struct TeamNameLogo : View {
 //        Text(team.name ?? team.uniformColor ?? "Team \(team.team)")
 //            .font(.largeTitle)
         style.body(for: team)
+            .colorize(for: team)
     }
 }
 
@@ -36,7 +37,6 @@ public struct Timeouts : View {
     }
     
     @EnvironmentObject var connection: Connection
-    @EnvironmentObject var theme: Theme
     @Stat var team: Team
 
     @Environment(\.timeoutStyle) var timeoutStyle
@@ -115,8 +115,6 @@ public struct TimeDisplay : View {
 }
 
 public struct SB: View {
-    @EnvironmentObject var theme: Theme
-
     public init(game: Game) {
         _game = .init(wrappedValue:game)
     }

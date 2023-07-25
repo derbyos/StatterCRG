@@ -77,7 +77,6 @@ public struct VerticalTimeoutStyle : TimeoutStyle {
     }
     
     struct TimeoutBox<C:View> : View {
-        @EnvironmentObject var theme: Theme
         @Environment(\.timeoutDotStyle) var dotStyle
         var content: C
         init(@ViewBuilder content: ()->C) {
