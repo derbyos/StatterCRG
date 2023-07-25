@@ -14,34 +14,45 @@ public protocol TeamNameLogoStyle  {
     @ViewBuilder func body(for: Team) -> Result
 }
 
+/// How should team names be displayed
 public enum TeamNameStyle {
+    /// Display the league name only
     case leagueName
+    /// Display the team name (appropriate for the AlternateNameType style)
     case teamName
+    /// Display a full name of league & team
     case fullName
+    /// Display the team's color
     case color
 }
 
-public enum DisplayType : Equatable {
+/// An enum specifying what sort of presention we are for.  This is used to support
+/// the alternate name style
+public enum AlternateNameType : Equatable {
+    /// Display the alternate name for operator
     case `operator`
+    /// Display the alternate name for overlay
     case overlay
+    /// Display the alternate name for scoreboard
     case scoreboard
+    /// Display the alternate name for whiteboard
     case whiteboard
+    /// Display the standard (no alternate) name
     case database
-//    case other(String)
 }
-struct DisplayTypeEnvironmentKey: EnvironmentKey {
-    typealias Value = DisplayType
+struct AlternateNameTypeEnvironmentKey: EnvironmentKey {
+    typealias Value = AlternateNameType
     
-    static var defaultValue: DisplayType = .database
+    static var defaultValue: AlternateNameType = .database
 }
 
 extension EnvironmentValues {
-    var displayType : DisplayType {
+    var alternateNameType : AlternateNameType {
         get {
-            self[DisplayTypeEnvironmentKey.self]
+            self[AlternateNameTypeEnvironmentKey.self]
         }
         set {
-            self[DisplayTypeEnvironmentKey.self] = newValue
+            self[AlternateNameTypeEnvironmentKey.self] = newValue
         }
     }
 }
@@ -85,8 +96,8 @@ public extension View {
         self.environment(\.teamNameLogoStyle, WrappedTeamNameLogoStyle(style: style))
     }
     
-    func displayType(_ displayType: DisplayType) -> some View {
-        self.environment(\.displayType, displayType)
+    func alternateNameType(_ alternateNameType: AlternateNameType) -> some View {
+        self.environment(\.alternateNameType, alternateNameType)
     }
 }
 
@@ -113,7 +124,7 @@ public struct NameAndLogoStyle : TeamNameLogoStyle {
 }
 
 extension Team {
-    func name(for type: DisplayType) -> String? {
+    public func name(for type: AlternateNameType) -> String? {
         switch type {
         case .operator: return alternateName[.operator]
         case .scoreboard: return alternateName[.scoreboard]
@@ -130,10 +141,10 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
     
     var nameStyle: TeamNameStyle
     struct TeamNameView: View {
-        @ObservedObject var team: ObservableState<Team>
-        @Environment(\.displayType) var display
+        @Stat var team: Team
+        @Environment(\.alternateNameType) var altType
         var body: some View {
-            if let name = team.wrappedValue.name(for: display) ?? team.name {
+            if let name = team.name(for: altType) ?? team.name {
                 Text(name)
             }
         }
@@ -145,21 +156,21 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
             if let name = team.leagueName {
                 Text(name)
             } else { // fallback to team name
-                TeamNameView(team: .init(team))
+                TeamNameView(team: team)
             }
         case .fullName:
             if let name = team.fullName {
                 Text(name)
             } else { // fallback to team name
-                TeamNameView(team: .init(team))
+                TeamNameView(team: team)
             }
         case .teamName:
-            TeamNameView(team: .init(team))
+            TeamNameView(team: team)
         case .color:
             if let name = team.color {
                 Text(name)
             } else { // fallback to team name
-                TeamNameView(team: .init(team))
+                TeamNameView(team: team)
             }
         }
     }

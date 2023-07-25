@@ -18,24 +18,6 @@ extension Connection {
         }
     }
 
-    #if false // this doesn't look good anyway
-//    subscript(dynamicMember string: String) -> JSONValue {
-//        return notification.userInfo?[string] as? String ?? .null
-//    }
-    subscript<T:PathSpecified>(dynamicMember keyPath: KeyPath<ScoreBoard, T>) -> JSONValue? {
-        let path = scoreBoard[keyPath: keyPath]
-        return state[path.statePath]
-    }
-    
-    func ignore() {
-        let game = self.clients
-    }
-    #endif
-    
-//    func ignore2() {
-//        let game = self.game.flatMap{WrappedState(connection: self, root: $0)}!
-//        game()
-//    }
 }
 
 
@@ -77,4 +59,24 @@ public class ObservableState<P: PathSpecified> : ObservableObject {
     public subscript<V>(dynamicMember keyPath: KeyPath<P, V>) -> V {
         wrappedValue[keyPath: keyPath]
     }
+}
+
+
+@propertyWrapper
+/// A property wrapper that is used to observe changes in some PathSpecified value
+/// Use this like you would @ObservedObject, except with the PathSpecified (which is
+/// usually a struct)
+public struct Stat<P: PathSpecified> : DynamicProperty {
+    @ObservedObject var connection: Connection
+    private var value: P
+    public init(wrappedValue p: P) {
+        self.connection = p.connection
+        self.value = p
+    }
+    public var wrappedValue: P {
+        get {
+            value
+        }
+    }
+    
 }

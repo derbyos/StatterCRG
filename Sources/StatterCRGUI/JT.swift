@@ -10,11 +10,11 @@ import StatterCRG
 
 public struct JT: View {
     public init(game: Game) {
-        self.game = game
+        _game = .init(wrappedValue:game)
     }
     
     @EnvironmentObject var connection: Connection
-    var game: Game
+    @Stat var game: Game
 
     public var body: some View {
         VStack {
