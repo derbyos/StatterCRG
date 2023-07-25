@@ -62,9 +62,11 @@ public struct TimeDisplay : View {
     public var body: some View {
         if game.intermissionClock.running == true {
             Text("Intermission \(game.intermissionClock.time.timeValue)")
+                .formFactorFont(.body, forTime: true)
         } else if game.timeOutClock.running == true || game.lineupClock.running == true {
             HStack {
                 Text(game.periodClock.time.timeValue)
+                    .formFactorFont(.body, forTime: true)
                 if let period = game.currentPeriodNumber {
                     Text("P\(period)")
                     Text("J\(game.period(period).currentJamNumber ?? 0)")
@@ -74,9 +76,11 @@ public struct TimeDisplay : View {
                 if game.lineupClock.running == true {
                     Text("Lineup")
                     Text(game.lineupClock.time.timeValue)
+                        .formFactorFont(.body, forTime: true)
                 } else {
                     Text(game.officialReview == true ? "OR" : "TO")
                     Text(game.timeOutClock.time.timeValue)
+                        .formFactorFont(.body, forTime: true)
                 }
             }
         } else if let period = game.currentPeriodNumber {
@@ -84,17 +88,21 @@ public struct TimeDisplay : View {
             HStack { Text("Period \(period)")
                 Spacer()
                 Text(game.periodClock.time.timeValue)
+                    .formFactorFont(.body, forTime: true)
             }
             HStack { Text("Jam \(game.period(period).currentJamNumber ?? 0)")
                 Spacer()
                 Text(game.jamClock.time.timeValue)
+                    .formFactorFont(.body, forTime: true)
             }
             #else
             GroupBox("Period \(period)") {
                 Text(game.periodClock.time.timeValue)
+                    .formFactorFont(.body, forTime: true)
             }
             GroupBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
                 Text(game.jamClock.time.timeValue)
+                    .formFactorFont(.body, forTime: true)
             }
             #endif
         }
