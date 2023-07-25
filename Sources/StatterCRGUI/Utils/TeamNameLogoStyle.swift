@@ -17,7 +17,7 @@ public protocol TeamNameLogoStyle  {
 public enum TeamNameStyle {
     case leagueName
     case teamName
-    case leagueAndTeamName
+    case fullName
     case color
 }
 
@@ -26,12 +26,13 @@ public enum DisplayType : Equatable {
     case overlay
     case scoreboard
     case whiteboard
+    case database
 //    case other(String)
 }
 struct DisplayTypeEnvironmentKey: EnvironmentKey {
     typealias Value = DisplayType
     
-    static var defaultValue: DisplayType = .operator
+    static var defaultValue: DisplayType = .database
 }
 
 extension EnvironmentValues {
@@ -111,13 +112,14 @@ public struct NameAndLogoStyle : TeamNameLogoStyle {
     }
 }
 
-extension DisplayType {
-    var asAlternateName: Team.AlternateName {
-        switch self {
-        case .operator: return .operator
-        case .scoreboard: return .scoreboard
-        case .whiteboard: return .whiteboard
-        case .overlay: return .overlay
+extension Team {
+    func name(for type: DisplayType) -> String? {
+        switch type {
+        case .operator: return alternateName[.operator]
+        case .scoreboard: return alternateName[.scoreboard]
+        case .whiteboard: return alternateName[.whiteboard]
+        case .overlay: return alternateName[.overlay]
+        case .database: return name
         }
     }
 }
@@ -128,10 +130,10 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
     
     var nameStyle: TeamNameStyle
     struct TeamNameView: View {
-        var team: Team
+        @ObservedObject var team: ObservableState<Team>
         @Environment(\.displayType) var display
         var body: some View {
-            if let name = team.alternateName[display.asAlternateName] ?? team.name {
+            if let name = team.wrappedValue.name(for: display) ?? team.name {
                 Text(name)
             }
         }
@@ -143,17 +145,21 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
             if let name = team.leagueName {
                 Text(name)
             } else { // fallback to team name
-                TeamNameView(team: team)
+                TeamNameView(team: .init(team))
             }
-        case .leagueAndTeamName:
+        case .fullName:
             if let name = team.fullName {
                 Text(name)
+            } else { // fallback to team name
+                TeamNameView(team: .init(team))
             }
         case .teamName:
-            TeamNameView(team: team)
+            TeamNameView(team: .init(team))
         case .color:
             if let name = team.color {
                 Text(name)
+            } else { // fallback to team name
+                TeamNameView(team: .init(team))
             }
         }
     }

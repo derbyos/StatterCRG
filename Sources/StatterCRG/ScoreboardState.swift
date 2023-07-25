@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 extension Connection {
     func binding(to path: PathSpecified) -> Binding<JSONValue> {
@@ -55,5 +56,25 @@ extension PathSpecified {
         }
         connection.register(self)
         return .null
+    }
+}
+
+
+@dynamicMemberLookup
+public class ObservableState<P: PathSpecified> : ObservableObject {
+    public let wrappedValue: P
+    var triggerChange: AnyCancellable?
+    deinit {
+        print("• Deinit")
+    }
+    public init(_ p: P) {
+        print("• Init")
+        self.wrappedValue = p
+        triggerChange = wrappedValue.connection.objectWillChange.sink(receiveValue: { [weak self] in
+            self?.objectWillChange.send()
+        })
+    }
+    public subscript<V>(dynamicMember keyPath: KeyPath<P, V>) -> V {
+        wrappedValue[keyPath: keyPath]
     }
 }
