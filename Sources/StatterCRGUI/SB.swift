@@ -66,13 +66,15 @@ public struct TimeDisplay : View {
         } else if game.timeOutClock.running == true || game.lineupClock.running == true {
             HStack {
                 Text(game.periodClock.time.timeValue)
-                    .formFactorFont(.body, forTime: true)
                 if let period = game.currentPeriodNumber {
                     Text("P\(period)")
+                    Spacer()
                     Text("J\(game.period(period).currentJamNumber ?? 0)")
                 }
             }
+            .formFactorFont(.body, forTime: true)
             HStack {
+                Spacer()
                 if game.lineupClock.running == true {
                     Text("Lineup")
                     Text(game.lineupClock.time.timeValue)
@@ -82,28 +84,30 @@ public struct TimeDisplay : View {
                     Text(game.timeOutClock.time.timeValue)
                         .formFactorFont(.body, forTime: true)
                 }
+                Spacer()
             }
+            .formFactorFont(.body, forTime: true)
         } else if let period = game.currentPeriodNumber {
             #if os(watchOS)
             HStack { Text("Period \(period)")
                 Spacer()
                 Text(game.periodClock.time.timeValue)
-                    .formFactorFont(.body, forTime: true)
             }
+            .formFactorFont(.body, forTime: true)
             HStack { Text("Jam \(game.period(period).currentJamNumber ?? 0)")
                 Spacer()
                 Text(game.jamClock.time.timeValue)
-                    .formFactorFont(.body, forTime: true)
             }
+            .formFactorFont(.body, forTime: true)
             #else
             GroupBox("Period \(period)") {
                 Text(game.periodClock.time.timeValue)
-                    .formFactorFont(.body, forTime: true)
             }
+            .formFactorFont(.body, forTime: true)
             GroupBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
                 Text(game.jamClock.time.timeValue)
-                    .formFactorFont(.body, forTime: true)
             }
+            .formFactorFont(.body, forTime: true)
             #endif
         }
 

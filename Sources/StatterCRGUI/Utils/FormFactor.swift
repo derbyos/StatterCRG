@@ -64,34 +64,56 @@ public extension FormFactor {
     }
     var lineWidth: CGFloat { 1.0 }
     
-    var score: Font { Font.largeTitle }
-    var title: Font { Font.title }
-    var subtitle: Font { Font.subheadline }
-    var body: Font { Font.body }
-    var caption: Font { Font.caption }
+    var score: Font { baseFontName.map{Font.custom($0, size: 34, relativeTo: .largeTitle)} ?? Font.largeTitle }
+    var title: Font { baseFontName.map{Font.custom($0, size: 28, relativeTo: .largeTitle)} ?? Font.title }
+    var subtitle: Font { baseFontName.map{Font.custom($0, size: 20, relativeTo: .title3)} ?? Font.title3 }
+    var body: Font { baseFontName.map{Font.custom($0, size: 17, relativeTo: .body)} ?? Font.body }
+    var caption: Font { baseFontName.map{Font.custom($0, size: 12, relativeTo: .caption)} ?? Font.caption }
+    
+    func with(fontName: String) -> Self {
+        var retval = self
+        retval.baseFontName = fontName
+        return retval
+    }
 }
 
 public struct WatchFormFactor : FormFactor {
+    public init(baseFontName: String? = nil) {
+        self.baseFontName = baseFontName
+    }
+    
     public var size: FormFactorSize { .small }
     public var baseFontName: String?
 }
 
 public struct CompactFormFactor : FormFactor {
+    public init(baseFontName: String? = nil) {
+        self.baseFontName = baseFontName
+    }
     public var size: FormFactorSize { .medium }
     public var baseFontName: String?
 }
 
 public struct RegularFormFactor : FormFactor {
+    public init(baseFontName: String? = nil) {
+        self.baseFontName = baseFontName
+    }
     public var size: FormFactorSize { .medium }
     public var baseFontName: String?
 }
 
 public struct WindowFormFactor : FormFactor {
+    public init(baseFontName: String? = nil) {
+        self.baseFontName = baseFontName
+    }
     public var size: FormFactorSize { .large }
     public var baseFontName: String?
 }
 
 public struct DisplayFormFactor : FormFactor {
+    public init(baseFontName: String? = nil) {
+        self.baseFontName = baseFontName
+    }
     public var size: FormFactorSize { .jumbo }
     public var baseFontName: String?
 }
@@ -158,6 +180,14 @@ struct MonospacedTime: ViewModifier {
         content.font(font?.monospacedDigit())
     }
 }
+
+struct FormFactorFontName: ViewModifier {
+    @Environment(\.formFactor) var formFactor
+    var name: String
+    func body(content: Content) -> some View {
+        content.formFactor(formFactor.with(fontName: name))
+    }
+}
 public extension View {
     /// Specify the formfactor for presentation
     /// - Parameter style: The style to use
@@ -177,7 +207,13 @@ public extension View {
         self.modifier(FontForFormFactor(size: size, forTime: forTime))
     }
     
-    
+    /// Specify a custom font for the given form factor.
+    /// - Parameter name: The font name
+    /// - Returns: A modified view that will have the font specified
+    func formFactorFontName(_ name: String) -> some View {
+        self.modifier(FormFactorFontName(name: name))
+    }
+
     /// Indicates that this view shows time in a monospaced form (if possible)
     func showingMonospacedTime() -> some View {
         self.modifier(MonospacedTime())
