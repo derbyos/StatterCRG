@@ -32,7 +32,7 @@ struct CreateTree: BuildToolPlugin {
 #else
 
 @main
-struct CreateTree: CommandPlugin {
+struct GenerateTree: CommandPlugin {
     
     func performCommand(
         context: PluginContext,

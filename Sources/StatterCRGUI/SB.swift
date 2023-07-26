@@ -100,11 +100,11 @@ public struct TimeDisplay : View {
             }
             .formFactorFont(.body, forTime: true)
             #else
-            GroupBox("Period \(period)") {
+            StackedBox("Period \(period)") {
                 Text(game.periodClock.time.timeValue)
             }
             .formFactorFont(.body, forTime: true)
-            GroupBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
+            StackedBox("Jam \(game.period(period).currentJamNumber ?? 0)") {
                 Text(game.jamClock.time.timeValue)
             }
             .formFactorFont(.body, forTime: true)

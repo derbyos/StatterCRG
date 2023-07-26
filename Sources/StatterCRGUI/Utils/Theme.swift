@@ -15,6 +15,8 @@ extension Color {
         Color(NSColor.textBackgroundColor)
         #elseif os(watchOS)
         Color(UIColor.black)
+        #elseif os(tvOS)
+        Color(UIColor.black)
         #else
         Color(UIColor.systemBackground)
         #endif

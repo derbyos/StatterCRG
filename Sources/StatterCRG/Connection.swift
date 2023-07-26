@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 //@dynamicMemberLookup
 /// The primary connection with the scoreboard server
@@ -143,6 +144,16 @@ public class Connection : ObservableObject, Equatable {
     public var isConnected: Bool {
         webSocket != nil
     }
+    
+    // Since not everything is SwiftUI, we provide addtional hooks for observing data changes on the scoreboard
+    
+    public struct StateDataChangeMessage {
+        var path: StatePath
+        var oldValue: JSONValue?
+        var newValue: JSONValue
+    }
+    public var stateDataDidChange : PassthroughSubject<StateDataChangeMessage, Never> = .init()
+    ///
     /// Create the websocket task, if possible (but not started yet)
     /// - Returns: The new websocket task
     func createWebSocket() -> URLSessionWebSocketTask? {
@@ -387,7 +398,9 @@ public class Connection : ObservableObject, Equatable {
                             default:
                                 break
                             }
+                            let oldValue = state[key]
                             state[key] = newStatePair.value
+                            stateDataDidChange.send(.init(path: key, oldValue: oldValue, newValue: newStatePair.value))
                         }
                     } else {
                         if let data {

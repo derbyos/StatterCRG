@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A048C002A714BB800718410 /* StatterScreenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A048BFF2A714BB800718410 /* StatterScreenApp.swift */; };
+		3A048C022A714BB800718410 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A048C012A714BB800718410 /* ContentView.swift */; };
+		3A048C042A714BBA00718410 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A048C032A714BBA00718410 /* Assets.xcassets */; };
+		3A048C072A714BBA00718410 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A048C062A714BBA00718410 /* Preview Assets.xcassets */; };
+		3A048C0C2A714BC600718410 /* StatterCRG in Frameworks */ = {isa = PBXBuildFile; productRef = 3A048C0B2A714BC600718410 /* StatterCRG */; };
 		3AE2908B2A70174B00F1C771 /* StatterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908A2A70174B00F1C771 /* StatterApp.swift */; };
 		3AE2908D2A70174B00F1C771 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908C2A70174B00F1C771 /* ContentView.swift */; };
 		3AE2908F2A70174C00F1C771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE2908E2A70174C00F1C771 /* Assets.xcassets */; };
@@ -45,6 +50,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3A048BFD2A714BB800718410 /* StatterScreen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StatterScreen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A048BFF2A714BB800718410 /* StatterScreenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatterScreenApp.swift; sourceTree = "<group>"; };
+		3A048C012A714BB800718410 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3A048C032A714BBA00718410 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3A048C062A714BBA00718410 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3AE290872A70174B00F1C771 /* Statter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Statter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE2908A2A70174B00F1C771 /* StatterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatterApp.swift; sourceTree = "<group>"; };
 		3AE2908C2A70174B00F1C771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -61,6 +71,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3A048BFA2A714BB800718410 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A048C0C2A714BC600718410 /* StatterCRG in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3AE290842A70174B00F1C771 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -80,12 +98,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A048BFE2A714BB800718410 /* StatterScreen */ = {
+			isa = PBXGroup;
+			children = (
+				3A048BFF2A714BB800718410 /* StatterScreenApp.swift */,
+				3A048C012A714BB800718410 /* ContentView.swift */,
+				3A048C032A714BBA00718410 /* Assets.xcassets */,
+				3A048C052A714BBA00718410 /* Preview Content */,
+			);
+			path = StatterScreen;
+			sourceTree = "<group>";
+		};
+		3A048C052A714BBA00718410 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				3A048C062A714BBA00718410 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		3AE2907E2A70174B00F1C771 = {
 			isa = PBXGroup;
 			children = (
 				3AE2909B2A70180700F1C771 /* Packages */,
 				3AE290892A70174B00F1C771 /* Statter */,
 				3AE290C52A701B2B00F1C771 /* StatterWatch Watch App */,
+				3A048BFE2A714BB800718410 /* StatterScreen */,
 				3AE290882A70174B00F1C771 /* Products */,
 				3AE2909D2A70181900F1C771 /* Frameworks */,
 			);
@@ -96,6 +134,7 @@
 			children = (
 				3AE290872A70174B00F1C771 /* Statter.app */,
 				3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */,
+				3A048BFD2A714BB800718410 /* StatterScreen.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -166,6 +205,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3A048BFC2A714BB800718410 /* StatterScreen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A048C0A2A714BBA00718410 /* Build configuration list for PBXNativeTarget "StatterScreen" */;
+			buildPhases = (
+				3A048BF92A714BB800718410 /* Sources */,
+				3A048BFA2A714BB800718410 /* Frameworks */,
+				3A048BFB2A714BB800718410 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StatterScreen;
+			packageProductDependencies = (
+				3A048C0B2A714BC600718410 /* StatterCRG */,
+			);
+			productName = StatterScreen;
+			productReference = 3A048BFD2A714BB800718410 /* StatterScreen.app */;
+			productType = "com.apple.product-type.application";
+		};
 		3AE290862A70174B00F1C771 /* Statter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3AE290962A70174C00F1C771 /* Build configuration list for PBXNativeTarget "Statter" */;
@@ -218,6 +277,9 @@
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					3A048BFC2A714BB800718410 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					3AE290862A70174B00F1C771 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -241,11 +303,21 @@
 			targets = (
 				3AE290862A70174B00F1C771 /* Statter */,
 				3AE290C32A701B2A00F1C771 /* StatterWatch Watch App */,
+				3A048BFC2A714BB800718410 /* StatterScreen */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3A048BFB2A714BB800718410 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A048C072A714BBA00718410 /* Preview Assets.xcassets in Resources */,
+				3A048C042A714BBA00718410 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3AE290852A70174B00F1C771 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -267,6 +339,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3A048BF92A714BB800718410 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A048C022A714BB800718410 /* ContentView.swift in Sources */,
+				3A048C002A714BB800718410 /* StatterScreenApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3AE290832A70174B00F1C771 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,6 +378,63 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3A048C082A714BBA00718410 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"StatterScreen/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.StatterScreen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 16.4;
+			};
+			name = Debug;
+		};
+		3A048C092A714BBA00718410 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"StatterScreen/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.StatterScreen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 16.4;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		3AE290942A70174C00F1C771 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -550,6 +688,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3A048C0A2A714BBA00718410 /* Build configuration list for PBXNativeTarget "StatterScreen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3A048C082A714BBA00718410 /* Debug */,
+				3A048C092A714BBA00718410 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3AE290822A70174B00F1C771 /* Build configuration list for PBXProject "Statter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -580,6 +727,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3A048C0B2A714BC600718410 /* StatterCRG */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StatterCRG;
+		};
 		3AE2909E2A70181900F1C771 /* StatterCRG */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = StatterCRG;

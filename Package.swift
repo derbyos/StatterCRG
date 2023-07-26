@@ -31,7 +31,7 @@ let package = Package(
             name: "StatterCRG",
             dependencies: [],
             plugins: [
-                .plugin(name: "CreateTree")
+//                .plugin(name: "CreateTree")
             ]),
         .testTarget(
             name: "StatterCRGTests",
@@ -53,7 +53,7 @@ let package = Package(
                 dependencies: ["treemaker"]
                ),
          */
-            .plugin(name: "CreateTree", capability: .command(intent: .custom(verb: "generate-tree", description: "Generating Tree Sources"), permissions: [.writeToPackageDirectory(reason: "Generating Tree Sources")]), dependencies: ["treemaker"]),
+            .plugin(name: "GenerateTree", capability: .command(intent: .custom(verb: "generate-tree", description: "Generating Tree Sources"), permissions: [.writeToPackageDirectory(reason: "Generating Tree Sources")]), dependencies: ["treemaker"]),
 
         .executableTarget(name: "treemaker"),
     ]
