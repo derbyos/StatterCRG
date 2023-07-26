@@ -43,10 +43,18 @@ let package = Package(
             name: "StatterCRGActions",
             dependencies: ["StatterCRG"]),
 
+// Until Xcode supports multiple targets in a project
+// that both use the same SPM which includes a build
+// tool we can't use a build tool or those targets
+// won't build
+        /*
         .plugin(name: "CreateTree",
                 capability: .buildTool(),
                 dependencies: ["treemaker"]
                ),
+         */
+            .plugin(name: "CreateTree", capability: .command(intent: .custom(verb: "generate-tree", description: "Generating Tree Sources"), permissions: [.writeToPackageDirectory(reason: "Generating Tree Sources")]), dependencies: ["treemaker"]),
+
         .executableTarget(name: "treemaker"),
     ]
 )

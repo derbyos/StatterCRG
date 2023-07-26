@@ -1,0 +1,594 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3AE2908B2A70174B00F1C771 /* StatterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908A2A70174B00F1C771 /* StatterApp.swift */; };
+		3AE2908D2A70174B00F1C771 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908C2A70174B00F1C771 /* ContentView.swift */; };
+		3AE2908F2A70174C00F1C771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE2908E2A70174C00F1C771 /* Assets.xcassets */; };
+		3AE290932A70174C00F1C771 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE290922A70174C00F1C771 /* Preview Assets.xcassets */; };
+		3AE2909F2A70181900F1C771 /* StatterCRG in Frameworks */ = {isa = PBXBuildFile; productRef = 3AE2909E2A70181900F1C771 /* StatterCRG */; };
+		3AE290C72A701B2B00F1C771 /* StatterWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE290C62A701B2B00F1C771 /* StatterWatchApp.swift */; };
+		3AE290C92A701B2B00F1C771 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE290C82A701B2B00F1C771 /* ContentView.swift */; };
+		3AE290CB2A701B2C00F1C771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE290CA2A701B2C00F1C771 /* Assets.xcassets */; };
+		3AE290CE2A701B2C00F1C771 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE290CD2A701B2C00F1C771 /* Preview Assets.xcassets */; };
+		3AE290D12A701B2C00F1C771 /* StatterWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3AE290D72A701BA600F1C771 /* StatterCRG in Frameworks */ = {isa = PBXBuildFile; productRef = 3AE290D62A701BA600F1C771 /* StatterCRG */; settings = {ATTRIBUTES = (Required, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3AE290CF2A701B2C00F1C771 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3AE2907F2A70174B00F1C771 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AE290C32A701B2A00F1C771;
+			remoteInfo = "StatterWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3AE290D22A701B2C00F1C771 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				3AE290D12A701B2C00F1C771 /* StatterWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3AE290872A70174B00F1C771 /* Statter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Statter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AE2908A2A70174B00F1C771 /* StatterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatterApp.swift; sourceTree = "<group>"; };
+		3AE2908C2A70174B00F1C771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3AE2908E2A70174C00F1C771 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3AE290902A70174C00F1C771 /* Statter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Statter.entitlements; sourceTree = "<group>"; };
+		3AE290922A70174C00F1C771 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3AE2909A2A7017E400F1C771 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3AE2909C2A70180700F1C771 /* StatterCRG */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = StatterCRG; path = ../..; sourceTree = "<group>"; };
+		3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StatterWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AE290C62A701B2B00F1C771 /* StatterWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatterWatchApp.swift; sourceTree = "<group>"; };
+		3AE290C82A701B2B00F1C771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3AE290CA2A701B2C00F1C771 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3AE290CD2A701B2C00F1C771 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3AE290842A70174B00F1C771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE2909F2A70181900F1C771 /* StatterCRG in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AE290C12A701B2A00F1C771 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE290D72A701BA600F1C771 /* StatterCRG in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3AE2907E2A70174B00F1C771 = {
+			isa = PBXGroup;
+			children = (
+				3AE2909B2A70180700F1C771 /* Packages */,
+				3AE290892A70174B00F1C771 /* Statter */,
+				3AE290C52A701B2B00F1C771 /* StatterWatch Watch App */,
+				3AE290882A70174B00F1C771 /* Products */,
+				3AE2909D2A70181900F1C771 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		3AE290882A70174B00F1C771 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3AE290872A70174B00F1C771 /* Statter.app */,
+				3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3AE290892A70174B00F1C771 /* Statter */ = {
+			isa = PBXGroup;
+			children = (
+				3AE2909A2A7017E400F1C771 /* Info.plist */,
+				3AE2908A2A70174B00F1C771 /* StatterApp.swift */,
+				3AE290992A7017DB00F1C771 /* Screens */,
+				3AE2908C2A70174B00F1C771 /* ContentView.swift */,
+				3AE2908E2A70174C00F1C771 /* Assets.xcassets */,
+				3AE290902A70174C00F1C771 /* Statter.entitlements */,
+				3AE290912A70174C00F1C771 /* Preview Content */,
+			);
+			path = Statter;
+			sourceTree = "<group>";
+		};
+		3AE290912A70174C00F1C771 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				3AE290922A70174C00F1C771 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		3AE290992A7017DB00F1C771 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		3AE2909B2A70180700F1C771 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				3AE2909C2A70180700F1C771 /* StatterCRG */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		3AE2909D2A70181900F1C771 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3AE290C52A701B2B00F1C771 /* StatterWatch Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				3AE290C62A701B2B00F1C771 /* StatterWatchApp.swift */,
+				3AE290C82A701B2B00F1C771 /* ContentView.swift */,
+				3AE290CA2A701B2C00F1C771 /* Assets.xcassets */,
+				3AE290CC2A701B2C00F1C771 /* Preview Content */,
+			);
+			path = "StatterWatch Watch App";
+			sourceTree = "<group>";
+		};
+		3AE290CC2A701B2C00F1C771 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				3AE290CD2A701B2C00F1C771 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3AE290862A70174B00F1C771 /* Statter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3AE290962A70174C00F1C771 /* Build configuration list for PBXNativeTarget "Statter" */;
+			buildPhases = (
+				3AE290832A70174B00F1C771 /* Sources */,
+				3AE290842A70174B00F1C771 /* Frameworks */,
+				3AE290852A70174B00F1C771 /* Resources */,
+				3AE290D22A701B2C00F1C771 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3AE290D02A701B2C00F1C771 /* PBXTargetDependency */,
+			);
+			name = Statter;
+			packageProductDependencies = (
+				3AE2909E2A70181900F1C771 /* StatterCRG */,
+			);
+			productName = Statter;
+			productReference = 3AE290872A70174B00F1C771 /* Statter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3AE290C32A701B2A00F1C771 /* StatterWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3AE290D52A701B2C00F1C771 /* Build configuration list for PBXNativeTarget "StatterWatch Watch App" */;
+			buildPhases = (
+				3AE290C02A701B2A00F1C771 /* Sources */,
+				3AE290C12A701B2A00F1C771 /* Frameworks */,
+				3AE290C22A701B2A00F1C771 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "StatterWatch Watch App";
+			packageProductDependencies = (
+				3AE290D62A701BA600F1C771 /* StatterCRG */,
+			);
+			productName = "StatterWatch Watch App";
+			productReference = 3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3AE2907F2A70174B00F1C771 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					3AE290862A70174B00F1C771 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					3AE290C32A701B2A00F1C771 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 3AE290822A70174B00F1C771 /* Build configuration list for PBXProject "Statter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3AE2907E2A70174B00F1C771;
+			productRefGroup = 3AE290882A70174B00F1C771 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3AE290862A70174B00F1C771 /* Statter */,
+				3AE290C32A701B2A00F1C771 /* StatterWatch Watch App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3AE290852A70174B00F1C771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE290932A70174C00F1C771 /* Preview Assets.xcassets in Resources */,
+				3AE2908F2A70174C00F1C771 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AE290C22A701B2A00F1C771 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE290CE2A701B2C00F1C771 /* Preview Assets.xcassets in Resources */,
+				3AE290CB2A701B2C00F1C771 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3AE290832A70174B00F1C771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE2908D2A70174B00F1C771 /* ContentView.swift in Sources */,
+				3AE2908B2A70174B00F1C771 /* StatterApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AE290C02A701B2A00F1C771 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AE290C92A701B2B00F1C771 /* ContentView.swift in Sources */,
+				3AE290C72A701B2B00F1C771 /* StatterWatchApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3AE290D02A701B2C00F1C771 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 3AE290C32A701B2A00F1C771 /* StatterWatch Watch App */;
+			targetProxy = 3AE290CF2A701B2C00F1C771 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3AE290942A70174C00F1C771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3AE290952A70174C00F1C771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		3AE290972A70174C00F1C771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Statter/Statter.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Statter/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Statter/Info.plist;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.Statter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3AE290982A70174C00F1C771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Statter/Statter.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Statter/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Statter/Info.plist;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.Statter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3AE290D32A701B2C00F1C771 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"StatterWatch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = StatterWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.gandreas.Statter;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.Statter.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 9.4;
+			};
+			name = Debug;
+		};
+		3AE290D42A701B2C00F1C771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"StatterWatch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = StatterWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.gandreas.Statter;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.Statter.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 9.4;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3AE290822A70174B00F1C771 /* Build configuration list for PBXProject "Statter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AE290942A70174C00F1C771 /* Debug */,
+				3AE290952A70174C00F1C771 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3AE290962A70174C00F1C771 /* Build configuration list for PBXNativeTarget "Statter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AE290972A70174C00F1C771 /* Debug */,
+				3AE290982A70174C00F1C771 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3AE290D52A701B2C00F1C771 /* Build configuration list for PBXNativeTarget "StatterWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AE290D32A701B2C00F1C771 /* Debug */,
+				3AE290D42A701B2C00F1C771 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3AE2909E2A70181900F1C771 /* StatterCRG */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StatterCRG;
+		};
+		3AE290D62A701BA600F1C771 /* StatterCRG */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StatterCRG;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 3AE2907F2A70174B00F1C771 /* Project object */;
+}

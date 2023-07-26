@@ -230,7 +230,7 @@ import Foundation
                 indent + "}",
                 indent + "public var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
             ]
-        case .key(let type):
+        case .key(_):
             // this is no longer stored, we make the state path in the init
             return []
 //            return [indent + "public var \(name.initialLowercase) : \(type)\n"]
@@ -549,20 +549,20 @@ do {
     let destURL = URL(fileURLWithPath: outputFolder, isDirectory: false)
     try FileManager.default.createDirectory(at: destURL.deletingLastPathComponent(), withIntermediateDirectories: true)
     let document = try parseAST(source: source)
-    var output = ""
+//    var output = ""
     for root in document {
         switch root.kind {
         case .node, .root:
             print("=========\(root.name)=======")
 //            print(try root.generate())
-            output.append(try root.generate())
-            output.append("\n")
-//            try root.save(destURL: destURL)
+//            output.append(try root.generate())
+//            output.append("\n")
+            try root.save(destURL: destURL)
         default:
             break
         }
     }
-    try output.data(using: .utf8)?.write(to: destURL)
+//    try output.data(using: .utf8)?.write(to: destURL)
 } catch {
     print("Error: \(error)")
     exit(99)

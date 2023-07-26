@@ -121,6 +121,20 @@ public class Connection : ObservableObject, Equatable {
 
     /// support for custom url sessions
     var urlSession : URLSession = .shared
+    
+    /// Various debugging flags
+    public struct DebugFlags: OptionSet {
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+        public var rawValue: Int
+        static let webSockets = DebugFlags(rawValue: 1 << 0)
+        static let outgoing = DebugFlags(rawValue: 1 << 1)
+        static let incoming = DebugFlags(rawValue: 1 << 2)
+        static let registering = DebugFlags(rawValue: 1 << 3)
+    }
+    /// what are the currently active debugging flags?
+    public var debugFlags: [DebugFlags] = []
 
     /// The current web socket task - use a single web socket if possible
     @Published var webSocket : URLSessionWebSocketTask?
@@ -161,7 +175,9 @@ public class Connection : ObservableObject, Equatable {
             }
             webSocket = socket
             socket.resume()
-            print("WS:Starting ping [\(socket.taskIdentifier)]")
+            if debugFlags.contains(.webSockets) {
+                print("WS:Starting ping [\(socket.taskIdentifier)]")
+            }
             sendDelayedPing(socket)
             then(.success(socket))
         }
@@ -176,11 +192,15 @@ public class Connection : ObservableObject, Equatable {
     /// - Parameter socket: The socket task to ping.
     func sendDelayedPing(_ socket: URLSessionWebSocketTask, delay: TimeInterval = 30.0) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            print("WS: Websocket ping")
+            if self.debugFlags.contains(.webSockets) {
+                print("WS: Websocket ping")
+            }
             socket.sendPing { [self] error in
                 let nextDelay: TimeInterval
                 if let error = error {
-                    print("WS: ping error [\(socket.taskIdentifier)] \(error)")
+                    if debugFlags.contains(.webSockets) {
+                        print("WS: ping error [\(socket.taskIdentifier)] \(error)")
+                    }
                     nextDelay = 3 // every 3 seconds if we fail
                     self.failedPings[socket.taskIdentifier] = self.failedPings[socket.taskIdentifier, default: 0] + 1
 //                    failedPings += 1
@@ -245,7 +265,9 @@ public class Connection : ObservableObject, Equatable {
     /// Defer adding a path to register, allowing us to collect multiple paths into a single transaction
     /// - Parameter path: The path to add
     public func register(path: PathSpecified) {
-//        print("=== Register \(path.statePath.description)")
+        if debugFlags.contains(.registering) {
+            print("=== Register \(path.statePath.description)")
+        }
         if toRegister.contains(where: { $0.statePath.description == path.statePath.description }) {
             return
         }
@@ -270,7 +292,9 @@ public class Connection : ObservableObject, Equatable {
     /// we process a message from the server)
     public func register(_ paths: PathSpecified...) {
         guard let webSocket else {
-//            print("Defer Registering for \(paths.map{$0.statePath.description}.joined(separator: ", "))")
+            if debugFlags.contains(.webSockets) {
+                print("Defer Registering for \(paths.map{$0.statePath.description}.joined(separator: ", "))")
+            }
             toRegister.append(contentsOf: paths)
             return
         }
@@ -295,12 +319,16 @@ public class Connection : ObservableObject, Equatable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         if let data = try? encoder.encode(command), let src = String(data: data, encoding: .utf8) {
-            print(">>> Sent \(src)")
+            if debugFlags.contains(.outgoing) {
+                print(">>> Sent \(src)")
+            }
             webSocket.send(.string(src)) { error in
                 // we use the callback version since this is self contained anyway
                 DispatchQueue.main.async {
                     if error == nil {
-//                        print("Registered for \((command.paths.map{$0.description}).joined(separator: ", "))")
+//                        if self.debugFlags.contains(.registering) {
+//                            "Registered for \((command.paths.map{$0.description}).joined(separator: ", "))")
+//                        }
                     } else {
                         print(error!)
                         self.error = error
@@ -323,7 +351,9 @@ public class Connection : ObservableObject, Equatable {
             register()
         }
         webSocket?.receive { result in
-            print("<<< \(result)")
+            if self.debugFlags.contains(.incoming) {
+                print("<<< \(result)")
+            }
             DispatchQueue.main.async { [self] in
                 switch result {
                 case .failure(let error):

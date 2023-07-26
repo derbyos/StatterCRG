@@ -8,6 +8,11 @@
 import Foundation
 import PackagePlugin
 
+// if this is done as a build tool, then
+// if multiple targets in a project use this SPM
+// it will fail because duplicate things are trying
+// to generate GenTree.swift
+#if false
 @main
 struct CreateTree: BuildToolPlugin {
     
@@ -24,3 +29,36 @@ struct CreateTree: BuildToolPlugin {
         ]
     }
 }
+#else
+
+@main
+struct CreateTree: CommandPlugin {
+    
+    func performCommand(
+        context: PluginContext,
+        arguments: [String]
+    ) throws {
+        let executable = try context.tool(named: "treemaker")
+        // include the config file as the first arg
+        let destDir = context.package.directory.appending("Sources/StatterCRG/GenTree").string + "/"
+        print("Generating tree in \(destDir)")
+        let arguments: [String] = [
+            context.package.directory.appending("Sources/StatterCRG/TreeDefinition").string,
+            destDir,
+        ]
+        print("Executing \(executable) \(arguments)")
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable.path.string)
+        process.arguments = arguments
+
+        try process.run()
+
+        process.waitUntilExit()
+        print("Done")
+
+
+    }
+}
+
+#endif
