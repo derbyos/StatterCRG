@@ -41,6 +41,9 @@ public protocol FormFactor {
     /// How large should "normal lines" appear
     var lineWidth: CGFloat { get }
     
+    /// A generic font scaling
+    var fontScale: CGFloat { get }
+
     /// Various fonts
     var score: Font { get }
     var title: Font { get }
@@ -63,12 +66,22 @@ public extension FormFactor {
         }
     }
     var lineWidth: CGFloat { 1.0 }
+    var fontScale: CGFloat { 1.0 }
     
-    var score: Font { baseFontName.map{Font.custom($0, size: 34, relativeTo: .largeTitle)} ?? Font.largeTitle }
-    var title: Font { baseFontName.map{Font.custom($0, size: 28, relativeTo: .largeTitle)} ?? Font.title }
-    var subtitle: Font { baseFontName.map{Font.custom($0, size: 20, relativeTo: .title3)} ?? Font.title3 }
-    var body: Font { baseFontName.map{Font.custom($0, size: 17, relativeTo: .body)} ?? Font.body }
-    var caption: Font { baseFontName.map{Font.custom($0, size: 12, relativeTo: .caption)} ?? Font.caption }
+    func customFont(size: CGFloat, relativeTo style: Font.TextStyle) -> Font {
+        if let baseFontName {
+            return Font.custom(baseFontName, size: size * fontScale, relativeTo: style)
+        } else if fontScale == 1 {
+            return Font.system(style)
+        } else {
+            return Font.system(size: size * fontScale)
+        }
+    }
+    var score: Font { customFont(size: 34, relativeTo: .largeTitle) }
+    var title: Font { customFont(size: 28, relativeTo: .largeTitle) }
+    var subtitle: Font { customFont(size: 20, relativeTo: .title3) }
+    var body: Font { customFont(size: 17, relativeTo: .body) }
+    var caption: Font { customFont(size: 12, relativeTo: .caption) }
     
     func with(fontName: String) -> Self {
         var retval = self
@@ -116,6 +129,8 @@ public struct DisplayFormFactor : FormFactor {
     }
     public var size: FormFactorSize { .jumbo }
     public var baseFontName: String?
+    
+    public var fontScale: CGFloat { 4.0 }
 }
 
 

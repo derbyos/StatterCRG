@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// A stacked group box like thing, used for displaying period/jam time for
+/// the scoreboard
 struct StackedBox<C:View>: View {
     var title: String
     var content: C
@@ -23,7 +25,7 @@ struct StackedBox<C:View>: View {
         #else
         VStack {
             Text(title)
-                .formFactorFont(.subtitle)
+                .formFactorFont(.caption)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, formFactor.lineWidth * 3)
                 .background(Color.backgroundFill.opacity(0.5))

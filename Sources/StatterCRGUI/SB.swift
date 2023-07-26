@@ -142,6 +142,7 @@ public struct SB: View {
                             .formFactorFont(.score)
                         Spacer()
                         Text("\(team.jamScore ?? 0)")
+                            .formFactorFont(.body)
                     }
                 }
                 if showJammer && team.displayLead == true {
