@@ -67,6 +67,10 @@ public struct Team : PathNode {
 
     @Leaf public var noInitial: Bool?
 
+    // path to file
+
+    @Leaf public var logo: String?
+
     
 
     // these are lowercase
@@ -105,6 +109,7 @@ public struct Team : PathNode {
         _displayLead = parent.leaf("DisplayLead")
         _jamScore = parent.leaf("JamScore")
         _noInitial = parent.leaf("NoInitial")
+        _logo = parent.leaf("Logo")
         _timeout = parent.flag("Timeout")
         _officialReview = parent.flag("OfficialReview")
         _team.parentPath = statePath
@@ -118,6 +123,7 @@ public struct Team : PathNode {
         _displayLead.parentPath = statePath
         _jamScore.parentPath = statePath
         _noInitial.parentPath = statePath
+        _logo.parentPath = statePath
         _timeout.parentPath = statePath
         _officialReview.parentPath = statePath
     }
@@ -135,6 +141,7 @@ public struct Team : PathNode {
         _displayLead = parent.leaf("DisplayLead")
         _jamScore = parent.leaf("JamScore")
         _noInitial = parent.leaf("NoInitial")
+        _logo = parent.leaf("Logo")
         _timeout = parent.flag("Timeout")
         _officialReview = parent.flag("OfficialReview")
         _team.parentPath = statePath
@@ -148,6 +155,7 @@ public struct Team : PathNode {
         _displayLead.parentPath = statePath
         _jamScore.parentPath = statePath
         _noInitial.parentPath = statePath
+        _logo.parentPath = statePath
         _timeout.parentPath = statePath
         _officialReview.parentPath = statePath
     }

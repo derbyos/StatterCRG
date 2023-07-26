@@ -17,7 +17,7 @@ struct StatterScreenApp: App {
                 .environmentObject(scoreboard)
 //                .timeoutStyle(.vertical(separated: false))
 //                .timeoutDotStyle(.square())
-//                .teamNameLogo(.nameOnly(.teamName))
+                .teamNameLogo(.logoOrName())
                 .alternateNameType(.scoreboard)
                 .formFactorFontName("Times New Roman")
         }

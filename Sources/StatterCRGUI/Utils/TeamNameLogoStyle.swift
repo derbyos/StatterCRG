@@ -36,7 +36,9 @@ struct WrappedTeamNameLogoStyle<T:TeamNameLogoStyle>: AbstractTeamNameLogoStyle 
         self.style = style
     }
     public func body(for team: Team) -> AnyView {
-        AnyView(style.body(for: team))
+        AnyView(WithStat(team) { team in
+            style.body(for: team)
+        })
     }
 }
 
@@ -67,6 +69,18 @@ public extension View {
     
 }
 
+/// Make a vew wrapped around watch the stat change
+public struct WithStat<P:PathSpecified, C:View> : View {
+    var content: (P)->C
+    @Stat var stat: P
+    public init(_ stat: P, @ViewBuilder content: @escaping (P) -> C) {
+        _stat = .init(wrappedValue: stat)
+        self.content = content
+    }
+    public var body: some View {
+        content(stat)
+    }
+}
 public extension TeamNameLogoStyle where Self == DefaultTeamNameLogoStyle {
     
     static var `default`: DefaultTeamNameLogoStyle {
@@ -81,11 +95,33 @@ public struct NameAndLogoStyle : TeamNameLogoStyle {
 
     var nameStyle: TeamNameStyle
     @ViewBuilder public func body(for team: Team) -> some View {
-        VStack(alignment: .center) {
-            NameOnlyStyle(nameStyle).body(for: team)
-            LogoOnlyStyle().body(for: team)
+        WithStat(team) { team in
+            VStack(alignment: .center) {
+                NameOnlyStyle(nameStyle).body(for: team)
+                LogoOnlyStyle().body(for: team)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
+    }
+}
+
+public struct LogoOrNameStyle : TeamNameLogoStyle {
+    public init(_ nameStyle: TeamNameStyle = .teamName) {
+        self.nameStyle = nameStyle
+    }
+
+    var nameStyle: TeamNameStyle
+    @ViewBuilder public func body(for team: Team) -> some View {
+        WithStat(team) { team in
+            VStack(alignment: .center) {
+                if team.logo != nil {
+                    LogoOnlyStyle().body(for: team)
+                } else {
+                    NameOnlyStyle(nameStyle).body(for: team)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
 }
 
@@ -117,41 +153,63 @@ public struct NameOnlyStyle : TeamNameLogoStyle {
     }
     
     @ViewBuilder public func body(for team: Team) -> some View {
-        switch nameStyle {
-        case .leagueName:
-            if let name = team.leagueName {
-                Text(name)
-            } else { // fallback to team name
+        WithStat(team) { team in
+            switch nameStyle {
+            case .leagueName:
+                if let name = team.leagueName {
+                    Text(name)
+                } else { // fallback to team name
+                    TeamNameView(team: team)
+                }
+            case .fullName:
+                if let name = team.fullName {
+                    Text(name)
+                } else { // fallback to team name
+                    TeamNameView(team: team)
+                }
+            case .teamName:
                 TeamNameView(team: team)
-            }
-        case .fullName:
-            if let name = team.fullName {
-                Text(name)
-            } else { // fallback to team name
-                TeamNameView(team: team)
-            }
-        case .teamName:
-            TeamNameView(team: team)
-        case .color:
-            if let name = team.color[.init(role: nil, component: .fg)] {
-                Text(name)
-            } else { // fallback to team name
-                TeamNameView(team: team)
+            case .color:
+                if let name = team.color[.init(role: nil, component: .fg)] {
+                    Text(name)
+                } else { // fallback to team name
+                    TeamNameView(team: team)
+                }
             }
         }
     }
 }
 
+public struct AssetView: View {
+    @EnvironmentObject var connection: Connection
+    var path: String?
+    public init(path: String?) {
+        self.path = path
+    }
+    
+    public var body: some View {
+        if let url = connection.url(for:path) {
+            AsyncImage(url: url) {
+                $0.image?.resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
+        }
+    }
+}
 public struct LogoOnlyStyle : TeamNameLogoStyle {
     @ViewBuilder public func body(for team: Team) -> some View {
-        EmptyView()
+        WithStat(team) { team in
+            AssetView(path: team.logo)
+        }
     }
 }
 
 public struct DefaultTeamNameLogoStyle : TeamNameLogoStyle {
     @ViewBuilder public func body(for team: Team) -> some View {
-        NameAndLogoStyle()
-            .body(for: team)
+        WithStat(team) { team in
+            NameAndLogoStyle()
+                .body(for: team)
+        }
     }
 }
 
@@ -175,5 +233,13 @@ public extension TeamNameLogoStyle where Self == NameAndLogoStyle {
     
     static func nameAndLogo(_ nameStyle: TeamNameStyle = .teamName) -> NameAndLogoStyle {
         NameAndLogoStyle(nameStyle)
+    }
+}
+
+
+public extension TeamNameLogoStyle where Self == LogoOrNameStyle {
+    
+    static func logoOrName(_ nameStyle: TeamNameStyle = .teamName) -> LogoOrNameStyle {
+        LogoOrNameStyle(nameStyle)
     }
 }

@@ -91,6 +91,16 @@ public class Connection : ObservableObject, Equatable {
         }
         return URL(string: "ws://\(host):\(port)/WS")
     }
+    
+    /// Get the url on the server for some asset path
+    /// - Parameter path: The asset path
+    /// - Returns: The url, if possible
+    public func url(for path: String?) -> URL? {
+        guard let host, let path else {
+            return nil
+        }
+        return URL(string: "http://\(host):\(port)")?.appendingPathComponent(path)
+    }
     /// The URL for the web socket API
     var webSocketURL: URL? {
         var source: String

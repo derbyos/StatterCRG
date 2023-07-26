@@ -22,6 +22,7 @@ public struct TeamNameLogo : View {
 //            .font(.largeTitle)
         style.body(for: team)
             .colorize(for: team)
+            .environmentObject(connection)
     }
 }
 

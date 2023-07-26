@@ -104,6 +104,8 @@ node Team Game
     leaf DisplayLead Bool
     leaf JamScore Int
     leaf NoInitial Bool
+    // path to file
+    leaf Logo String
     
     // these are lowercase
     enum AlternateName
