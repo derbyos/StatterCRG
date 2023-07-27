@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct Jam<P:PathSpecified> : PathNode {
+public struct Jam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: P
+    public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     @Leaf public var walltimeStart: Int?
 

@@ -5,9 +5,24 @@
 //
 
 import Foundation
-public struct Skater : PathNode {
+public struct Skater : PathNodeId, Identifiable {
     public var parent: Team
+    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
     public let statePath: StatePath
+    public enum Role: String, Codable, JSONTypeable {
+    case bench = "Bench"
+    case blocker = "Blocker"
+    case pivot = "Pivot"
+    case jammer = "Jammer"
+    public init?(_ json: JSONValue) {
+    if let value = json.stringValue, let role = Role(rawValue: value) {
+    self = role
+    } else {
+    return nil
+    }
+    }
+    public var asJSON: JSONValue { .string(rawValue) }
+    }
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
 
     @Leaf public var flags: String?
@@ -18,6 +33,10 @@ public struct Skater : PathNode {
 
     @Leaf public var rosterNumber: String?
 
+    @Leaf public var role: Role?
+
+    public var penalties : MapNodeCollection<Self, Penalty> { .init(self,"Penalty") } 
+
     public init(parent: Team, id: UUID) {
         self.parent = parent
         statePath = parent.adding(.id("Skater", id: id))
@@ -26,10 +45,12 @@ public struct Skater : PathNode {
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
         _rosterNumber = parent.leaf("RosterNumber")
+        _role = parent.leaf("Role")
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
         _rosterNumber.parentPath = statePath
+        _role.parentPath = statePath
     }
     public init(parent: Team, statePath: StatePath) {
         self.parent = parent
@@ -38,15 +59,14 @@ public struct Skater : PathNode {
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
         _rosterNumber = parent.leaf("RosterNumber")
+        _role = parent.leaf("Role")
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
         _rosterNumber.parentPath = statePath
+        _role.parentPath = statePath
     }
 }
 extension Team {
     public func skater(_ id: UUID) -> Skater { .init(parent: self, id: id) }
 }
-    extension Skater : Identifiable {
-        public var id: UUID? { statePath.last?.id }
-    }

@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct Game : PathNode {
+public struct Game : PathNodeId, Identifiable {
     public var parent: ScoreBoard
+    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     
 
@@ -80,6 +81,3 @@ public struct Game : PathNode {
 extension ScoreBoard {
     public func game(_ id: UUID) -> Game { .init(parent: self, id: id) }
 }
-    extension Game : Identifiable {
-        public var id: UUID? { statePath.last?.id }
-    }

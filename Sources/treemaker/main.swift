@@ -87,6 +87,15 @@ extension String {
         }
     }
 }
+extension String {
+    var plural : String {
+        if hasSuffix("y") {
+            return self.dropLast() + "ies"
+        } else {
+            return self + "s"
+        }
+    }
+}
 extension AST {
     var key: AST? {
         children.first(where: {
@@ -143,7 +152,7 @@ import Foundation
             return [indent + name]
         case .enum:
             lines = [
-                "public enum \(name): String {",
+                "public enum \(name): String, EnumStringAsID {",
             ]
         case .`case`(let value):
             return [indent + "case \(name.initialLowercase) = \"\(value ?? name)\""]
@@ -157,11 +166,12 @@ import Foundation
                 "",
             ]
         case .list(let type):
-            return [indent + "public var \(name.initialLowercase)s : MapNodeCollection<Self, \(type)> { .init(self,\"\(name)\") } \n"]
+            return [indent + "public var \(name.initialLowercase.plural) : MapNodeCollection<Self, \(type)> { .init(self,\"\(name)\") } \n"]
         case .node(let parent2):
             let fullParent = parent2 ?? parent
             let qname: String
             let qparent: String
+            var protos: String = ""
             if fullParent.contains(" ") { // it is a template
                 qname = name + "<P:PathSpecified>"
                 qparent = "P"
@@ -172,10 +182,20 @@ import Foundation
                 qname = name
                 qparent = fullParent
             }
+            if let key = self.key, key.keyType != nil {
+                protos = "Id, Identifiable"
+            }
             lines = [
-                "public struct \(qname) : PathNode {",
+                "public struct \(qname) : PathNode\(protos) {",
                 indentBy + "public var parent: \(qparent)"
             ]
+            // get non-optional
+            if let keyType = self.key?.keyType?.trimmingCharacters(in: .punctuationCharacters) {
+                lines += [
+                    indentBy + "public var id: \(keyType)? { \(keyType).from(component: statePath.last)?.1 }",
+                ]
+            }
+
             // state path can either be plain, or some sort of parameter (or an optional one)
             #if nomore
             if let key, let keyType = key.keyType {
@@ -359,13 +379,6 @@ import Foundation
             lines.append("}")
         case .node(let parent2):
             declareInit(parent2: parent2)
-            if self.key?.keyType == "UUID" {
-                lines += [
-                    indentBy + "extension \(name) : Identifiable {",
-                    indentBy + indentBy + "public var id: UUID? { statePath.last?.id }",
-                    indentBy + "}"
-                ]
-            }
         case .root:
             lines.append(indentBy + "public init(connection: Connection) {")
             lines.append(indentBy + indentBy + "self.connection = connection")

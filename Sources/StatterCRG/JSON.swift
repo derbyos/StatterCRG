@@ -167,9 +167,21 @@ public enum JSONValue: Codable, Equatable, Hashable, CustomStringConvertible {
 }
 
 
-public protocol JSONTypeable {
+public protocol JSONTypeable : Hashable {
     init?(_ json: JSONValue)
     var asJSON: JSONValue { get }
+    
+    /// Provide a way to get this out of a path component's index
+    static func from(component: StatePath.PathComponent?) -> (String, Self)?
+    func asComponent(named: String) -> StatePath.PathComponent
+}
+extension JSONTypeable {
+    public static func from(component: StatePath.PathComponent?) -> (String, Self)? {
+        nil
+    }
+    public func asComponent(named: String) -> StatePath.PathComponent {
+        fatalError("Can not make into path component")
+    }
 }
 extension Int : JSONTypeable {
     public init?(_ json: JSONValue) {
@@ -179,6 +191,16 @@ extension Int : JSONTypeable {
         self = value
     }
     public var asJSON: JSONValue { .int(self) }
+    public static func from(component: StatePath.PathComponent?) -> (String, Self)? {
+        if case let .number(name, param:id) = component {
+            return (name, id)
+        }
+        return nil
+    }
+    public func asComponent(named: String) -> StatePath.PathComponent {
+        .number(named, param: self)
+    }
+
 }
 extension Bool : JSONTypeable {
     public init?(_ json: JSONValue) {
@@ -202,6 +224,15 @@ extension String : JSONTypeable {
         self = value
     }
     public var asJSON: JSONValue { .string(self) }
+    public static func from(component: StatePath.PathComponent?) -> (String, Self)? {
+        if case let .name(name, name:id) = component {
+            return (name, id)
+        }
+        return nil
+    }
+    public func asComponent(named: String) -> StatePath.PathComponent {
+        .name(named, name: self)
+    }
 }
 extension UUID : JSONTypeable {
     public init?(_ json: JSONValue) {
@@ -211,4 +242,25 @@ extension UUID : JSONTypeable {
         self = value
     }
     public var asJSON: JSONValue { .string(self.uuidString) }
+    public static func from(component: StatePath.PathComponent?) -> (String, Self)? {
+        if case let .id(name, id:id) = component {
+            return (name, id)
+        }
+        return nil
+    }
+    public func asComponent(named: String) -> StatePath.PathComponent {
+        .id(named, id: self)
+    }
+}
+
+//extension AnyOptional {
+//    public static var nonOptional: Wrapped.Type { Wrapped.self }
+//}
+public protocol AnyOptional {
+    associatedtype Wrapped
+//    var optional: Optional<Wrapped> { get }
+}
+
+extension Optional: AnyOptional {
+//    public var optional: Optional<Wrapped> { self }
 }

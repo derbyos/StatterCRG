@@ -5,10 +5,11 @@
 //
 
 import Foundation
-public struct Clock : PathNode {
+public struct Clock : PathNodeId, Identifiable {
     public var parent: Game
+    public var id: Kind? { Kind.from(component: statePath.last)?.1 }
     public let statePath: StatePath
-    public enum Kind: String {
+    public enum Kind: String, EnumStringAsID {
         case timeOut = "Timeout"
         case period = "Period"
         case lineup = "Lineup"

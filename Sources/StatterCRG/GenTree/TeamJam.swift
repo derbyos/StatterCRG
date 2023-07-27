@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct TeamJam<P:PathSpecified> : PathNode {
+public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: Jam<P>
+    public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     public init(parent: Jam<P>, team: Int) {
         self.parent = parent

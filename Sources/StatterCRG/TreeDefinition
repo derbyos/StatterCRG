@@ -154,10 +154,39 @@ end
 
 
 node Skater Team
+!public enum Role: String, Codable, JSONTypeable {
+!   case bench = "Bench"
+!   case blocker = "Blocker"
+!   case pivot = "Pivot"
+!   case jammer = "Jammer"
+!   public init?(_ json: JSONValue) {
+!      if let value = json.stringValue, let role = Role(rawValue: value) {
+!              self = role
+!       } else {
+!           return nil
+!      }
+!   }
+!   public var asJSON: JSONValue { .string(rawValue) }
+!}
     key Id UUID
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
     leaf Flags String
     leaf Name String
     leaf Pronouns String
     leaf RosterNumber String
+    leaf Role Role
+    list Penalty Penalty
+
+end
+
+
+node Penalty Skater
+    key Number Int
+    leaf Number Int
+    leaf JamNumber Int
+    leaf PeriodNumber Int
+    leaf Serving Bool
+    leaf Served Bool
+    leaf Code String
+    leaf Next String
 end

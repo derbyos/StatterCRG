@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct Period : PathNode {
+public struct Period : PathNodeId, Identifiable {
     public var parent: Game
+    public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     @Leaf public var team1Points: Int?
 

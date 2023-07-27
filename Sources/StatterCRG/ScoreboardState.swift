@@ -20,6 +20,27 @@ extension Connection {
 
 }
 
+public protocol EnumStringAsID : Identifiable, JSONTypeable, RawRepresentable {
+}
+extension EnumStringAsID where RawValue == String  {
+    public var id: String { rawValue }
+    public init?(_ json: JSONValue) {
+        guard let value = json.stringValue, let e = Self(rawValue: value) else {
+            return nil
+        }
+        self = e
+    }
+    public var asJSON: JSONValue { .string(self.rawValue) }
+    static public func from(component: StatePath.PathComponent?) -> (String, Self)? {
+        if case let .name(name, name:id) = component, let e = Self(rawValue: id) {
+            return (name, e)
+        }
+        return nil
+    }
+    public func asComponent(named: String) -> StatePath.PathComponent {
+        .name(named, name: self.rawValue)
+    }
+}
 
 extension PathSpecified {
     
@@ -169,7 +190,8 @@ public struct Flag: PathSpecified, DynamicProperty {
 
 /// An list of leaves, indexed by whatever the type is.  Used, for example,
 /// to declare Skater roster in a team
-public struct MapNodeCollection<Parent:PathSpecified, T:PathNode & Identifiable> : PathSpecified where T.ID == UUID?, T.Parent == Parent {
+public struct MapNodeCollection<Parent:PathSpecified, T:PathNodeId> : PathSpecified where T.Parent == Parent {
+    public typealias I = T.IDBase
     public var connection: Connection {
         parent.connection
     }
@@ -188,7 +210,7 @@ public struct MapNodeCollection<Parent:PathSpecified, T:PathNode & Identifiable>
     // walk through all elements in the connection
     // and find any which match our path converting
     // the plain element to an id element
-    func iterateElements(block: (T.ID, inout Bool)->Void) {
+    func iterateElements(block: (I, inout Bool)->Void) {
         let ourParent = parent.statePath
         for kv in parent.connection.state {
             // check to see if we are `foo.bar` and
@@ -196,7 +218,8 @@ public struct MapNodeCollection<Parent:PathSpecified, T:PathNode & Identifiable>
             // then we want to build an element for `foo.bar(id)`
             if let relativeName = kv.key.dropping(parent: ourParent) {
                 // see that this is `.bar(id)`
-                guard case let .id(childName, id: id) = relativeName.first, childName == ourName else {
+                guard let firstComponent = relativeName.first, let (childName, id) = I.from(component: firstComponent),
+                      childName == ourName else {
                     continue
                 }
                 var stop = false
@@ -207,19 +230,19 @@ public struct MapNodeCollection<Parent:PathSpecified, T:PathNode & Identifiable>
             }
         }
     }
-    public subscript(id: T.ID) -> T? {
+    public subscript(id: I) -> T? {
         var retval: T? = nil
         iterateElements {
             if $0 == id {
                 $1 = true
-                retval = T(parent: parent, statePath: parent.statePath.adding(.id(ourName, id: $0!)))
+                retval = T(parent: parent, statePath: parent.statePath.adding($0.asComponent(named: ourName)))
             }
         }
         return retval
     }
     
-    public func keys() -> Set<T.ID> {
-        var retval = Set<T.ID>()
+    public func keys() -> Set<I> {
+        var retval = Set<I>()
         iterateElements { id, stop in
             retval.insert(id)
         }
@@ -228,13 +251,13 @@ public struct MapNodeCollection<Parent:PathSpecified, T:PathNode & Identifiable>
     
     public func allValues() -> [T] {
         var retval = [T]()
-        var seen = Set<T.ID>()
+        var seen = Set<I>()
         iterateElements { id, stop in
             if seen.contains(id) {
                 return
             }
             seen.insert(id)
-            retval.append(T(parent: parent, statePath: parent.statePath.adding(.id(ourName, id: id!))))
+            retval.append(T(parent: parent, statePath: parent.statePath.adding(id.asComponent(named: ourName))))
         }
         return retval
     }

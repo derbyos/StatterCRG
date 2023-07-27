@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct Team : PathNode {
+public struct Team : PathNodeId, Identifiable {
     public var parent: Game
+    public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     @Leaf public var team: Int?
 
@@ -75,7 +76,7 @@ public struct Team : PathNode {
 
     // these are lowercase
 
-    public enum AlternateName: String {
+    public enum AlternateName: String, EnumStringAsID {
         case `operator` = "operator"
         case scoreboard = "scoreboard"
         case whiteboard = "whiteboard"

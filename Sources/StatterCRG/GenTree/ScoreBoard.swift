@@ -24,8 +24,9 @@ public struct ScoreBoard : PathSpecified {
     public struct Clients : PathNode {
         public var parent: ScoreBoard
         public let statePath: StatePath
-        public struct Device : PathNode {
+        public struct Device : PathNodeId, Identifiable {
             public var parent: Clients
+            public var id: UUID? { UUID.from(component: statePath.last)?.1 }
             public let statePath: StatePath
             @Leaf public var comment: String?
 
@@ -61,7 +62,7 @@ public struct ScoreBoard : PathSpecified {
     public var clients: Clients { .init(parent: self) }
     
 
-    public enum Version: String {
+    public enum Version: String, EnumStringAsID {
         case release = "Release"
     }
     public struct Version_Subscript {
