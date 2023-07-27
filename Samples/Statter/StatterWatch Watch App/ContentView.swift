@@ -17,12 +17,19 @@ struct ContentView: View {
                 TabView {
                     SB(game: game)
                     JT(game: game)
+                    List {
+                        Roster(team: game.teamOne)
+                    }
+                    List {
+                        Roster(team: game.teamTwo)
+                    }
                 }
                 .tabViewStyle(PageTabViewStyle())
             }
         }
         .onAppear {
             scoreboard.connect()
+            scoreboard.debugFlags = [.registering, .incoming]
         }
     }
 }

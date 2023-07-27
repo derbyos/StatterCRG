@@ -47,3 +47,6 @@ public struct Skater : PathNode {
 extension Team {
     public func skater(_ id: UUID) -> Skater { .init(parent: self, id: id) }
 }
+    extension Skater : Identifiable {
+        public var id: UUID? { statePath.last?.id }
+    }

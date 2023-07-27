@@ -94,6 +94,10 @@ public struct Team : PathNode {
 
     @Flag public var officialReview: Bool?
 
+    
+
+    public var skaters : MapNodeCollection<Self, Skater> { .init(self,"Skater") } 
+
     public init(parent: Game, team: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Team", param: team))

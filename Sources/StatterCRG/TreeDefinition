@@ -118,6 +118,9 @@ node Team Game
 
     flag Timeout
     flag OfficialReview
+    
+    list Skater Skater
+
 end
 
 node Clock Game

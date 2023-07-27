@@ -80,3 +80,6 @@ public struct Game : PathNode {
 extension ScoreBoard {
     public func game(_ id: UUID) -> Game { .init(parent: self, id: id) }
 }
+    extension Game : Identifiable {
+        public var id: UUID? { statePath.last?.id }
+    }

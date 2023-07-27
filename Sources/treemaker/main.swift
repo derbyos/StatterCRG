@@ -37,6 +37,7 @@ class AST {
         case map(String) // like a subscript but maps optional ids
         case action
         case ref(String)
+        case list(String)
     }
     var kind: Kind
     var name: String
@@ -155,6 +156,8 @@ import Foundation
                 indentBy + "public var statePath: StatePath { .init(components: [.plain(\"\(name)\")])}",
                 "",
             ]
+        case .list(let type):
+            return [indent + "public var \(name.initialLowercase)s : MapNodeCollection<Self, \(type)> { .init(self,\"\(name)\") } \n"]
         case .node(let parent2):
             let fullParent = parent2 ?? parent
             let qname: String
@@ -356,6 +359,13 @@ import Foundation
             lines.append("}")
         case .node(let parent2):
             declareInit(parent2: parent2)
+            if self.key?.keyType == "UUID" {
+                lines += [
+                    indentBy + "extension \(name) : Identifiable {",
+                    indentBy + indentBy + "public var id: UUID? { statePath.last?.id }",
+                    indentBy + "}"
+                ]
+            }
         case .root:
             lines.append(indentBy + "public init(connection: Connection) {")
             lines.append(indentBy + indentBy + "self.connection = connection")
@@ -488,6 +498,14 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingLeafType
             }
             astStack.last?.children.append(.init(kind: .leaf(type), name: name))
+        case "list":
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            guard let type = nextToken() else {
+                throw Errors.missingLeafType
+            }
+            astStack.last?.children.append(.init(kind: .list(type), name: name))
         case "flag":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

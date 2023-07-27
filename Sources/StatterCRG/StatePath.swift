@@ -18,7 +18,8 @@ import SwiftUI
 ///  - __uuid__ identifier
 ///  - __string__ enumeration
 ///
-public struct StatePath : Codable, Hashable {
+public struct StatePath : Codable, Hashable, Sequence {
+    public typealias Element = StatePath.PathComponent
     internal init(components: [StatePath.PathComponent]) {
         self.components = components
     }
@@ -104,12 +105,24 @@ public struct StatePath : Codable, Hashable {
             case .number(let s, param: let n): return "\(s)(\(n))"
             }
         }
+        public var id: UUID? {
+            switch self {
+            case .id(_, id: let id): return id
+            default: return nil
+            }
+        }
     }
     var components: [PathComponent]
     
+    /// Create a new state path, adding this component
+    /// - Parameter component: The component to add
+    /// - Returns: A new state path with this component added
     public func adding(_ component: PathComponent) -> StatePath {
         .init(components: components + [component])
     }
+    /// Create a new state path, adding this string as a .plain component
+    /// - Parameter plain: The name to add
+    /// - Returns: A new state path with this appended
     public func adding(_ plain: String) -> StatePath {
         .init(components: components + [.plain(plain)])
     }
@@ -117,6 +130,72 @@ public struct StatePath : Codable, Hashable {
         .init(components.map {
             $0.description
         }.joined(separator: "."))
+    }
+    
+    /// Test if a state path has another state path as its first components
+    /// - Parameter other: The state path to compare
+    /// - Returns: True if the other state path's components are our prefix
+    public func hasPrefix(_ other: StatePath) -> Bool {
+        if components.count >= other.components.count && components[0 ..< other.components.count] == other.components[0 ..< other.components.count] {
+            return true
+        }
+        return false
+    }
+    
+    /// Test if a state path has another state path as its first components,
+    /// and is exactly one component longer (so an immediate child of the
+    /// other one)
+    /// - Parameter other: The state path to compare
+    /// - Returns: The child component added to our path relative to the parent
+    public func immediateChild(of parent: StatePath) -> PathComponent? {
+        if components.count == parent.components.count+1 && components[0 ..< parent.components.count-1] == parent.components[0 ..< parent.components.count-1] {
+            return components[count - 1]
+        }
+        return nil
+    }
+    
+    /// Test if a state path has another state path as its first components,
+    /// and if so, drop that parent and give what is left
+    /// - Parameter other: The state path to compare
+    /// - Returns: The child components added to our path relative to the parent
+    public func dropping(parent: StatePath) -> ArraySlice<PathComponent>? {
+        if hasPrefix(parent) {
+            return components[parent.count ..<  components.count]
+        }
+        return nil
+    }
+
+    
+    /// The last component of our path
+    public var last : StatePath.PathComponent? {
+        components.last
+    }
+    /// A new state path with the last component of us dropped
+    /// - Returns: The state path
+    public var parent : StatePath {
+        .init(components: components.dropLast())
+    }
+    
+    /// The number of elements
+    public var count: Int {
+        components.count
+    }
+    
+    // for sequence conformity
+    public typealias Iterator = StatePathIterator
+    public struct StatePathIterator : IteratorProtocol {
+        var index: Int = -1
+        var components: [PathComponent]
+        mutating public func next() -> Element? {
+            index += 1
+            if index >= components.count {
+                return nil
+            }
+            return components[index]
+        }
+    }
+    public func makeIterator() -> StatePathIterator {
+        .init(components: components)
     }
 }
 
@@ -141,95 +220,13 @@ public extension PathSpecified {
 public protocol PathNode : PathSpecified {
     associatedtype Parent : PathSpecified
     var parent: Parent { get }
+    
+    init(parent: Parent, statePath: StatePath)
 }
 public extension PathNode {
     var connection: Connection { parent.connection }
 }
 
-/// An actual value that is contained in the data tree.  We currently support
-/// strings, integers, uuids, and booleans, and are read-only
-@propertyWrapper
-public struct Leaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
-    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath, change: Connection.StateChange = .change) {
-        self.connection = connection
-        self.component = component
-        self.parentPath = parentPath
-        self.change = change
-    }
-    public init<P:PathSpecified>(_ parent: P, _ name: String, change: Connection.StateChange = .change) {
-        self.connection = parent.connection
-        self.component = .plain(name)
-        self.parentPath = parent.statePath
-        self.change = change
-    }
-    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent, change: Connection.StateChange = .change) {
-        self.connection = parent.connection
-        self.component = component
-        self.parentPath = parent.statePath
-        self.change = change
-    }
-
-    @ObservedObject public var connection: Connection
-    public var component: StatePath.PathComponent
-    public var parentPath: StatePath
-    public var change: Connection.StateChange = .change
-    public var statePath: StatePath {
-        parentPath.adding(component)
-    }
-    public var wrappedValue: T? {
-        get {
-            if let value = connection.state[statePath] {
-                return T(value)
-            }
-            connection.register(path: self)
-            return nil
-        }
-        nonmutating set {
-            connection.set(key: statePath, value: newValue?.asJSON ?? .null, kind: change)
-        }
-    }
-}
-
-@propertyWrapper
-/// A Flag is like a Leaf but it is a bool that can be set via the `set` command
-public struct Flag: PathSpecified, DynamicProperty {
-    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
-        self.connection = connection
-        self.component = component
-        self.parentPath = parentPath
-    }
-    public init<P:PathSpecified>(_ parent: P, _ name: String) {
-        self.connection = parent.connection
-        self.component = .plain(name)
-        self.parentPath = parent.statePath
-    }
-    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent) {
-        self.connection = parent.connection
-        self.component = component
-        self.parentPath = parent.statePath
-    }
-
-    @ObservedObject public var connection: Connection
-    public var component: StatePath.PathComponent
-    public var parentPath: StatePath
-    public var statePath: StatePath {
-        parentPath.adding(component)
-    }
-    public var wrappedValue: Bool? {
-        get {
-            if let value = connection.state[statePath] {
-                return Bool(value)
-            }
-            connection.register(path: self)
-            return nil
-        }
-        nonmutating set {
-            if let newValue {
-                connection.set(key: statePath, value: .bool(newValue), kind: .set)
-            }
-        }
-    }
-}
 
 
 extension PathSpecified {
@@ -304,3 +301,4 @@ public struct MapValueCollection<Value: JSONTypeable> : PathSpecified {
         return retval
     }
 }
+

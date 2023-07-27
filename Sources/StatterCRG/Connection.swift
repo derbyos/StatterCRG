@@ -139,13 +139,14 @@ public class Connection : ObservableObject, Equatable {
             self.rawValue = rawValue
         }
         public var rawValue: Int
-        static let webSockets = DebugFlags(rawValue: 1 << 0)
-        static let outgoing = DebugFlags(rawValue: 1 << 1)
-        static let incoming = DebugFlags(rawValue: 1 << 2)
-        static let registering = DebugFlags(rawValue: 1 << 3)
+        public static let webSockets = DebugFlags(rawValue: 1 << 0)
+        public static let outgoing = DebugFlags(rawValue: 1 << 1)
+        public static let incoming = DebugFlags(rawValue: 1 << 2)
+        public static let registering = DebugFlags(rawValue: 1 << 3)
+        public static let none = DebugFlags([])
     }
     /// what are the currently active debugging flags?
-    public var debugFlags: [DebugFlags] = []
+    public var debugFlags: DebugFlags = .none
 
     /// The current web socket task - use a single web socket if possible
     @Published var webSocket : URLSessionWebSocketTask?
