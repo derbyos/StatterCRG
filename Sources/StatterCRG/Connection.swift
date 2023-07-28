@@ -78,6 +78,7 @@ public class Connection : ObservableObject, Equatable {
     @Published public var source: Source = .root {
         didSet {
             webSocket?.cancel(with: .normalClosure, reason: nil)
+            self.objectWillChange.send()
             webSocket = nil
             state = [:]
             registered = []
@@ -149,11 +150,11 @@ public class Connection : ObservableObject, Equatable {
     public var debugFlags: DebugFlags = .none
 
     /// The current web socket task - use a single web socket if possible
-    @Published var webSocket : URLSessionWebSocketTask?
+    var webSocket : URLSessionWebSocketTask?
     
     /// Are we currently connected (or at least do we have a socket task)
     public var isConnected: Bool {
-        webSocket != nil
+        webSocket != nil && webSocket?.error == nil
     }
     
     // Since not everything is SwiftUI, we provide addtional hooks for observing data changes on the scoreboard
@@ -195,6 +196,7 @@ public class Connection : ObservableObject, Equatable {
                 then(.failure(Errors.noConnection))
                 return
             }
+            self.objectWillChange.send()
             webSocket = socket
             socket.resume()
             if debugFlags.contains(.webSockets) {
@@ -231,6 +233,7 @@ public class Connection : ObservableObject, Equatable {
                         self.failedPings[socket.taskIdentifier] = nil
                         if self.webSocket == socket {
                             DispatchQueue.main.async {
+                                self.objectWillChange.send()
                                 self.webSocket = nil // try opening a new connection (but only if it is this socket)
                                 // indicate that things bailed after we nilled out websocket
                                 // so we don't open one just before closing it.  Don't complain
@@ -272,6 +275,7 @@ public class Connection : ObservableObject, Equatable {
 //                _ = scoreBoard.version(.release)
                 _ = scoreBoard.version[.release]
                 _ = scoreBoard.clients.device().comment
+                _ = scoreBoard.currentGame.rule
                 self.getPacket()
             }
         }

@@ -21,10 +21,10 @@ public struct Team : PathNodeId, Identifiable {
 
     // this is actually a map of ID -> String
 
-    public typealias UniformColor_Map = MapValueCollection<String>
+    public typealias UniformColor_Map = MapValueCollection<String, UUID>
     public var uniformColor:UniformColor_Map { .init(connection: connection, statePath: self.adding(.wild("UniformColor"))) }
 
-    //    leaf Color String
+    //    leaf Color : String
 
     // A custom color for differnt roles
 

@@ -34,7 +34,7 @@ class AST {
         case `enum`
         case `case`(String?)
         case `subscript`(String)
-        case map(String) // like a subscript but maps optional ids
+        case map(String, index: String) // like a subscript but maps optional ids
         case action
         case ref(String)
         case list(String)
@@ -60,6 +60,7 @@ enum Errors : Error {
     case missingLeafType
     case rootNodeNotAtRoot
     case multipleNodeKeys
+    case expected(String)
 }
 
 let indentBy = "    "
@@ -235,9 +236,9 @@ import Foundation
 
         case .flag:
             return [indent + "@Flag public var \(name.initialLowercase): Bool?\n"]
-        case .map(let type):
+        case .map(let type, index: let index):
             return [
-                indent + "public typealias \(name)_Map = MapValueCollection<\(type)>",
+                indent + "public typealias \(name)_Map = MapValueCollection<\(type), \(index)>",
                 indent + "public var \(name.initialLowercase):\(name)_Map { .init(connection: connection, statePath: self.adding(.wild(\"\(name)\"))) }\n"
             ]
 
@@ -404,7 +405,9 @@ func parseAST(source: String) throws -> [AST] {
             }
         }
     }
+    var lineNum = 0
     for line in source.split(separator: "\n") {
+        lineNum += 1
         let trim = line.trimmingCharacters(in: .whitespaces)
         if trim.hasPrefix("//") || trim.isEmpty {
             if astStack.isEmpty {
@@ -423,6 +426,28 @@ func parseAST(source: String) throws -> [AST] {
             continue // verbatim code
         }
         let parts = trim.components(separatedBy: .whitespaces)
+            .flatMap { str in
+                // strip punct into its own token
+                var retval : [String] = []
+                var next: String = ""
+                func finishCurrent() {
+                    if next != "" {
+                        retval.append(next)
+                    }
+                    next = ""
+                }
+                for c in str {
+                    switch c {
+                    case "[", "]", ":", "(", ")", "{", "}", ".":
+                        finishCurrent()
+                        retval.append(.init(c))
+                    default:
+                        next.append(c)
+                    }
+                }
+                finishCurrent()
+                return retval
+            }
         // this to make parsing the parts more like a tokenizer
         var tokenIndex = 0
         var token : String? {
@@ -440,8 +465,26 @@ func parseAST(source: String) throws -> [AST] {
             tokenIndex += 1
             return token
         }
+        func hasNext(_ str: String) -> Bool {
+            tokenIndex += 1
+            if token == str {
+                return true
+            }
+            tokenIndex -= 1
+            return false
+        }
+        func expect(_ str: String) throws {
+            guard nextToken() == str else {
+                print("Error line \(lineNum): expected \(str), in \(parts)")
+                throw Errors.expected(str)
+            }
+        }
         func nextTokenList() -> String? {
             tokenIndex += 1
+            if token == "{" {
+                tokenIndex -= 1
+                return nil
+            }
             var retval = token
             if retval?.hasPrefix("<") == true {
                 retval = retval.map{String($0.dropFirst())}
@@ -469,7 +512,7 @@ func parseAST(source: String) throws -> [AST] {
             return .init(parts[(tokenIndex+1)...].joined(separator: " "))
         }
         switch token {
-        case "end":
+        case "}":
             _ = astStack.popLast()
         case "root":
             guard astStack.isEmpty else {
@@ -481,6 +524,7 @@ func parseAST(source: String) throws -> [AST] {
             let node = AST(kind: .root, name: name)
             document.append(node)
             astStack.append(node)
+            try expect("{")
         case "node":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -495,10 +539,12 @@ func parseAST(source: String) throws -> [AST] {
                 document.append(node)
             }
             astStack.append(node)
+            try expect("{")
         case "ref":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
@@ -507,6 +553,7 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
@@ -515,6 +562,7 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
@@ -528,6 +576,7 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
@@ -536,10 +585,16 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect("[")
+            guard let index = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            try expect("]")
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
-            astStack.last?.children.append(.init(kind: .map(type), name: name))
+            astStack.last?.children.append(.init(kind: .map(type, index: index), name: name))
         case "var":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -549,6 +604,7 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
@@ -558,11 +614,17 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingNodeName
             }
             astStack.append(.init(kind: .enum, name: name))
+            try expect("{")
         case "case":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
-            astStack.last?.children.append(.init(kind: .case(nextToken()), name: name))
+            if hasNext("=") {
+                let value = nextToken()
+                astStack.last?.children.append(.init(kind: .case(value), name: name))
+            } else {
+                astStack.last?.children.append(.init(kind: .case(nil), name: name))
+            }
         case "action":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -596,6 +658,6 @@ do {
 //    try output.data(using: .utf8)?.write(to: destURL)
 } catch {
     print("Error: \(error)")
-    exit(99)
+    exit(-1)
 }
     

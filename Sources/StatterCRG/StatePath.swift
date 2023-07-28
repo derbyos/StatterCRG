@@ -269,7 +269,7 @@ struct PathLeaf<P: PathSpecified> : PathSpecified {
 
 */
 
-public struct MapValueCollection<Value: JSONTypeable> : PathSpecified {
+public struct MapValueCollection<Value: JSONTypeable, Index: JSONTypeable> : PathSpecified {
     public var connection: Connection
     public var statePath: StatePath
     var lastComponentName: String
@@ -283,21 +283,21 @@ public struct MapValueCollection<Value: JSONTypeable> : PathSpecified {
         }
         self.statePath = statePath
     }
-    public subscript(id: UUID) -> Value? {
+    public subscript(id: Index) -> Value? {
         if let value = connection.state[statePath] {
             return Value(value)
         }
         //            connection.register(path: )
         return nil
     }
-    public func allValues() -> [UUID: Value] {
+    public func allValues() -> [Index: Value] {
         connection.register(self) // always re-register, in case
-        var retval: [UUID:Value] = [:]
+        var retval: [Index:Value] = [:]
         for state in connection.state {
             // is this "us(someID)"?
             if state.key.components.count == statePath.components.count && state.key.components[0 ..< statePath.components.count-1] == statePath.components[0 ..< statePath.components.count-1] {
                 // yes, we want this
-                if case let .id(name, id: id) = state.key.components.last {
+                if let (name, id) = Index.from(component: state.key.components.last) {
                     if name == lastComponentName {
                         retval[id] = Value(state.value)
                     }

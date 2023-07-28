@@ -19,7 +19,7 @@ struct StackedBox<C:View>: View {
     @Environment(\.formFactor) var formFactor
     var body: some View {
         #if os(macOS)
-        GroupBox("Period \(period)") {
+        GroupBox(title) {
             content
         }
         #else

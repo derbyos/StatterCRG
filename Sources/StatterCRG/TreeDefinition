@@ -1,49 +1,49 @@
 // The definitions for the data tree.  The treemaker script
 // will convert this to the tree data structures
 
-root WS
-    node Device
-        leaf Name String
-        leaf Id UUID
-    end
-    node Client
-        leaf RemoteAddress String
-        leaf Id String
-    end
-end
+root WS {
+    node Device {
+        leaf Name : String
+        leaf Id : UUID
+    }
+    node Client {
+        leaf RemoteAddress : String
+        leaf Id : String
+    }
+}
 
-root ScoreBoard
+root ScoreBoard {
 //    node CurrentGame
 //        leaf Game UUID
 //        leaf InJam Bool
 //        leaf OfficialReview Bool
 //    end
-    ref CurrentGame Game
-    node Clients
-        node Device
-            key id UUID?
-            leaf Comment String
-        end
-    end
+    ref CurrentGame : Game
+    node Clients {
+        node Device {
+            key id : UUID?
+            leaf Comment : String
+        }
+    }
     
-    enum Version
+    enum Version {
         case Release
-    end
-    subscript Version String
-    leaf BlankStatsbookFound Bool
-end
+    }
+    subscript Version : String
+    leaf BlankStatsbookFound : Bool
+}
 
-node Period Game
-    key period Int?
-    leaf Team1Points Int
-    leaf Team2Points Int
-    leaf CurrentJamNumber Int
-end
+node Period Game {
+    key period : Int?
+    leaf Team1Points : Int
+    leaf Team2Points : Int
+    leaf CurrentJamNumber : Int
+}
 
-node Game ScoreBoard
-    key id UUID
+node Game ScoreBoard {
+    key id : UUID
     
-    leaf Game UUID
+    leaf Game : UUID
 
     !public var teamOne: Team { team(1) }
     !public var teamTwo: Team { team(2) }
@@ -53,31 +53,31 @@ node Game ScoreBoard
     !public var timeOutClock: Clock { clock(.timeOut) }
     !public var intermissionClock: Clock { clock(.intermission) }
 
-    leaf CurrentPeriodNumber Int
-    leaf OfficialScore Bool
-    leaf RulesetName String
+    leaf CurrentPeriodNumber : Int
+    leaf OfficialScore : Bool
+    leaf RulesetName : String
 
-    leaf InJam Bool
-    leaf OfficialReview Bool
+    leaf InJam : Bool
+    leaf OfficialReview : Bool
     
-    leaf TimeoutOwner String
+    leaf TimeoutOwner : String
     // These are commands, not state
     action StartJam
     action StopJam
     action Timeout
     action OfficialTimeout
-end
+}
 
-node Team Game
-    key team Int
-    leaf Team Int
-    leaf Name String
-    leaf FullName String
+node Team Game {
+    key team : Int
+    leaf Team : Int
+    leaf Name : String
+    leaf FullName : String
 //    leaf AlternateName String
-    leaf LeagueName String
+    leaf LeagueName : String
     // this is actually a map of ID -> String
-    map UniformColor String
-//    leaf Color String
+    map UniformColor [ UUID ] : String
+//    leaf Color : String
     // A custom color for differnt roles
     !public struct Color {
     !   public init(role: Team.AlternateName? = nil, component: Component) {
@@ -96,64 +96,64 @@ node Team Game
     !       else { return component.rawValue }
     !   }
     !}
-    subscript Color String
-    leaf Score Int
-    leaf Timeouts Int
-    leaf OfficialReviews Int
+    subscript Color : String
+    leaf Score : Int
+    leaf Timeouts : Int
+    leaf OfficialReviews : Int
     flag RetainedOfficialReview
-    leaf DisplayLead Bool
-    leaf JamScore Int
-    leaf NoInitial Bool
+    leaf DisplayLead : Bool
+    leaf JamScore : Int
+    leaf NoInitial : Bool
     // path to file
-    leaf Logo String
+    leaf Logo : String
     
     // these are lowercase
-    enum AlternateName
+    enum AlternateName {
         case operator
         case scoreboard
         case whiteboard
         case overlay
-    end
-    subscript AlternateName String
+    }
+    subscript AlternateName : String
 
     flag Timeout
     flag OfficialReview
     
-    list Skater Skater
+    list Skater : Skater
 
-end
+}
 
-node Clock Game
-    enum Kind
-        case timeOut Timeout
+node Clock Game {
+    enum Kind {
+        case timeOut = Timeout
         case Period
         case Lineup
         case Jam
         case Intermission
-    end
-    key kind Kind
-    leaf Time Int
-    leaf InvertedTime Int
-    leaf MaximumTime Int
-    leaf Readonly Bool
-    leaf Running Bool
-    leaf Name String
-    leaf Direction Bool
-    leaf Number Int
-end
+    }
+    key kind : Kind
+    leaf Time : Int
+    leaf InvertedTime : Int
+    leaf MaximumTime : Int
+    leaf Readonly : Bool
+    leaf Running : Bool
+    leaf Name : String
+    leaf Direction : Bool
+    leaf Number : Int
+}
 
 
-node Jam <Period Game>
-    key jam Int
-    leaf WalltimeStart Int
-end
+node Jam <Period Game> {
+    key jam : Int
+    leaf WalltimeStart : Int
+}
 
-node TeamJam Jam<P>
-    key team Int
-end
+node TeamJam Jam<P> {
+    key team : Int
+}
 
 
-node Skater Team
+node Skater Team {
 !public enum Role: String, Codable, JSONTypeable {
 !   case bench = "Bench"
 !   case blocker = "Blocker"
@@ -168,25 +168,28 @@ node Skater Team
 !   }
 !   public var asJSON: JSONValue { .string(rawValue) }
 !}
-    key Id UUID
+    key Id: UUID
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
-    leaf Flags String
-    leaf Name String
-    leaf Pronouns String
-    leaf RosterNumber String
-    leaf Role Role
-    list Penalty Penalty
+    leaf Flags : String
+    leaf Name : String
+    leaf Pronouns : String
+    leaf RosterNumber : String
+    leaf Role : Role
+    list Penalty : Penalty
 
-end
+}
 
 
-node Penalty Skater
-    key Number Int
-    leaf Number Int
-    leaf JamNumber Int
-    leaf PeriodNumber Int
-    leaf Serving Bool
-    leaf Served Bool
-    leaf Code String
-    leaf Next String
-end
+node Penalty Skater {
+    key Number : Int
+    leaf Number : Int
+    leaf JamNumber : Int
+    leaf PeriodNumber : Int
+    leaf Serving : Bool
+    leaf Served : Bool
+    leaf Code : String
+    leaf Next : String
+}
+
+node Rule Game {
+}
