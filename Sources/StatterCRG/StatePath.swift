@@ -242,12 +242,19 @@ extension PathSpecified {
     func leaf<T:JSONTypeable> (_ component: StatePath.PathComponent) -> Leaf<T> {
         .init(connection: connection, component: component, parentPath: statePath)
     }
-    
+    #if nomore // leaf takes the change type
     func flag (_ name: String) -> Flag {
         .init(connection: connection, component: .plain(name), parentPath: statePath)
     }
     func flag (_ component: StatePath.PathComponent) -> Flag {
         .init(connection: connection, component: component, parentPath: statePath)
+    }
+    #endif
+}
+extension Leaf {
+    /// Convert a Leaf to an ImmutableLeaf
+    var immutable: ImmutableLeaf<T> {
+        .init(connection: connection, component: component, parentPath: parentPath)
     }
 }
 /*

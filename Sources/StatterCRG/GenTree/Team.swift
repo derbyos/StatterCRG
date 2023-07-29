@@ -15,7 +15,7 @@ public struct Team : PathNodeId, Identifiable {
 
     @Leaf public var fullName: String?
 
-    //    leaf AlternateName String
+    //    var AlternateName String
 
     @Leaf public var leagueName: String?
 
@@ -24,7 +24,7 @@ public struct Team : PathNodeId, Identifiable {
     public typealias UniformColor_Map = MapValueCollection<String, UUID>
     public var uniformColor:UniformColor_Map { .init(connection: connection, statePath: self.adding(.wild("UniformColor"))) }
 
-    //    leaf Color : String
+    //    var Color : String
 
     // A custom color for differnt roles
 
@@ -54,13 +54,13 @@ public struct Team : PathNodeId, Identifiable {
         }
     }
     public var color:Color_Subscript { .init(connection: connection, statePath: statePath) }
-    @Leaf public var score: Int?
+    @ImmutableLeaf public var score: Int?
 
     @Leaf public var timeouts: Int?
 
     @Leaf public var officialReviews: Int?
 
-    @Flag public var retainedOfficialReview: Bool?
+    @Leaf public var retainedOfficialReview: Bool?
 
     @Leaf public var displayLead: Bool?
 
@@ -91,9 +91,9 @@ public struct Team : PathNodeId, Identifiable {
         }
     }
     public var alternateName:AlternateName_Subscript { .init(connection: connection, statePath: statePath) }
-    @Flag public var timeout: Bool?
+    @Leaf public var timeout: Bool?
 
-    @Flag public var officialReview: Bool?
+    @Leaf public var officialReview: Bool?
 
     
 
@@ -107,16 +107,16 @@ public struct Team : PathNodeId, Identifiable {
         _name = parent.leaf("Name")
         _fullName = parent.leaf("FullName")
         _leagueName = parent.leaf("LeagueName")
-        _score = parent.leaf("Score")
+        _score = parent.leaf("Score").immutable
         _timeouts = parent.leaf("Timeouts")
         _officialReviews = parent.leaf("OfficialReviews")
-        _retainedOfficialReview = parent.flag("RetainedOfficialReview")
+        _retainedOfficialReview = parent.leaf("RetainedOfficialReview")
         _displayLead = parent.leaf("DisplayLead")
         _jamScore = parent.leaf("JamScore")
         _noInitial = parent.leaf("NoInitial")
         _logo = parent.leaf("Logo")
-        _timeout = parent.flag("Timeout")
-        _officialReview = parent.flag("OfficialReview")
+        _timeout = parent.leaf("Timeout")
+        _officialReview = parent.leaf("OfficialReview")
         _team.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
@@ -139,16 +139,16 @@ public struct Team : PathNodeId, Identifiable {
         _name = parent.leaf("Name")
         _fullName = parent.leaf("FullName")
         _leagueName = parent.leaf("LeagueName")
-        _score = parent.leaf("Score")
+        _score = parent.leaf("Score").immutable
         _timeouts = parent.leaf("Timeouts")
         _officialReviews = parent.leaf("OfficialReviews")
-        _retainedOfficialReview = parent.flag("RetainedOfficialReview")
+        _retainedOfficialReview = parent.leaf("RetainedOfficialReview")
         _displayLead = parent.leaf("DisplayLead")
         _jamScore = parent.leaf("JamScore")
         _noInitial = parent.leaf("NoInitial")
         _logo = parent.leaf("Logo")
-        _timeout = parent.flag("Timeout")
-        _officialReview = parent.flag("OfficialReview")
+        _timeout = parent.leaf("Timeout")
+        _officialReview = parent.leaf("OfficialReview")
         _team.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath

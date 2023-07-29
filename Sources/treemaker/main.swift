@@ -25,9 +25,8 @@ class AST {
     enum Kind : Equatable {
         case root
         case node(parent: String?)
-        case leaf(String)
+        case leaf(String, immutable: Bool)
         case flag
-        case `var`
         case key(String)
         case comment // stored in name
         case code // pass through verbatim
@@ -135,7 +134,7 @@ import Foundation
 //            throw Errors.rootNodeNotAtRoot
 //        }
         switch kind {
-        case .comment, .var:
+        case .comment:
             return // do nothing with these in top level
         default:
             let fileURL = destURL.appending(path: "\(name).swift")
@@ -229,8 +228,12 @@ import Foundation
                 indentBy + "public let statePath: StatePath"
             ]
             #endif
-        case .leaf(let type):
-            return [indent + "@Leaf public var \(name.initialLowercase): \(type)?\n"]
+        case .leaf(let type, immutable: let immutable):
+            if !immutable {
+                return [indent + "@Leaf public var \(name.initialLowercase): \(type)?\n"]
+            } else { // immutable
+                return [indent + "@ImmutableLeaf public var \(name.initialLowercase): \(type)?\n"]
+            }
         case .ref(let type): // only support for named references
             return [indent + "public var \(name.initialLowercase): \(type) { \(type)(parent: self, statePath: self.adding(\"\(name)\"))}\n"]
 
@@ -258,8 +261,6 @@ import Foundation
             // this is no longer stored, we make the state path in the init
             return []
 //            return [indent + "public var \(name.initialLowercase) : \(type)\n"]
-        case .var:
-            return [indent + "public var \(name.initialLowercase) : \(name) { .init(parent: self) }\n"]
         }
         // now the children
         for child in children {
@@ -271,8 +272,12 @@ import Foundation
             // we can't use that until it is set, so two passes
             for child in children {
                 switch child.kind {
-                case .leaf(_):
-                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\")")
+                case .leaf(_, immutable: let immutable):
+                    if !immutable {
+                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\")")
+                    } else {
+                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\").immutable")
+                    }
                 case .flag:
                     lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).flag(\"\(child.name)\")")
                 default:
@@ -281,7 +286,7 @@ import Foundation
             }
             for child in children {
                 switch child.kind {
-                case .leaf(_), .flag:
+                case .leaf(_, immutable: _), .flag:
                     lines.append(indentBy + indentBy + "_\(child.name.initialLowercase).parentPath = statePath")
                 default:
                     break
@@ -549,7 +554,7 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingLeafType
             }
             astStack.last?.children.append(.init(kind: .ref(type), name: name))
-        case "leaf":
+        case "leaf", "var":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
@@ -557,7 +562,16 @@ func parseAST(source: String) throws -> [AST] {
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
-            astStack.last?.children.append(.init(kind: .leaf(type), name: name))
+            astStack.last?.children.append(.init(kind: .leaf(type, immutable: false), name: name))
+        case "let":
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            try expect(":")
+            guard let type = nextToken() else {
+                throw Errors.missingLeafType
+            }
+            astStack.last?.children.append(.init(kind: .leaf(type, immutable: true), name: name))
         case "list":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -571,7 +585,8 @@ func parseAST(source: String) throws -> [AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
-            astStack.last?.children.append(.init(kind: .flag, name: name))
+//            astStack.last?.children.append(.init(kind: .flag, name: name))
+            astStack.last?.children.append(.init(kind: .leaf("Bool", immutable: false), name: name))
         case "subscript":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -595,11 +610,6 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingLeafType
             }
             astStack.last?.children.append(.init(kind: .map(type, index: index), name: name))
-        case "var":
-            guard let name = nextToken() else {
-                throw Errors.missingNodeName
-            }
-            astStack.last?.children.append(.init(kind: .var, name: name))
         case "key":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

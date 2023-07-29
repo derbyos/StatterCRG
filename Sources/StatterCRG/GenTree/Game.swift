@@ -40,6 +40,11 @@ public struct Game : PathNodeId, Identifiable {
     public func stopJam() { connection.set(key: statePath.adding("StopJam"), value: .bool(true), kind: .set) }
     public func timeout() { connection.set(key: statePath.adding("Timeout"), value: .bool(true), kind: .set) }
     public func officialTimeout() { connection.set(key: statePath.adding("OfficialTimeout"), value: .bool(true), kind: .set) }
+    
+
+    public typealias PenaltyCode_Map = MapValueCollection<String, String>
+    public var penaltyCode:PenaltyCode_Map { .init(connection: connection, statePath: self.adding(.wild("PenaltyCode"))) }
+
     public init(parent: ScoreBoard, id: UUID) {
         self.parent = parent
         statePath = parent.adding(.id("Game", id: id))

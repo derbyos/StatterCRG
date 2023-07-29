@@ -11,8 +11,12 @@ public extension Connection {
     /// What kind of change is this.  This is the "flag" that is passed to
     /// the `Set` command
     enum StateChange : String {
-        case change
+        /// Set the value
         case set = ""
+        /// Adjust the value by this delta
+        case change
+        /// Reset the value (for time on a clock)
+        case reset
     }
     /// Send out an update to the state of the data to the server
     /// - Parameters:

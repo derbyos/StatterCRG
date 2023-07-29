@@ -3,26 +3,26 @@
 
 root WS {
     node Device {
-        leaf Name : String
-        leaf Id : UUID
+        var Name : String
+        var Id : UUID
     }
     node Client {
-        leaf RemoteAddress : String
-        leaf Id : String
+        var RemoteAddress : String
+        var Id : String
     }
 }
 
 root ScoreBoard {
 //    node CurrentGame
-//        leaf Game UUID
-//        leaf InJam Bool
-//        leaf OfficialReview Bool
+//        var Game UUID
+//        var InJam Bool
+//        var OfficialReview Bool
 //    end
     ref CurrentGame : Game
     node Clients {
         node Device {
             key id : UUID?
-            leaf Comment : String
+            var Comment : String
         }
     }
     
@@ -30,20 +30,20 @@ root ScoreBoard {
         case Release
     }
     subscript Version : String
-    leaf BlankStatsbookFound : Bool
+    var BlankStatsbookFound : Bool
 }
 
 node Period Game {
     key period : Int?
-    leaf Team1Points : Int
-    leaf Team2Points : Int
-    leaf CurrentJamNumber : Int
+    var Team1Points : Int
+    var Team2Points : Int
+    var CurrentJamNumber : Int
 }
 
 node Game ScoreBoard {
     key id : UUID
     
-    leaf Game : UUID
+    var Game : UUID
 
     !public var teamOne: Team { team(1) }
     !public var teamTwo: Team { team(2) }
@@ -53,31 +53,33 @@ node Game ScoreBoard {
     !public var timeOutClock: Clock { clock(.timeOut) }
     !public var intermissionClock: Clock { clock(.intermission) }
 
-    leaf CurrentPeriodNumber : Int
-    leaf OfficialScore : Bool
-    leaf RulesetName : String
+    var CurrentPeriodNumber : Int
+    var OfficialScore : Bool
+    var RulesetName : String
 
-    leaf InJam : Bool
-    leaf OfficialReview : Bool
+    var InJam : Bool
+    var OfficialReview : Bool
     
-    leaf TimeoutOwner : String
+    var TimeoutOwner : String
     // These are commands, not state
     action StartJam
     action StopJam
     action Timeout
     action OfficialTimeout
+    
+    map PenaltyCode[String] : String
 }
 
 node Team Game {
     key team : Int
-    leaf Team : Int
-    leaf Name : String
-    leaf FullName : String
-//    leaf AlternateName String
-    leaf LeagueName : String
+    var Team : Int
+    var Name : String
+    var FullName : String
+//    var AlternateName String
+    var LeagueName : String
     // this is actually a map of ID -> String
     map UniformColor [ UUID ] : String
-//    leaf Color : String
+//    var Color : String
     // A custom color for differnt roles
     !public struct Color {
     !   public init(role: Team.AlternateName? = nil, component: Component) {
@@ -97,15 +99,15 @@ node Team Game {
     !   }
     !}
     subscript Color : String
-    leaf Score : Int
-    leaf Timeouts : Int
-    leaf OfficialReviews : Int
+    let Score : Int
+    var Timeouts : Int
+    var OfficialReviews : Int
     flag RetainedOfficialReview
-    leaf DisplayLead : Bool
-    leaf JamScore : Int
-    leaf NoInitial : Bool
+    var DisplayLead : Bool
+    var JamScore : Int
+    var NoInitial : Bool
     // path to file
-    leaf Logo : String
+    var Logo : String
     
     // these are lowercase
     enum AlternateName {
@@ -132,20 +134,20 @@ node Clock Game {
         case Intermission
     }
     key kind : Kind
-    leaf Time : Int
-    leaf InvertedTime : Int
-    leaf MaximumTime : Int
-    leaf Readonly : Bool
-    leaf Running : Bool
-    leaf Name : String
-    leaf Direction : Bool
-    leaf Number : Int
+    var Time : Int
+    var InvertedTime : Int
+    var MaximumTime : Int
+    var Readonly : Bool
+    var Running : Bool
+    var Name : String
+    var Direction : Bool
+    var Number : Int
 }
 
 
 node Jam <Period Game> {
     key jam : Int
-    leaf WalltimeStart : Int
+    var WalltimeStart : Int
 }
 
 node TeamJam Jam<P> {
@@ -170,11 +172,11 @@ node Skater Team {
 !}
     key Id: UUID
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
-    leaf Flags : String
-    leaf Name : String
-    leaf Pronouns : String
-    leaf RosterNumber : String
-    leaf Role : Role
+    var Flags : String
+    var Name : String
+    var Pronouns : String
+    var RosterNumber : String
+    var Role : Role
     list Penalty : Penalty
 
 }
@@ -182,13 +184,13 @@ node Skater Team {
 
 node Penalty Skater {
     key Number : Int
-    leaf Number : Int
-    leaf JamNumber : Int
-    leaf PeriodNumber : Int
-    leaf Serving : Bool
-    leaf Served : Bool
-    leaf Code : String
-    leaf Next : String
+    var Number : Int
+    var JamNumber : Int
+    var PeriodNumber : Int
+    var Serving : Bool
+    var Served : Bool
+    var Code : String
+    var Next : String
 }
 
 node Rule Game {

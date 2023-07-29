@@ -106,29 +106,25 @@ public struct Stat<P: PathSpecified> : DynamicProperty {
 /// strings, integers, uuids, and booleans, and are read-only
 @propertyWrapper
 public struct Leaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
-    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath, change: Connection.StateChange = .change) {
+    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
         self.connection = connection
         self.component = component
         self.parentPath = parentPath
-        self.change = change
     }
-    public init<P:PathSpecified>(_ parent: P, _ name: String, change: Connection.StateChange = .change) {
+    public init<P:PathSpecified>(_ parent: P, _ name: String) {
         self.connection = parent.connection
         self.component = .plain(name)
         self.parentPath = parent.statePath
-        self.change = change
     }
-    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent, change: Connection.StateChange = .change) {
+    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent) {
         self.connection = parent.connection
         self.component = component
         self.parentPath = parent.statePath
-        self.change = change
     }
 
     @ObservedObject public var connection: Connection
     public var component: StatePath.PathComponent
     public var parentPath: StatePath
-    public var change: Connection.StateChange = .change
     public var statePath: StatePath {
         parentPath.adding(component)
     }
@@ -141,11 +137,49 @@ public struct Leaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
             return nil
         }
         nonmutating set {
-            connection.set(key: statePath, value: newValue?.asJSON ?? .null, kind: change)
+            connection.set(key: statePath, value: newValue?.asJSON ?? .null, kind: .set)
         }
     }
 }
 
+/// Immutable leaf is a leaf that is immutable (for a calculated value from
+/// the server that we should not change
+@propertyWrapper
+public struct ImmutableLeaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
+    public init(connection: Connection, component: StatePath.PathComponent, parentPath: StatePath) {
+        self.connection = connection
+        self.component = component
+        self.parentPath = parentPath
+    }
+    public init<P:PathSpecified>(_ parent: P, _ name: String) {
+        self.connection = parent.connection
+        self.component = .plain(name)
+        self.parentPath = parent.statePath
+    }
+    public init<P:PathSpecified>(_ parent: P, component: StatePath.PathComponent) {
+        self.connection = parent.connection
+        self.component = component
+        self.parentPath = parent.statePath
+    }
+
+    @ObservedObject public var connection: Connection
+    public var component: StatePath.PathComponent
+    public var parentPath: StatePath
+    public var statePath: StatePath {
+        parentPath.adding(component)
+    }
+    public var wrappedValue: T? {
+        get {
+            if let value = connection.state[statePath] {
+                return T(value)
+            }
+            connection.register(path: self)
+            return nil
+        }
+    }
+}
+
+#if nomore // leaf now can set the kind
 @propertyWrapper
 /// A Flag is like a Leaf but it is a bool that can be set via the `set` command
 public struct Flag: PathSpecified, DynamicProperty {
@@ -186,7 +220,7 @@ public struct Flag: PathSpecified, DynamicProperty {
         }
     }
 }
-
+#endif
 
 /// An list of leaves, indexed by whatever the type is.  Used, for example,
 /// to declare Skater roster in a team

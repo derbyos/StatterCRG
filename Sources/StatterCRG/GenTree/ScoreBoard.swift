@@ -11,11 +11,11 @@ public struct ScoreBoard : PathSpecified {
 
     //    node CurrentGame
 
-    //        leaf Game UUID
+    //        var Game UUID
 
-    //        leaf InJam Bool
+    //        var InJam Bool
 
-    //        leaf OfficialReview Bool
+    //        var OfficialReview Bool
 
     //    end
 
