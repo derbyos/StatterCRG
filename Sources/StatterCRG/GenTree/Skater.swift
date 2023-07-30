@@ -15,9 +15,15 @@ public struct Skater : PathNodeId, Identifiable {
         case pivot = "Pivot"
         case jammer = "Jammer"
     }
-    // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
-
-    @Leaf public var flags: String?
+    public enum Flags: String, EnumStringAsID {
+        case skater = ""
+        case altSkater = "ALT"
+        case bench = "B"
+        case captain = "C"
+        case benchAltCaptain = "BA"
+        case altCaptain = "AC"
+    }
+    @Leaf public var flags: Flags?
 
     @Leaf public var name: String?
 
@@ -28,6 +34,8 @@ public struct Skater : PathNodeId, Identifiable {
     @Leaf public var role: Role?
 
     public var penalties : MapNodeCollection<Self, Penalty> { .init(self,"Penalty") } 
+
+    
 
     public init(parent: Team, id: UUID) {
         self.parent = parent

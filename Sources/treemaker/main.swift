@@ -417,7 +417,7 @@ func parseAST(source: String) throws -> [String:AST] {
         }
     }
     var lineNum = 0
-    for line in source.split(separator: "\n") {
+    for line in source.split(separator: "\n", omittingEmptySubsequences: false) {
         lineNum += 1
         let trim = line.trimmingCharacters(in: .whitespaces)
         if trim.hasPrefix("//") || trim.isEmpty {

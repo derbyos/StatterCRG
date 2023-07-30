@@ -75,12 +75,11 @@ node Game ScoreBoard {
     let InOvertime : Bool
     let InSuddenScoring : Bool
     let InjuryContinuationUpcoming : Bool
-    var TimoutOwner : UUID
     var OfficialReview : Bool
     
     let UpcomingJam : UUID
     let UpcomingJamNumber : Int
-    var TimeoutOwner : String
+    var TimeoutOwner : UUID
     var NoMoreJam : Bool
     var OfficalScore : Bool
     var AbortReason : String
@@ -110,19 +109,22 @@ node Game ScoreBoard {
     map PenaltyCode[String] : String
     map Label[UUID] : String
     map EventInfo[UUID] : String
-
 }
 
 node Team Game {
     key team : Int
     var Team : Int
-    var Name : String
+    // was writable before 5.0
+    let Name : String
     var FullName : String
+    let Initials : String
+    let FileName : String
 //    var AlternateName String
     var LeagueName : String
     // this is actually a map of ID -> String
-    map UniformColor [ UUID ] : String
-//    var Color : String
+    // or myabe it isn't!
+    // map UniformColor [ UUID ] : String
+    var UniformColor : String
     // A custom color for differnt roles
     !public struct Color {
     !   public init(role: Team.AlternateName? = nil, component: Component) {
@@ -143,12 +145,40 @@ node Team Game {
     !}
     subscript Color : String
     let Score : Int
-    var Timeouts : Int
-    var OfficialReviews : Int
+    let Timeouts : Int
+    let OfficialReviews : Int
+    let InTimeout : Bool
+    let InOfficialReview : Bool
+    let TotalPenalites : Int
     flag RetainedOfficialReview
-    var DisplayLead : Bool
-    var JamScore : Int
+    let DisplayLead : Bool
+    let JamScore : Int
+    var TripScore : Int
+    let LastScore : Int
+    var Lost : Bool
+    var Lead : Bool
+    var Calloff : Bool
+    var Injury : Bool
+    // writable during initial & first scoring trip if JamScore is 0
     var NoInitial : Bool
+    var StarPass : Bool
+    var NoPivot : Bool
+    let StarPassTrip : UUID
+    node ScoreAdjustment {
+        key Id : UUID
+        let Readonly : Bool
+        let Amount : Int
+        let JamRecorded : UUID
+        let PeriodNumberRecorded : Int
+        let JamNumberRecorded : Int
+        let RecordedDuringJam : Bool
+        let LastTwoMinutes : Bool
+        let Open : Bool
+        var AppliedTo : Bool
+        action Discard
+    }
+    ref ActiveScoreAdjustment : ScoreAdjustment
+    var ActiveScoreAdjustmentAmount : Int
     // path to file
     var Logo : String
     
@@ -161,11 +191,16 @@ node Team Game {
     }
     subscript AlternateName : String
 
-    flag Timeout
-    flag OfficialReview
+//    flag Timeout
+//    flag OfficialReview
     
     list Skater : Skater
 
+    action AddTrip
+    action RemoveTrip
+    action AdvanceFieldings
+    action Timeout
+    action OfficialReview
 }
 
 node Clock Game {
@@ -206,8 +241,15 @@ node Skater Team {
         case Jammer
     }
     key Id: UUID
-    // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
-    var Flags : String
+    enum Flags {
+        case Skater = ""
+        case AltSkater = "ALT"
+        case Bench = "B"
+        case Captain = "C"
+        case BenchAltCaptain = "BA"
+        case AltCaptain = "AC"
+    }
+    var Flags : Flags
     var Name : String
     var Pronouns : String
     var RosterNumber : String
@@ -305,6 +347,13 @@ node Settings ScoreBoard {
                 var ForcedServed : BoolString
                 var UseLT : BoolString
             }
+            enum BoxStyle {
+                case empty = ""
+                case flat = "box_flat"
+                case bright = "box_flag_bright"
+            }
+            var View_BoxStyle : BoxStyle
+            var Preview_BoxStyle : BoxStyle
             enum CurrentView {
                 case scoreboard
                 case whiteboard
@@ -319,6 +368,13 @@ node Settings ScoreBoard {
             var View_SidePadding : String
             var View_SwapTeams : BoolString
             var View_Video : String
+            var Preview_CurrentView : CurrentView
+            var Preview_CustomHTML : String
+            var Preview_HideLogos : BoolString
+            var Preview_Image : String
+            var Preview_SidePadding : String
+            var Preview_SwapTeams : BoolString
+            var Preview_Video : String
         }
     }
 }

@@ -269,6 +269,15 @@ public struct Settings : PathNode {
                 }
             }
             public var penalties: Penalties { .init(parent: self) }
+            public enum BoxStyle: String, EnumStringAsID {
+                case empty = ""
+                case flat = "box_flat"
+                case bright = "box_flag_bright"
+            }
+            @Leaf public var view_BoxStyle: BoxStyle?
+
+            @Leaf public var preview_BoxStyle: BoxStyle?
+
             public enum CurrentView: String, EnumStringAsID {
                 case scoreboard = "scoreboard"
                 case whiteboard = "whiteboard"
@@ -290,6 +299,20 @@ public struct Settings : PathNode {
 
             @Leaf public var view_Video: String?
 
+            @Leaf public var preview_CurrentView: CurrentView?
+
+            @Leaf public var preview_CustomHTML: String?
+
+            @Leaf public var preview_HideLogos: BoolString?
+
+            @Leaf public var preview_Image: String?
+
+            @Leaf public var preview_SidePadding: String?
+
+            @Leaf public var preview_SwapTeams: BoolString?
+
+            @Leaf public var preview_Video: String?
+
             public init(parent: Setting) {
                 self.parent = parent
                 statePath = parent.adding("ScoreBoard")
@@ -299,6 +322,8 @@ public struct Settings : PathNode {
                 _autoEndJam = parent.leaf("AutoEndJam")
                 _autoEndTTO = parent.leaf("AutoEndTTO")
                 _clockAfterTimeout = parent.leaf("ClockAfterTimeout")
+                _view_BoxStyle = parent.leaf("View_BoxStyle")
+                _preview_BoxStyle = parent.leaf("Preview_BoxStyle")
                 _view_CurrentView = parent.leaf("View_CurrentView")
                 _view_CustomHTML = parent.leaf("View_CustomHTML")
                 _view_HideLogos = parent.leaf("View_HideLogos")
@@ -306,11 +331,20 @@ public struct Settings : PathNode {
                 _view_SidePadding = parent.leaf("View_SidePadding")
                 _view_SwapTeams = parent.leaf("View_SwapTeams")
                 _view_Video = parent.leaf("View_Video")
+                _preview_CurrentView = parent.leaf("Preview_CurrentView")
+                _preview_CustomHTML = parent.leaf("Preview_CustomHTML")
+                _preview_HideLogos = parent.leaf("Preview_HideLogos")
+                _preview_Image = parent.leaf("Preview_Image")
+                _preview_SidePadding = parent.leaf("Preview_SidePadding")
+                _preview_SwapTeams = parent.leaf("Preview_SwapTeams")
+                _preview_Video = parent.leaf("Preview_Video")
                 _autoStart.parentPath = statePath
                 _autoStartBuffer.parentPath = statePath
                 _autoEndJam.parentPath = statePath
                 _autoEndTTO.parentPath = statePath
                 _clockAfterTimeout.parentPath = statePath
+                _view_BoxStyle.parentPath = statePath
+                _preview_BoxStyle.parentPath = statePath
                 _view_CurrentView.parentPath = statePath
                 _view_CustomHTML.parentPath = statePath
                 _view_HideLogos.parentPath = statePath
@@ -318,6 +352,13 @@ public struct Settings : PathNode {
                 _view_SidePadding.parentPath = statePath
                 _view_SwapTeams.parentPath = statePath
                 _view_Video.parentPath = statePath
+                _preview_CurrentView.parentPath = statePath
+                _preview_CustomHTML.parentPath = statePath
+                _preview_HideLogos.parentPath = statePath
+                _preview_Image.parentPath = statePath
+                _preview_SidePadding.parentPath = statePath
+                _preview_SwapTeams.parentPath = statePath
+                _preview_Video.parentPath = statePath
             }
             public init(parent: Setting, statePath: StatePath) {
                 self.parent = parent
@@ -327,6 +368,8 @@ public struct Settings : PathNode {
                 _autoEndJam = parent.leaf("AutoEndJam")
                 _autoEndTTO = parent.leaf("AutoEndTTO")
                 _clockAfterTimeout = parent.leaf("ClockAfterTimeout")
+                _view_BoxStyle = parent.leaf("View_BoxStyle")
+                _preview_BoxStyle = parent.leaf("Preview_BoxStyle")
                 _view_CurrentView = parent.leaf("View_CurrentView")
                 _view_CustomHTML = parent.leaf("View_CustomHTML")
                 _view_HideLogos = parent.leaf("View_HideLogos")
@@ -334,11 +377,20 @@ public struct Settings : PathNode {
                 _view_SidePadding = parent.leaf("View_SidePadding")
                 _view_SwapTeams = parent.leaf("View_SwapTeams")
                 _view_Video = parent.leaf("View_Video")
+                _preview_CurrentView = parent.leaf("Preview_CurrentView")
+                _preview_CustomHTML = parent.leaf("Preview_CustomHTML")
+                _preview_HideLogos = parent.leaf("Preview_HideLogos")
+                _preview_Image = parent.leaf("Preview_Image")
+                _preview_SidePadding = parent.leaf("Preview_SidePadding")
+                _preview_SwapTeams = parent.leaf("Preview_SwapTeams")
+                _preview_Video = parent.leaf("Preview_Video")
                 _autoStart.parentPath = statePath
                 _autoStartBuffer.parentPath = statePath
                 _autoEndJam.parentPath = statePath
                 _autoEndTTO.parentPath = statePath
                 _clockAfterTimeout.parentPath = statePath
+                _view_BoxStyle.parentPath = statePath
+                _preview_BoxStyle.parentPath = statePath
                 _view_CurrentView.parentPath = statePath
                 _view_CustomHTML.parentPath = statePath
                 _view_HideLogos.parentPath = statePath
@@ -346,6 +398,13 @@ public struct Settings : PathNode {
                 _view_SidePadding.parentPath = statePath
                 _view_SwapTeams.parentPath = statePath
                 _view_Video.parentPath = statePath
+                _preview_CurrentView.parentPath = statePath
+                _preview_CustomHTML.parentPath = statePath
+                _preview_HideLogos.parentPath = statePath
+                _preview_Image.parentPath = statePath
+                _preview_SidePadding.parentPath = statePath
+                _preview_SwapTeams.parentPath = statePath
+                _preview_Video.parentPath = statePath
             }
         }
         public var scoreBoard: ScoreBoard { .init(parent: self) }

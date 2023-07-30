@@ -11,9 +11,15 @@ public struct Team : PathNodeId, Identifiable {
     public let statePath: StatePath
     @Leaf public var team: Int?
 
-    @Leaf public var name: String?
+    // was writable before 5.0
+
+    @ImmutableLeaf public var name: String?
 
     @Leaf public var fullName: String?
+
+    @ImmutableLeaf public var initials: String?
+
+    @ImmutableLeaf public var fileName: String?
 
     //    var AlternateName String
 
@@ -21,10 +27,11 @@ public struct Team : PathNodeId, Identifiable {
 
     // this is actually a map of ID -> String
 
-    public typealias UniformColor_Map = MapValueCollection<String, UUID>
-    public var uniformColor:UniformColor_Map { .init(connection: connection, statePath: self.adding(.wild("UniformColor"))) }
+    // or myabe it isn't!
 
-    //    var Color : String
+    // map UniformColor [ UUID ] : String
+
+    @Leaf public var uniformColor: String?
 
     // A custom color for differnt roles
 
@@ -56,17 +63,117 @@ public struct Team : PathNodeId, Identifiable {
     public var color:Color_Subscript { .init(connection: connection, statePath: statePath) }
     @ImmutableLeaf public var score: Int?
 
-    @Leaf public var timeouts: Int?
+    @ImmutableLeaf public var timeouts: Int?
 
-    @Leaf public var officialReviews: Int?
+    @ImmutableLeaf public var officialReviews: Int?
+
+    @ImmutableLeaf public var inTimeout: Bool?
+
+    @ImmutableLeaf public var inOfficialReview: Bool?
+
+    @ImmutableLeaf public var totalPenalites: Int?
 
     @Leaf public var retainedOfficialReview: Bool?
 
-    @Leaf public var displayLead: Bool?
+    @ImmutableLeaf public var displayLead: Bool?
 
-    @Leaf public var jamScore: Int?
+    @ImmutableLeaf public var jamScore: Int?
+
+    @Leaf public var tripScore: Int?
+
+    @ImmutableLeaf public var lastScore: Int?
+
+    @Leaf public var lost: Bool?
+
+    @Leaf public var lead: Bool?
+
+    @Leaf public var calloff: Bool?
+
+    @Leaf public var injury: Bool?
+
+    // writable during initial & first scoring trip if JamScore is 0
 
     @Leaf public var noInitial: Bool?
+
+    @Leaf public var starPass: Bool?
+
+    @Leaf public var noPivot: Bool?
+
+    @ImmutableLeaf public var starPassTrip: UUID?
+
+    public struct ScoreAdjustment : PathNodeId, Identifiable {
+        public var parent: Team
+        public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+        public let statePath: StatePath
+        @ImmutableLeaf public var readonly: Bool?
+
+        @ImmutableLeaf public var amount: Int?
+
+        @ImmutableLeaf public var jamRecorded: UUID?
+
+        @ImmutableLeaf public var periodNumberRecorded: Int?
+
+        @ImmutableLeaf public var jamNumberRecorded: Int?
+
+        @ImmutableLeaf public var recordedDuringJam: Bool?
+
+        @ImmutableLeaf public var lastTwoMinutes: Bool?
+
+        @ImmutableLeaf public var open: Bool?
+
+        @Leaf public var appliedTo: Bool?
+
+        public func discard() { connection.set(key: statePath.adding("Discard"), value: .bool(true), kind: .set) }
+        public init(parent: Team, id: UUID) {
+            self.parent = parent
+            statePath = parent.adding(.id("ScoreAdjustment", id: id))
+    
+            _readonly = parent.leaf("Readonly").immutable
+            _amount = parent.leaf("Amount").immutable
+            _jamRecorded = parent.leaf("JamRecorded").immutable
+            _periodNumberRecorded = parent.leaf("PeriodNumberRecorded").immutable
+            _jamNumberRecorded = parent.leaf("JamNumberRecorded").immutable
+            _recordedDuringJam = parent.leaf("RecordedDuringJam").immutable
+            _lastTwoMinutes = parent.leaf("LastTwoMinutes").immutable
+            _open = parent.leaf("Open").immutable
+            _appliedTo = parent.leaf("AppliedTo")
+            _readonly.parentPath = statePath
+            _amount.parentPath = statePath
+            _jamRecorded.parentPath = statePath
+            _periodNumberRecorded.parentPath = statePath
+            _jamNumberRecorded.parentPath = statePath
+            _recordedDuringJam.parentPath = statePath
+            _lastTwoMinutes.parentPath = statePath
+            _open.parentPath = statePath
+            _appliedTo.parentPath = statePath
+        }
+        public init(parent: Team, statePath: StatePath) {
+            self.parent = parent
+            self.statePath = statePath
+            _readonly = parent.leaf("Readonly").immutable
+            _amount = parent.leaf("Amount").immutable
+            _jamRecorded = parent.leaf("JamRecorded").immutable
+            _periodNumberRecorded = parent.leaf("PeriodNumberRecorded").immutable
+            _jamNumberRecorded = parent.leaf("JamNumberRecorded").immutable
+            _recordedDuringJam = parent.leaf("RecordedDuringJam").immutable
+            _lastTwoMinutes = parent.leaf("LastTwoMinutes").immutable
+            _open = parent.leaf("Open").immutable
+            _appliedTo = parent.leaf("AppliedTo")
+            _readonly.parentPath = statePath
+            _amount.parentPath = statePath
+            _jamRecorded.parentPath = statePath
+            _periodNumberRecorded.parentPath = statePath
+            _jamNumberRecorded.parentPath = statePath
+            _recordedDuringJam.parentPath = statePath
+            _lastTwoMinutes.parentPath = statePath
+            _open.parentPath = statePath
+            _appliedTo.parentPath = statePath
+        }
+    }
+    public func scoreAdjustment(_ id: UUID) -> ScoreAdjustment { .init(parent: self, id: id) }
+    public var activeScoreAdjustment: ScoreAdjustment { ScoreAdjustment(parent: self, statePath: self.adding("ActiveScoreAdjustment"))}
+
+    @Leaf public var activeScoreAdjustmentAmount: Int?
 
     // path to file
 
@@ -91,78 +198,143 @@ public struct Team : PathNodeId, Identifiable {
         }
     }
     public var alternateName:AlternateName_Subscript { .init(connection: connection, statePath: statePath) }
-    @Leaf public var timeout: Bool?
+    
 
-    @Leaf public var officialReview: Bool?
+    //    flag Timeout
+
+    //    flag OfficialReview
 
     
 
     public var skaters : MapNodeCollection<Self, Skater> { .init(self,"Skater") } 
 
+    
+
+    public func addTrip() { connection.set(key: statePath.adding("AddTrip"), value: .bool(true), kind: .set) }
+    public func removeTrip() { connection.set(key: statePath.adding("RemoveTrip"), value: .bool(true), kind: .set) }
+    public func advanceFieldings() { connection.set(key: statePath.adding("AdvanceFieldings"), value: .bool(true), kind: .set) }
+    public func timeout() { connection.set(key: statePath.adding("Timeout"), value: .bool(true), kind: .set) }
+    public func officialReview() { connection.set(key: statePath.adding("OfficialReview"), value: .bool(true), kind: .set) }
     public init(parent: Game, team: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Team", param: team))
 
         _team = parent.leaf("Team")
-        _name = parent.leaf("Name")
+        _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
+        _initials = parent.leaf("Initials").immutable
+        _fileName = parent.leaf("FileName").immutable
         _leagueName = parent.leaf("LeagueName")
+        _uniformColor = parent.leaf("UniformColor")
         _score = parent.leaf("Score").immutable
-        _timeouts = parent.leaf("Timeouts")
-        _officialReviews = parent.leaf("OfficialReviews")
+        _timeouts = parent.leaf("Timeouts").immutable
+        _officialReviews = parent.leaf("OfficialReviews").immutable
+        _inTimeout = parent.leaf("InTimeout").immutable
+        _inOfficialReview = parent.leaf("InOfficialReview").immutable
+        _totalPenalites = parent.leaf("TotalPenalites").immutable
         _retainedOfficialReview = parent.leaf("RetainedOfficialReview")
-        _displayLead = parent.leaf("DisplayLead")
-        _jamScore = parent.leaf("JamScore")
+        _displayLead = parent.leaf("DisplayLead").immutable
+        _jamScore = parent.leaf("JamScore").immutable
+        _tripScore = parent.leaf("TripScore")
+        _lastScore = parent.leaf("LastScore").immutable
+        _lost = parent.leaf("Lost")
+        _lead = parent.leaf("Lead")
+        _calloff = parent.leaf("Calloff")
+        _injury = parent.leaf("Injury")
         _noInitial = parent.leaf("NoInitial")
+        _starPass = parent.leaf("StarPass")
+        _noPivot = parent.leaf("NoPivot")
+        _starPassTrip = parent.leaf("StarPassTrip").immutable
+        _activeScoreAdjustmentAmount = parent.leaf("ActiveScoreAdjustmentAmount")
         _logo = parent.leaf("Logo")
-        _timeout = parent.leaf("Timeout")
-        _officialReview = parent.leaf("OfficialReview")
         _team.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
+        _initials.parentPath = statePath
+        _fileName.parentPath = statePath
         _leagueName.parentPath = statePath
+        _uniformColor.parentPath = statePath
         _score.parentPath = statePath
         _timeouts.parentPath = statePath
         _officialReviews.parentPath = statePath
+        _inTimeout.parentPath = statePath
+        _inOfficialReview.parentPath = statePath
+        _totalPenalites.parentPath = statePath
         _retainedOfficialReview.parentPath = statePath
         _displayLead.parentPath = statePath
         _jamScore.parentPath = statePath
+        _tripScore.parentPath = statePath
+        _lastScore.parentPath = statePath
+        _lost.parentPath = statePath
+        _lead.parentPath = statePath
+        _calloff.parentPath = statePath
+        _injury.parentPath = statePath
         _noInitial.parentPath = statePath
+        _starPass.parentPath = statePath
+        _noPivot.parentPath = statePath
+        _starPassTrip.parentPath = statePath
+        _activeScoreAdjustmentAmount.parentPath = statePath
         _logo.parentPath = statePath
-        _timeout.parentPath = statePath
-        _officialReview.parentPath = statePath
     }
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
         _team = parent.leaf("Team")
-        _name = parent.leaf("Name")
+        _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
+        _initials = parent.leaf("Initials").immutable
+        _fileName = parent.leaf("FileName").immutable
         _leagueName = parent.leaf("LeagueName")
+        _uniformColor = parent.leaf("UniformColor")
         _score = parent.leaf("Score").immutable
-        _timeouts = parent.leaf("Timeouts")
-        _officialReviews = parent.leaf("OfficialReviews")
+        _timeouts = parent.leaf("Timeouts").immutable
+        _officialReviews = parent.leaf("OfficialReviews").immutable
+        _inTimeout = parent.leaf("InTimeout").immutable
+        _inOfficialReview = parent.leaf("InOfficialReview").immutable
+        _totalPenalites = parent.leaf("TotalPenalites").immutable
         _retainedOfficialReview = parent.leaf("RetainedOfficialReview")
-        _displayLead = parent.leaf("DisplayLead")
-        _jamScore = parent.leaf("JamScore")
+        _displayLead = parent.leaf("DisplayLead").immutable
+        _jamScore = parent.leaf("JamScore").immutable
+        _tripScore = parent.leaf("TripScore")
+        _lastScore = parent.leaf("LastScore").immutable
+        _lost = parent.leaf("Lost")
+        _lead = parent.leaf("Lead")
+        _calloff = parent.leaf("Calloff")
+        _injury = parent.leaf("Injury")
         _noInitial = parent.leaf("NoInitial")
+        _starPass = parent.leaf("StarPass")
+        _noPivot = parent.leaf("NoPivot")
+        _starPassTrip = parent.leaf("StarPassTrip").immutable
+        _activeScoreAdjustmentAmount = parent.leaf("ActiveScoreAdjustmentAmount")
         _logo = parent.leaf("Logo")
-        _timeout = parent.leaf("Timeout")
-        _officialReview = parent.leaf("OfficialReview")
         _team.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
+        _initials.parentPath = statePath
+        _fileName.parentPath = statePath
         _leagueName.parentPath = statePath
+        _uniformColor.parentPath = statePath
         _score.parentPath = statePath
         _timeouts.parentPath = statePath
         _officialReviews.parentPath = statePath
+        _inTimeout.parentPath = statePath
+        _inOfficialReview.parentPath = statePath
+        _totalPenalites.parentPath = statePath
         _retainedOfficialReview.parentPath = statePath
         _displayLead.parentPath = statePath
         _jamScore.parentPath = statePath
+        _tripScore.parentPath = statePath
+        _lastScore.parentPath = statePath
+        _lost.parentPath = statePath
+        _lead.parentPath = statePath
+        _calloff.parentPath = statePath
+        _injury.parentPath = statePath
         _noInitial.parentPath = statePath
+        _starPass.parentPath = statePath
+        _noPivot.parentPath = statePath
+        _starPassTrip.parentPath = statePath
+        _activeScoreAdjustmentAmount.parentPath = statePath
         _logo.parentPath = statePath
-        _timeout.parentPath = statePath
-        _officialReview.parentPath = statePath
     }
 }
 extension Game {

@@ -29,41 +29,43 @@ public struct JT: View {
             #endif
             Spacer()
             if game.timeOutClock.running == true {
-                if game.teamOne.officialReview == true {
-                    HStack {
-                        Button {
-                            game.teamOne.retainedOfficialReview = true
-                        } label: {
-                            Image(systemName: "checkmark")
+                if game.officialReview == true {
+                    if game.teamOne.inOfficialReview == true {
+                        HStack {
+                            Button {
+                                game.teamOne.retainedOfficialReview = true
+                            } label: {
+                                Image(systemName: "checkmark")
+                            }
+                            Button {
+                                game.teamOne.retainedOfficialReview = false
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
                         }
-                        Button {
-                            game.teamOne.retainedOfficialReview = false
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                    }
-                } else if game.teamTwo.officialReview == true {
-                    HStack {
-                        Button {
-                            game.teamTwo.retainedOfficialReview = true
-                        } label: {
-                            Image(systemName: "checkmark")
-                        }
-                        Button {
-                            game.teamTwo.retainedOfficialReview = false
-                        } label: {
-                            Image(systemName: "xmark")
+                    } else if game.teamTwo.inOfficialReview == true {
+                        HStack {
+                            Button {
+                                game.teamTwo.retainedOfficialReview = true
+                            } label: {
+                                Image(systemName: "checkmark")
+                            }
+                            Button {
+                                game.teamTwo.retainedOfficialReview = false
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
                         }
                     }
                 }
                 HStack {
                     Button {
-                        game.teamOne.timeout = true
+                        game.teamOne.timeout()
                     } label: {
                         Image(systemName: "1.square")
                     }
                     Button {
-                        game.teamOne.officialReview = true
+                        game.teamOne.officialReview()
                     } label: {
                         Image(systemName: "o.square")
                     }
@@ -71,12 +73,12 @@ public struct JT: View {
                     Divider()
 
                     Button {
-                        game.teamTwo.officialReview = true
+                        game.teamTwo.officialReview()
                     } label: {
                         Image(systemName: "o.square")
                     }
                     Button {
-                        game.teamTwo.timeout = true
+                        game.teamTwo.timeout()
                     } label: {
                         Image(systemName: "2.square")
                     }

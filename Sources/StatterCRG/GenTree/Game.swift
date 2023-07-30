@@ -17,6 +17,8 @@ public struct Game : PathNodeId, Identifiable {
 
     @Leaf public var game: UUID?
 
+    
+
     @ImmutableLeaf public var name: String?
 
     public enum PreparedState: String, EnumStringAsID {
@@ -35,6 +37,8 @@ public struct Game : PathNodeId, Identifiable {
     public var lineupClock: Clock { clock(.lineup) }
     public var timeOutClock: Clock { clock(.timeOut) }
     public var intermissionClock: Clock { clock(.intermission) }
+    
+
     @ImmutableLeaf public var currentPeriodNumber: Int?
 
     @ImmutableLeaf public var currentPeriod: Int?
@@ -45,6 +49,8 @@ public struct Game : PathNodeId, Identifiable {
 
     @Leaf public var officialScore: Bool?
 
+    
+
     @ImmutableLeaf public var inJam: Bool?
 
     @ImmutableLeaf public var inOvertime: Bool?
@@ -52,8 +58,6 @@ public struct Game : PathNodeId, Identifiable {
     @ImmutableLeaf public var inSuddenScoring: Bool?
 
     @ImmutableLeaf public var injuryContinuationUpcoming: Bool?
-
-    @Leaf public var timoutOwner: UUID?
 
     @Leaf public var officialReview: Bool?
 
@@ -63,7 +67,7 @@ public struct Game : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var upcomingJamNumber: Int?
 
-    @Leaf public var timeoutOwner: String?
+    @Leaf public var timeoutOwner: UUID?
 
     @Leaf public var noMoreJam: Bool?
 
@@ -82,6 +86,8 @@ public struct Game : PathNodeId, Identifiable {
     @Leaf public var suspensionsServed: String?
 
     @Leaf public var clockDuringFinalScore: Bool?
+
+    
 
     // These are commands, not state
 
@@ -133,7 +139,6 @@ public struct Game : PathNodeId, Identifiable {
         _inOvertime = parent.leaf("InOvertime").immutable
         _inSuddenScoring = parent.leaf("InSuddenScoring").immutable
         _injuryContinuationUpcoming = parent.leaf("InjuryContinuationUpcoming").immutable
-        _timoutOwner = parent.leaf("TimoutOwner")
         _officialReview = parent.leaf("OfficialReview")
         _upcomingJam = parent.leaf("UpcomingJam").immutable
         _upcomingJamNumber = parent.leaf("UpcomingJamNumber").immutable
@@ -164,7 +169,6 @@ public struct Game : PathNodeId, Identifiable {
         _inOvertime.parentPath = statePath
         _inSuddenScoring.parentPath = statePath
         _injuryContinuationUpcoming.parentPath = statePath
-        _timoutOwner.parentPath = statePath
         _officialReview.parentPath = statePath
         _upcomingJam.parentPath = statePath
         _upcomingJamNumber.parentPath = statePath
@@ -199,7 +203,6 @@ public struct Game : PathNodeId, Identifiable {
         _inOvertime = parent.leaf("InOvertime").immutable
         _inSuddenScoring = parent.leaf("InSuddenScoring").immutable
         _injuryContinuationUpcoming = parent.leaf("InjuryContinuationUpcoming").immutable
-        _timoutOwner = parent.leaf("TimoutOwner")
         _officialReview = parent.leaf("OfficialReview")
         _upcomingJam = parent.leaf("UpcomingJam").immutable
         _upcomingJamNumber = parent.leaf("UpcomingJamNumber").immutable
@@ -230,7 +233,6 @@ public struct Game : PathNodeId, Identifiable {
         _inOvertime.parentPath = statePath
         _inSuddenScoring.parentPath = statePath
         _injuryContinuationUpcoming.parentPath = statePath
-        _timoutOwner.parentPath = statePath
         _officialReview.parentPath = statePath
         _upcomingJam.parentPath = statePath
         _upcomingJamNumber.parentPath = statePath
