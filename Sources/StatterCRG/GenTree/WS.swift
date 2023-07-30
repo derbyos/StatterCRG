@@ -18,7 +18,7 @@ public struct WS : PathSpecified {
 
         public init(parent: WS) {
             self.parent = parent
-            statePath = parent.adding(.plain("Device"))
+            statePath = parent.adding("Device")
     
             _name = parent.leaf("Name")
             _id = parent.leaf("Id")
@@ -44,7 +44,7 @@ public struct WS : PathSpecified {
 
         public init(parent: WS) {
             self.parent = parent
-            statePath = parent.adding(.plain("Client"))
+            statePath = parent.adding("Client")
     
             _remoteAddress = parent.leaf("RemoteAddress")
             _id = parent.leaf("Id")

@@ -126,7 +126,12 @@ public struct Leaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
     public var component: StatePath.PathComponent
     public var parentPath: StatePath
     public var statePath: StatePath {
-        parentPath.adding(component)
+        if case let .plain(string) = component {
+            // so we add the correct compound
+            return parentPath.adding(string)
+        } else {
+            return parentPath.adding(component)
+        }
     }
     public var wrappedValue: T? {
         get {
@@ -166,7 +171,12 @@ public struct ImmutableLeaf<T:JSONTypeable>: PathSpecified, DynamicProperty {
     public var component: StatePath.PathComponent
     public var parentPath: StatePath
     public var statePath: StatePath {
-        parentPath.adding(component)
+        if case let .plain(string) = component {
+            // so we add the correct compound
+            return parentPath.adding(string)
+        } else {
+            return parentPath.adding(component)
+        }
     }
     public var wrappedValue: T? {
         get {

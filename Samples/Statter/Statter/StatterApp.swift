@@ -12,11 +12,16 @@ import StatterCRGUI
 
 @main
 struct StatterApp: App {
-    var scoreboard: Connection = .init(host: "10.0.0.10")
+    var scoreboard: Connection = {
+        let retval = Connection(host: "10.0.0.10")
+        retval.debugFlags.insert(.registering)
+        retval.debugFlags.insert(.incoming)
+        return retval
+    }()
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(scoreboard)
+                .environmentObject(scoreboard) 
         }
     }
 }

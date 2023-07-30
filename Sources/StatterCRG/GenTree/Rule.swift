@@ -10,7 +10,7 @@ public struct Rule : PathNode {
     public let statePath: StatePath
     public init(parent: Game) {
         self.parent = parent
-        statePath = parent.adding(.plain("Rule"))
+        statePath = parent.adding("Rule")
 
     }
     public init(parent: Game, statePath: StatePath) {

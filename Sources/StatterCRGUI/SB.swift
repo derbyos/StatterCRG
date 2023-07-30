@@ -174,9 +174,15 @@ public struct SB: View {
     public var body: some View {
         VStack {
             HStack {
-                TeamDisplay(team: game.teamOne, leftSide: true, showJammer: game.inJam == true)
-                Divider()
-                TeamDisplay(team: game.teamTwo, leftSide: false, showJammer: game.inJam == true)
+                if connection.scoreBoard.settings.setting.scoreBoard.view_SwapTeams?.isTrue == true {
+                    TeamDisplay(team: game.teamTwo, leftSide: true, showJammer: game.inJam == true)
+                    Divider()
+                    TeamDisplay(team: game.teamOne, leftSide: false, showJammer: game.inJam == true)
+                } else {
+                    TeamDisplay(team: game.teamOne, leftSide: true, showJammer: game.inJam == true)
+                    Divider()
+                    TeamDisplay(team: game.teamTwo, leftSide: false, showJammer: game.inJam == true)
+                }
             }
             Divider()
             HStack {

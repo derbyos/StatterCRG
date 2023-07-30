@@ -9,19 +9,11 @@ public struct Skater : PathNodeId, Identifiable {
     public var parent: Team
     public var id: UUID? { UUID.from(component: statePath.last)?.1 }
     public let statePath: StatePath
-    public enum Role: String, Codable, JSONTypeable {
-    case bench = "Bench"
-    case blocker = "Blocker"
-    case pivot = "Pivot"
-    case jammer = "Jammer"
-    public init?(_ json: JSONValue) {
-    if let value = json.stringValue, let role = Role(rawValue: value) {
-    self = role
-    } else {
-    return nil
-    }
-    }
-    public var asJSON: JSONValue { .string(rawValue) }
+    public enum Role: String, EnumStringAsID {
+        case bench = "Bench"
+        case blocker = "Blocker"
+        case pivot = "Pivot"
+        case jammer = "Jammer"
     }
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
 

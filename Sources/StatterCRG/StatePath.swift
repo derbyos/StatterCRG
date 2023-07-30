@@ -43,6 +43,8 @@ public struct StatePath : Codable, Hashable, Sequence {
             if key.isEmpty == false {
                 if param.isEmpty {
                     components.append(.plain(key))
+                } else if param.contains(".") {
+                    components.append(.compound(key, parts: param.components(separatedBy: ".").map{String($0)}))
                 } else if param == "*" {
                     components.append(.wild(key))
                 } else if let i = Int(param) {
@@ -96,6 +98,7 @@ public struct StatePath : Codable, Hashable, Sequence {
         case number(String, param: Int)
         case id(String, id: UUID)
         case name(String, name: String)
+        case compound(String, parts: [String]) // simlar to name, but parts are separated by periods
         public var description: String {
             switch self {
             case .plain(let s): return s
@@ -103,6 +106,7 @@ public struct StatePath : Codable, Hashable, Sequence {
             case .name(let s, name: let name): return "\(s)(\(name))"
             case .wild(let s): return "\(s)(*)"
             case .number(let s, param: let n): return "\(s)(\(n))"
+            case .compound(let s, parts: let p): return "\(s)(\(p.joined(separator: ".")))"
             }
         }
         public var id: UUID? {
@@ -123,8 +127,15 @@ public struct StatePath : Codable, Hashable, Sequence {
     /// Create a new state path, adding this string as a .plain component
     /// - Parameter plain: The name to add
     /// - Returns: A new state path with this appended
+    ///
+    /// - Important: If the last element is a compound, this will add to the compound
     public func adding(_ plain: String) -> StatePath {
-        .init(components: components + [.plain(plain)])
+        switch components.last {
+        case .compound(let s, parts: let p):
+            return .init(components: components.dropLast() + [.compound(s, parts: p + [plain])])
+        default:
+            return .init(components: components + [.plain(plain)])
+        }
     }
     public var description: String {
         .init(components.map {
@@ -212,7 +223,7 @@ public extension PathSpecified {
         statePath.adding(component)
     }
     func adding(_ plain: String) -> StatePath {
-        statePath.adding(.plain(plain))
+        statePath.adding(plain)
     }
 }
 

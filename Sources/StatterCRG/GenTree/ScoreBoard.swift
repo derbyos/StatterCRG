@@ -51,7 +51,7 @@ public struct ScoreBoard : PathSpecified {
         public func device(_ id: UUID? = nil) -> Device { .init(parent: self, id: id) }
         public init(parent: ScoreBoard) {
             self.parent = parent
-            statePath = parent.adding(.plain("Clients"))
+            statePath = parent.adding("Clients")
     
         }
         public init(parent: ScoreBoard, statePath: StatePath) {
@@ -76,10 +76,16 @@ public struct ScoreBoard : PathSpecified {
     public var version:Version_Subscript { .init(connection: connection, statePath: statePath) }
     @Leaf public var blankStatsbookFound: Bool?
 
+    
+
+    @Leaf public var importsInProgress: Bool?
+
     public init(connection: Connection) {
         self.connection = connection
         let dummy = Leaf<Bool>(connection: connection, component: .wild(""), parentPath: .init(components: []))
         _blankStatsbookFound = dummy.leaf("BlankStatsbookFound")
+        _importsInProgress = dummy.leaf("ImportsInProgress")
         _blankStatsbookFound.parentPath = statePath
+        _importsInProgress.parentPath = statePath
     }
 }

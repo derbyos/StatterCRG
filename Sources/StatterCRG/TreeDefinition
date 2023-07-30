@@ -31,6 +31,8 @@ root ScoreBoard {
     }
     subscript Version : String
     var BlankStatsbookFound : Bool
+    
+    var ImportsInProgress : Bool
 }
 
 node Period Game {
@@ -41,10 +43,20 @@ node Period Game {
 }
 
 node Game ScoreBoard {
-    key id : UUID
+    key Id : UUID
+    let Readonly : Bool
     
+    // Only valid in CurrentGame
     var Game : UUID
 
+    let Name : String
+    enum PreparedState {
+        case Prepared
+        case Running
+        case Finished
+    }
+    let State : PreparedState
+    
     !public var teamOne: Team { team(1) }
     !public var teamTwo: Team { team(2) }
     !public var periodClock: Clock { clock(.period) }
@@ -53,21 +65,52 @@ node Game ScoreBoard {
     !public var timeOutClock: Clock { clock(.timeOut) }
     !public var intermissionClock: Clock { clock(.intermission) }
 
-    var CurrentPeriodNumber : Int
+    let CurrentPeriodNumber : Int
+    let CurrentPeriod : Int
+    let CurrentTimout : UUID
+    let InPeriod : Bool
     var OfficialScore : Bool
-    var RulesetName : String
 
-    var InJam : Bool
+    let InJam : Bool
+    let InOvertime : Bool
+    let InSuddenScoring : Bool
+    let InjuryContinuationUpcoming : Bool
+    var TimoutOwner : UUID
     var OfficialReview : Bool
     
+    let UpcomingJam : UUID
+    let UpcomingJamNumber : Int
     var TimeoutOwner : String
+    var NoMoreJam : Bool
+    var OfficalScore : Bool
+    var AbortReason : String
+    var Ruleset : UUID
+    let RulesetName : String
+    var HeadNso : UUID
+    var HeadRef : UUID
+    var SuspensionsServed : String
+    var ClockDuringFinalScore : Bool
+
     // These are commands, not state
     action StartJam
     action StopJam
     action Timeout
     action OfficialTimeout
+    action StartOvertime
+    action ClockUndo
+    action ClockReplace
+    
+    // MARK: Exporting
+    action Export
+    let UpdateInProgress : Bool
+    var StatsbookExists : Bool
+    var JsonExists : Bool
+    let ExportBlockedBy : String
     
     map PenaltyCode[String] : String
+    map Label[UUID] : String
+    map EventInfo[UUID] : String
+
 }
 
 node Team Game {
@@ -127,7 +170,7 @@ node Team Game {
 
 node Clock Game {
     enum Kind {
-        case timeOut = Timeout
+        case timeOut = "Timeout"
         case Period
         case Lineup
         case Jam
@@ -156,20 +199,12 @@ node TeamJam Jam<P> {
 
 
 node Skater Team {
-!public enum Role: String, Codable, JSONTypeable {
-!   case bench = "Bench"
-!   case blocker = "Blocker"
-!   case pivot = "Pivot"
-!   case jammer = "Jammer"
-!   public init?(_ json: JSONValue) {
-!      if let value = json.stringValue, let role = Role(rawValue: value) {
-!              self = role
-!       } else {
-!           return nil
-!      }
-!   }
-!   public var asJSON: JSONValue { .string(rawValue) }
-!}
+    enum Role {
+        case Bench
+        case Blocker
+        case Pivot
+        case Jammer
+    }
     key Id: UUID
     // skater = "", alt skater "ALT", bench "B", bench alt captain = "BA", captain = "C",  alt captain "AC"
     var Flags : String
@@ -195,3 +230,114 @@ node Penalty Skater {
 
 node Rule Game {
 }
+
+node Settings ScoreBoard {
+    @compound node Setting {
+        enum BoolString {
+            case _true = "true"
+            case _false = "false"
+            ! public var isTrue : Bool { self == ._true }
+        }
+        node Overlay {
+            node Interactive {
+                enum OnOff {
+                    case On
+                    case Off
+                }
+                var BackgroundColor : String
+                var Clock : OnOff
+                node LowerThird {
+                    var Line1 : String
+                    var Line2 : String
+                    enum Style {
+                        case ColorDefault
+                        case ColorTeam1
+                        case ColorTeam2
+                    }
+                    var Style : Style
+                    enum Panel {
+                        case Empty = ""
+                        case PPJBox
+                        case RosterTeam1
+                        case RosterTeam2
+                        case PenaltyTeam1
+                        case PenaltyTeam2
+                        case LowerThird
+                        case Upcoming
+                    }
+                    var Panel : Panel
+                    var Score : OnOff
+                    var ShowJammers : OnOff
+                    var ShowLineups : OnOff
+                    var ShowAllNames : OnOff
+                }
+            }
+        }
+        node ScoreBoard {
+            enum AutoStart {
+                case Empty = ""
+                case Jam
+                case Timout
+            }
+            var AutoStart : AutoStart
+            var AutoStartBuffer : Int
+            var AutoEndJam : BoolString
+            var AutoEndTTO : BoolString
+            enum ClockAfterTimeout {
+                case Lineup
+                case Timeout
+            }
+            var ClockAfterTimeout : ClockAfterTimeout
+            node Clock {
+                var Sync : BoolString
+            }
+            node Game {
+                var DefaultNameFormat : String
+            }
+            node Intermission {
+                var PreGame : String
+                var Intermission : String
+                var Unofficial : String
+                var Official : String
+                var OfficialWithclock : String
+            }
+            node Penalties {
+                var ForcedServed : BoolString
+                var UseLT : BoolString
+            }
+            enum CurrentView {
+                case scoreboard
+                case whiteboard
+                case image
+                case video
+                case html
+            }
+            var View_CurrentView : CurrentView
+            var View_CustomHTML : String
+            var View_HideLogos : BoolString
+            var View_Image : String
+            var View_SidePadding : String
+            var View_SwapTeams : BoolString
+            var View_Video : String
+        }
+    }
+}
+
+
+//node Official {
+//    key Id : UUID
+//    let Readonly : Bool
+//    var Role : String
+//    var Name : String
+//    var League : String
+//    var Cert : String
+//    var P1Team : UUID
+//    var Swap : Bool
+//}
+
+//node Ref Game : Official {
+//
+//}
+//node Nso Game : Official  {
+//
+//}

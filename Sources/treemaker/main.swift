@@ -37,14 +37,27 @@ class AST {
         case action
         case ref(String)
         case list(String)
+        case `protocol`
     }
     var kind: Kind
     var name: String
+    var componentName: String {
+        if let attr = getAttribute("name"), let name = attr.params.first?.0 {
+            return name
+        }
+        return name
+    }
     var children: [AST]
-    init(kind: Kind, name: String) {
+    struct Attribute {
+        var name: String
+        var params: [(String,String?)]
+    }
+    var attributes: [Attribute]
+    init(kind: Kind, name: String, attributes: [Attribute] = []) {
         self.kind = kind
         self.name = name
         children = []
+        self.attributes = attributes
     }
 }
 
@@ -111,6 +124,12 @@ extension AST {
         }
         return nil
     }
+    func hasAttribute(_ name: String) -> Bool {
+        attributes.contains(where:{$0.name == name})
+    }
+    func getAttribute(_ name: String) -> Attribute? {
+        attributes.first(where:{$0.name == name})
+    }
     func generate() throws -> String {
 //        guard kind == .root else {
 //            throw Errors.rootNodeNotAtRoot
@@ -146,6 +165,8 @@ import Foundation
     func generate(parent: String, indent: String) throws -> [String] {
         var lines : [String]
         switch kind {
+        case .protocol:
+            return [] // this doesn't generate code, it is automatically folded into everything that adopts it
         case .comment:
             return [indent + name + "\n"]
         case .code: // since the newline will be added
@@ -155,7 +176,11 @@ import Foundation
                 "public enum \(name): String, EnumStringAsID {",
             ]
         case .`case`(let value):
-            return [indent + "case \(name.initialLowercase) = \"\(value ?? name)\""]
+            if let value { // assumes to be quoted
+                return [indent + "case \(name.initialLowercase) = \(value)"]
+            } else {
+                return [indent + "case \(name.initialLowercase) = \"\(name)\""]
+            }
         case .action:
             return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: .set) }"]
         case .root:
@@ -196,38 +221,10 @@ import Foundation
                 ]
             }
 
-            // state path can either be plain, or some sort of parameter (or an optional one)
-            #if nomore
-            if let key, let keyType = key.keyType {
-                if keyType.hasSuffix("?") {
-                    lines += [
-                        indentBy + "public var statePath: StatePath {",
-                        indentBy + indentBy + "if let \(key.name) {",
-                        indentBy + indentBy + indentBy + "return parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
-                        indentBy + indentBy + "} else {",
-                        indentBy + indentBy + indentBy + "return  parent.adding(.wild(\"\(name)\"))",
-                        indentBy + indentBy + "}",
-                        indentBy + "}",
-                        "",
-                    ]
-                } else {
-                    lines += [
-                        indentBy + "public var statePath: StatePath { parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))}",
-                        "",
-                    ]
-                }
-            } else {
-                lines += [
-                    indentBy + "public var statePath: StatePath { parent.adding(.plain(\"\(name)\"))}",
-                    "",
-                ]
-            }
-            #else
             // make statePath be a variable so we can have multiple "containment"
             lines += [
                 indentBy + "public let statePath: StatePath"
             ]
-            #endif
         case .leaf(let type, immutable: let immutable):
             if !immutable {
                 return [indent + "@Leaf public var \(name.initialLowercase): \(type)?\n"]
@@ -316,23 +313,31 @@ import Foundation
                 if keyType.hasSuffix("?") {
                     lines += [
                         indentBy + indentBy + "if let \(key.name) {",
-                        indentBy + indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
+                        indentBy + indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(componentName, name: key.name.initialLowercase)))",
                         indentBy + indentBy + "} else {",
-                        indentBy + indentBy + indentBy + "statePath =  parent.adding(.wild(\"\(name)\"))",
+                        indentBy + indentBy + indentBy + "statePath =  parent.adding(.wild(\"\(componentName)\"))",
                         indentBy + indentBy + "}",
                         "",
                     ]
                 } else {
                     lines += [
-                        indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(name, name: key.name.initialLowercase)))",
+                        indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(componentName, name: key.name.initialLowercase)))",
                         "",
                     ]
                 }
             } else {
-                lines += [
-                    indentBy + indentBy + "statePath = parent.adding(.plain(\"\(name)\"))",
-                    "",
-                ]
+                if hasAttribute("compound") {
+                    // start with empty parts
+                    lines += [
+                        indentBy + indentBy + "statePath = parent.adding(.compound(\"\(componentName)\", parts: []))",
+                        "",
+                    ]
+                } else {
+                    lines += [
+                        indentBy + indentBy + "statePath = parent.adding(\"\(componentName)\")",
+                        "",
+                    ]
+                }
             }
             
             declareLeafs()
@@ -400,8 +405,9 @@ import Foundation
     }
 }
 
-func parseAST(source: String) throws -> [AST] {
-    var document: [AST] = []
+func parseAST(source: String) throws -> [String:AST] {
+    var initCommon = AST(kind: .root, name: "")
+    var document: [String:AST] = ["__init__": initCommon]
     var astStack: [AST] = [] {
         willSet {
             // automatically link as part of the parent
@@ -416,7 +422,7 @@ func parseAST(source: String) throws -> [AST] {
         let trim = line.trimmingCharacters(in: .whitespaces)
         if trim.hasPrefix("//") || trim.isEmpty {
             if astStack.isEmpty {
-                document.append(.init(kind: .comment, name: trim))
+                initCommon.children.append(.init(kind: .comment, name: trim))
             } else {
                 astStack.last?.children.append(.init(kind: .comment, name: trim))
             }
@@ -424,7 +430,7 @@ func parseAST(source: String) throws -> [AST] {
         } else if trim.hasPrefix("!") {
             let code = AST(kind: .code, name: .init(trim.dropFirst().trimmingCharacters(in: .whitespaces)))
             if astStack.isEmpty {
-                document.append(code)
+                initCommon.children.append(code)
             } else {
                 astStack.last?.children.append(code)
             }
@@ -443,7 +449,7 @@ func parseAST(source: String) throws -> [AST] {
                 }
                 for c in str {
                     switch c {
-                    case "[", "]", ":", "(", ")", "{", "}", ".":
+                    case "[", "]", ":", "(", ")", ",", "=", "{", "}", ".":
                         finishCurrent()
                         retval.append(.init(c))
                     default:
@@ -465,6 +471,43 @@ func parseAST(source: String) throws -> [AST] {
         var isAtEOL: Bool {
             tokenIndex >= parts.count
         }
+        func getAttributes() -> [AST.Attribute] {
+            var retval = [AST.Attribute]()
+            while !isAtEOL, token?.hasPrefix("@") == true {
+                let name = String(token!.dropFirst())
+                nextToken()
+                if token == "(" {
+                    nextToken()
+                    var params: [(String, String?)] = []
+                    while !isAtEOL, token != ")" {
+                        guard let pname = token else {
+                            break
+                        }
+                        if nextToken() == ")" {
+                            params.append((pname, nil))
+                            break
+                        }
+                        if token == "," {
+                            params.append((pname, nil))
+                        } else if token == "=" {
+                            guard let pvalue = nextToken() else {
+                                break
+                            }
+                            params.append((pname, pvalue))
+                        }
+                    }
+                    retval.append(.init(name: name, params: params))
+                    nextToken() // since current token is ")"
+                } else {
+                    retval.append(.init(name: name, params: []))
+                }
+            }
+            if retval.isEmpty == false {
+                print("found attributes \(retval)")
+            }
+            return retval
+        }
+        let preAttributes = getAttributes()
         @discardableResult
         func nextToken() -> String? {
             tokenIndex += 1
@@ -527,7 +570,7 @@ func parseAST(source: String) throws -> [AST] {
                 throw Errors.missingNodeName
             }
             let node = AST(kind: .root, name: name)
-            document.append(node)
+            document[name] = node
             astStack.append(node)
             try expect("{")
         case "node":
@@ -536,13 +579,35 @@ func parseAST(source: String) throws -> [AST] {
             }
             let node: AST
             if let parent = nextTokenList() {
-                node = .init(kind: .node(parent: parent), name: name)
+                node = .init(kind: .node(parent: parent), name: name, attributes: preAttributes)
             } else {
-                node = .init(kind: .node(parent: nil), name: name)
+                node = .init(kind: .node(parent: nil), name: name, attributes: preAttributes)
+            }
+            if hasNext(":") {
+                guard let proto = nextToken() else {
+                    throw Errors.missingNodeName
+                }
+                guard let protoNode = document[proto] else {
+                    throw Errors.missingNodeName
+                }
+                // we dump all these values in
+                node.children.append(contentsOf: protoNode.children)
             }
             if astStack.isEmpty {
-                document.append(node)
+//                document.append(node)
+                document[name] = node
             }
+            astStack.append(node)
+            try expect("{")
+        case "protocol":
+            guard astStack.isEmpty else {
+                throw Errors.rootNodeNotAtRoot
+            }
+            guard let name = nextToken() else {
+                throw Errors.missingNodeName
+            }
+            let node = AST(kind: .protocol, name: name, attributes: preAttributes)
+            document[name] = node
             astStack.append(node)
             try expect("{")
         case "ref":
@@ -641,6 +706,7 @@ func parseAST(source: String) throws -> [AST] {
             }
             astStack.last?.children.append(.init(kind: .action, name: name))
         default:
+            print("Error line \(lineNum) in \(parts)")
             throw Errors.syntaxError
         }
     }
@@ -654,13 +720,13 @@ do {
     let document = try parseAST(source: source)
 //    var output = ""
     for root in document {
-        switch root.kind {
+        switch root.value.kind {
         case .node, .root:
-            print("=========\(root.name)=======")
+            print("=========\(root.value.name)=======")
 //            print(try root.generate())
 //            output.append(try root.generate())
 //            output.append("\n")
-            try root.save(destURL: destURL)
+            try root.value.save(destURL: destURL)
         default:
             break
         }
