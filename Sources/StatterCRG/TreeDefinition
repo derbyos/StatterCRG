@@ -216,6 +216,7 @@ node Clock Game {
     var Time : Int
     let InvertedTime : Int
     var MaximumTime : Int
+    var MinimumTime : Int
     let Readonly : Bool
     var Running : Bool
     var Name : String
@@ -384,20 +385,13 @@ node Settings ScoreBoard {
 }
 
 
-//node Official {
-//    key Id : UUID
-//    let Readonly : Bool
-//    var Role : String
-//    var Name : String
-//    var League : String
-//    var Cert : String
-//    var P1Team : UUID
-//    var Swap : Bool
-//}
-
-//node Ref Game : Official {
-//
-//}
-//node Nso Game : Official  {
-//
-//}
+node Official <Game.Nso Game.Ref> {
+    key Id : UUID
+    let Readonly : Bool
+    var Role : String
+    var Name : String
+    var League : String
+    var Cert : String
+    var P1Team : UUID
+    var Swap : Bool
+}

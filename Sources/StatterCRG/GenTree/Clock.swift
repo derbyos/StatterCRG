@@ -24,6 +24,8 @@ public struct Clock : PathNodeId, Identifiable {
 
     @Leaf public var maximumTime: Int?
 
+    @Leaf public var minimumTime: Int?
+
     @ImmutableLeaf public var readonly: Bool?
 
     @Leaf public var running: Bool?
@@ -44,6 +46,7 @@ public struct Clock : PathNodeId, Identifiable {
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
+        _minimumTime = parent.leaf("MinimumTime")
         _readonly = parent.leaf("Readonly").immutable
         _running = parent.leaf("Running")
         _name = parent.leaf("Name")
@@ -52,6 +55,7 @@ public struct Clock : PathNodeId, Identifiable {
         _time.parentPath = statePath
         _invertedTime.parentPath = statePath
         _maximumTime.parentPath = statePath
+        _minimumTime.parentPath = statePath
         _readonly.parentPath = statePath
         _running.parentPath = statePath
         _name.parentPath = statePath
@@ -64,6 +68,7 @@ public struct Clock : PathNodeId, Identifiable {
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
+        _minimumTime = parent.leaf("MinimumTime")
         _readonly = parent.leaf("Readonly").immutable
         _running = parent.leaf("Running")
         _name = parent.leaf("Name")
@@ -72,6 +77,7 @@ public struct Clock : PathNodeId, Identifiable {
         _time.parentPath = statePath
         _invertedTime.parentPath = statePath
         _maximumTime.parentPath = statePath
+        _minimumTime.parentPath = statePath
         _readonly.parentPath = statePath
         _running.parentPath = statePath
         _name.parentPath = statePath

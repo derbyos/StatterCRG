@@ -351,32 +351,35 @@ import Foundation
             lines.append("}")
 
             // the declaration in the parent (either in this file or at the root as an extension)
-            func addParentVar(indent: String = "", parent: String = "") {
+            func addParentVar(indent: String = "", parent: String = "", field: String? = nil) {
                 if let key, let keyType = key.keyType {
                     let qualified = keyType == "Kind" ? "\(name).Kind" : keyType
                     let defaultValue = keyType.hasSuffix("?") ? " = nil" : ""
-                    lines.append("\(indent)public func \(name.initialLowercase)(_ \(key.name.initialLowercase): \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, \(key.name.initialLowercase): \(key.name.initialLowercase)) }")
+                    lines.append("\(indent)public func \(field?.initialLowercase ?? name.initialLowercase)(_ \(key.name.initialLowercase): \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, \(key.name.initialLowercase): \(key.name.initialLowercase)) }")
                 } else {
-                    lines.append("\(indent)public var \(name.initialLowercase): \(name)\(parent) { .init(parent: self) }")
+                    lines.append("\(indent)public var \(field?.initialLowercase ?? name.initialLowercase): \(name)\(parent) { .init(parent: self) }")
                 }
             }
             if let parent2 {
                 for aParent in parent2.components(separatedBy: " ") {
-                    let qparent : String
+                    let qparentFull : String
                     if aParent.hasSuffix(">") {
-                        qparent = aParent.split(separator: "<").first.flatMap{String($0)}!
+                        qparentFull = aParent.split(separator: "<").first.flatMap{String($0)}!
                     } else {
-                        qparent = aParent
+                        qparentFull = aParent
                     }
+                    let qparentParts = qparentFull.split(separator: ".")
+                    let qparent = String(qparentParts.first!)
+                    let qparentField = String(qparentParts.last!)
                     lines += [ "extension \(qparent) {"]
                     if parent2.contains(" ") {
                         // needs to qualify this
-                        addParentVar(indent: indentBy, parent: "<\(qparent)>")
+                        addParentVar(indent: indentBy, parent: "<\(qparent)>", field: qparentParts.count == 2 ? qparentField : nil)
                     } else if parent2.hasSuffix(">") {
                         // needs to qualify this
-                        addParentVar(indent: indentBy, parent: "<P>")
+                        addParentVar(indent: indentBy, parent: "<P>", field: qparentParts.count == 2 ? qparentField : nil)
                     } else {
-                        addParentVar(indent: indentBy)
+                        addParentVar(indent: indentBy, field: qparentParts.count == 2 ? qparentField : nil)
                     }
                     lines += [ "}"]
                 }
@@ -449,7 +452,7 @@ func parseAST(source: String) throws -> [String:AST] {
                 }
                 for c in str {
                     switch c {
-                    case "[", "]", ":", "(", ")", ",", "=", "{", "}", ".":
+                    case "[", "]", ":", "(", ")", ",", "=", "{", "}":
                         finishCurrent()
                         retval.append(.init(c))
                     default:
