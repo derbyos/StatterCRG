@@ -438,9 +438,6 @@ public class Connection : ObservableObject, Equatable {
     /// A list of everything we've registered (so we only do it once)
     var registered = Set<StatePath>()
     
-    /// used to determine the current state change
-    var stateChange = StateChange.set
-    
     /// Convenience to fetch state via a path
     public subscript(path: PathSpecified) -> JSONValue? {
         state[path.statePath]

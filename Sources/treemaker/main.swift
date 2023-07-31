@@ -182,7 +182,7 @@ import Foundation
                 return [indent + "case \(name.initialLowercase) = \"\(name)\""]
             }
         case .action:
-            return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: .set) }"]
+            return [indent + "public func \(name.initialLowercase)() { connection.set(key: statePath.adding(\"\(name)\"), value: .bool(true), kind: \(hasAttribute("reset") ? ".reset" : ".set")) }"]
         case .root:
             lines = [
                 "public struct \(name) : PathSpecified {",
@@ -704,7 +704,7 @@ func parseAST(source: String) throws -> [String:AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
-            astStack.last?.children.append(.init(kind: .action, name: name))
+            astStack.last?.children.append(.init(kind: .action, name: name, attributes: preAttributes))
         default:
             print("Error line \(lineNum) in \(parts)")
             throw Errors.syntaxError

@@ -16,13 +16,15 @@ public struct Clock : PathNodeId, Identifiable {
         case jam = "Jam"
         case intermission = "Intermission"
     }
+    //    let Id : String
+
     @Leaf public var time: Int?
 
-    @Leaf public var invertedTime: Int?
+    @ImmutableLeaf public var invertedTime: Int?
 
     @Leaf public var maximumTime: Int?
 
-    @Leaf public var readonly: Bool?
+    @ImmutableLeaf public var readonly: Bool?
 
     @Leaf public var running: Bool?
 
@@ -32,14 +34,17 @@ public struct Clock : PathNodeId, Identifiable {
 
     @Leaf public var number: Int?
 
+    public func start() { connection.set(key: statePath.adding("Start"), value: .bool(true), kind: .set) }
+    public func stop() { connection.set(key: statePath.adding("Stop"), value: .bool(true), kind: .set) }
+    public func resetTime() { connection.set(key: statePath.adding("ResetTime"), value: .bool(true), kind: .reset) }
     public init(parent: Game, kind: Kind) {
         self.parent = parent
         statePath = parent.adding(.name("Clock", name: kind.rawValue))
 
         _time = parent.leaf("Time")
-        _invertedTime = parent.leaf("InvertedTime")
+        _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
-        _readonly = parent.leaf("Readonly")
+        _readonly = parent.leaf("Readonly").immutable
         _running = parent.leaf("Running")
         _name = parent.leaf("Name")
         _direction = parent.leaf("Direction")
@@ -57,9 +62,9 @@ public struct Clock : PathNodeId, Identifiable {
         self.parent = parent
         self.statePath = statePath
         _time = parent.leaf("Time")
-        _invertedTime = parent.leaf("InvertedTime")
+        _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
-        _readonly = parent.leaf("Readonly")
+        _readonly = parent.leaf("Readonly").immutable
         _running = parent.leaf("Running")
         _name = parent.leaf("Name")
         _direction = parent.leaf("Direction")

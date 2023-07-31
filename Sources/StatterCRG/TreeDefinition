@@ -212,14 +212,18 @@ node Clock Game {
         case Intermission
     }
     key kind : Kind
+//    let Id : String
     var Time : Int
-    var InvertedTime : Int
+    let InvertedTime : Int
     var MaximumTime : Int
-    var Readonly : Bool
+    let Readonly : Bool
     var Running : Bool
     var Name : String
     var Direction : Bool
     var Number : Int
+    action Start
+    action Stop
+    @reset action ResetTime
 }
 
 
