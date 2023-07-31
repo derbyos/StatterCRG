@@ -9,14 +9,20 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: Jam<P>
     public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
+    @Leaf public var teamJamID: UUID?
+
     public init(parent: Jam<P>, team: Int) {
         self.parent = parent
         statePath = parent.adding(.number("TeamJam", param: team))
 
+        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID.parentPath = statePath
     }
     public init(parent: Jam<P>, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID.parentPath = statePath
     }
 }
 extension Jam {

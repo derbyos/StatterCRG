@@ -197,7 +197,10 @@ import Foundation
             let qname: String
             let qparent: String
             var protos: String = ""
-            if fullParent.contains(" ") { // it is a template
+            if let parentAttr = getAttribute("parent") {
+                qname = name
+                qparent = parentAttr.params.first?.0 ?? fullParent
+            } else if fullParent.contains(" ") { // it is a template
                 qname = name + "<P:PathSpecified>"
                 qparent = "P"
             } else if fullParent.hasSuffix(">") {
@@ -212,7 +215,7 @@ import Foundation
             }
             lines = [
                 "public struct \(qname) : PathNode\(protos) {",
-                indentBy + "public var parent: \(qparent)"
+                indentBy + "public var parent: \(qparent.split(separator:".").first!)"
             ]
             // get non-optional
             if let keyType = self.key?.keyType?.trimmingCharacters(in: .punctuationCharacters) {
@@ -292,7 +295,7 @@ import Foundation
         }
 
         func declareInit(parent2: String?) {
-            let fullParent = parent2 ?? parent
+            let fullParent = String((parent2 ?? parent).split(separator: ".").first!)
             var parameters = ""
             if let key = self.key, let keyType = key.keyType {
                 parameters = ", \(key.name.initialLowercase): \(keyType)"
@@ -372,10 +375,10 @@ import Foundation
                     let qparent = String(qparentParts.first!)
                     let qparentField = String(qparentParts.last!)
                     lines += [ "extension \(qparent) {"]
-                    if parent2.contains(" ") {
+                    if parent2.contains(" ") && !hasAttribute("parent") {
                         // needs to qualify this
                         addParentVar(indent: indentBy, parent: "<\(qparent)>", field: qparentParts.count == 2 ? qparentField : nil)
-                    } else if parent2.hasSuffix(">") {
+                    } else if parent2.hasSuffix(">") && !hasAttribute("parent") {
                         // needs to qualify this
                         addParentVar(indent: indentBy, parent: "<P>", field: qparentParts.count == 2 ? qparentField : nil)
                     } else {
@@ -384,7 +387,14 @@ import Foundation
                     lines += [ "}"]
                 }
             } else {
-                addParentVar()
+                let qparentParts = parent.split(separator: ".")
+                if qparentParts.count == 2 {
+                    let qparent = String(qparentParts.first!)
+                    let qparentField = String(qparentParts.last!)
+                    addParentVar(parent: qparent, field:  qparentField)
+                } else {
+                    addParentVar()
+                }
             }
 
         }

@@ -33,15 +33,56 @@ root ScoreBoard {
     var BlankStatsbookFound : Bool
     
     var ImportsInProgress : Bool
+    node PenaltyCodes {
+        key Id : String
+        let Readonly : Bool
+        map Code[UUID] : String
+        map PenaltyCode[UUID] : String
+    }
 }
 
 node Period Game {
     key period : Int?
-    var Team1Points : Int
-    var Team2Points : Int
-    var CurrentJamNumber : Int
+    let Number : Int
+    let Previous : UUID
+    let Next : UUID
+    let CurrentJam : UUID
+    let CurrentJamNumber : Int
+    let FirstJam : UUID
+    let FirstJamNumber : Int
+    let SuddenScoring : Bool
+    let Running : Bool
+    let Duration : Int
+    var WalltimeStart :Int
+    var WalltimeEnd : Int
+    var LocalTimeStart : String
+    action Delete
+    action InsertBefore
+    action InsertTimeout
+    @version(2023.1) let Team1PenaltyCount : Int
+    @version(2023.1) let Tema2PenaltyCount : Int
+    @version(2023.1) let Team1Points : Int
+    @version(2023.1) let Team2Points : Int
 }
 
+node Timeout Period {
+    key Id : UUID
+    let Readonly : Bool
+    var Owner : String
+    var Review : Bool
+    var RetainedReview : Bool
+    var Running : Bool
+    var PrecedingJam : UUID
+    let PrecedingJamNumber : Int
+    let Duration : Int
+    var PeriodClockElapsedStart : Int
+    var PeriodClockElapsedEnd : Int
+    var PeriodClocEnd : Int
+    var WalltimeStart : Int
+    var WalltimeEnd : Int
+    action Delete
+    @version(2023.0) action InsertAfter
+}
 node Game ScoreBoard {
     key Id : UUID
     let Readonly : Bool
@@ -149,7 +190,7 @@ node Team Game {
     let OfficialReviews : Int
     let InTimeout : Bool
     let InOfficialReview : Bool
-    let TotalPenalites : Int
+    @version(2023.0) let TotalPenalites : Int
     flag RetainedOfficialReview
     let DisplayLead : Bool
     let JamScore : Int
@@ -164,7 +205,7 @@ node Team Game {
     var StarPass : Bool
     var NoPivot : Bool
     let StarPassTrip : UUID
-    node ScoreAdjustment {
+    @version(2023.0) node ScoreAdjustment {
         key Id : UUID
         let Readonly : Bool
         let Amount : Int
@@ -177,8 +218,8 @@ node Team Game {
         var AppliedTo : Bool
         action Discard
     }
-    ref ActiveScoreAdjustment : ScoreAdjustment
-    var ActiveScoreAdjustmentAmount : Int
+    @version(2023.0) ref ActiveScoreAdjustment : ScoreAdjustment
+    @version(2023.0) var ActiveScoreAdjustmentAmount : Int
     // path to file
     var Logo : String
     
@@ -201,6 +242,14 @@ node Team Game {
     action AdvanceFieldings
     action Timeout
     action OfficialReview
+    
+    node Expulsion {
+        key Id : UUID
+        let Readonly : Bool
+        var Info : String
+        var ExtraInfo : String
+        var Suspension : Bool
+    }
 }
 
 node Clock Game {
@@ -212,7 +261,7 @@ node Clock Game {
         case Intermission
     }
     key kind : Kind
-//    let Id : String
+    @name(Id) let clockId : String
     var Time : Int
     let InvertedTime : Int
     var MaximumTime : Int
@@ -230,11 +279,29 @@ node Clock Game {
 
 node Jam <Period Game> {
     key jam : Int
+    @name(Id) let jamID : UUID
+    let Readonly : Bool
+    let Number : Int
+    let Previous : UUID
+    let Next : UUID
+    let PeriodNumber : Int
+    let StarPass : Bool
+    var Overtime : Bool
+    var InjuryContinuation : Bool
+    let Duration : Int
+    var PeriodClockElapsedStart : Int
+    var PeriodClockElapsedEnd : Int
+    var PeriodClockDisplayEnd : Int
     var WalltimeStart : Int
+    var WalltimeEnd : Int
+    action Delete
+    action InsertBefore
+    action InsertTimeoutAfter
 }
 
 node TeamJam Jam<P> {
     key team : Int
+    @name(Id) var teamJamID : UUID
 }
 
 
@@ -256,7 +323,9 @@ node Skater Team {
     }
     var Flags : Flags
     var Name : String
-    var Pronouns : String
+    @version(2023.0) var Pronouns : String
+    // only jammer and pivot
+    @version(2023.0) var Color : String
     var RosterNumber : String
     var Role : Role
     list Penalty : Penalty
@@ -385,7 +454,7 @@ node Settings ScoreBoard {
 }
 
 
-node Official <Game.Nso Game.Ref> {
+@parent(Game) node Official <Game.Nso Game.Ref> {
     key Id : UUID
     let Readonly : Bool
     var Role : String
@@ -394,4 +463,28 @@ node Official <Game.Nso Game.Ref> {
     var Cert : String
     var P1Team : UUID
     var Swap : Bool
+}
+
+
+node PreparedTeam ScoreBoard {
+    key Id : UUID
+    let Readonly : Bool
+    let Name : String
+    let FullName : String
+    var LeagueName : String
+    var TeamName : String
+    map UniformColor [ UUID ] : String
+    var Logo : String
+    map AlternateName[Team.AlternateName] : String
+    map Color[Team.AlternateName] : String
+}
+
+node PreparedSkater PreparedTeam.Skater {
+    key Id : UUID
+    let Readonly : Bool
+    var Name : String
+    let Number : String
+    var RosterNumber : String
+    var Flags : Skater.Flags
+    @version(2023.0) var Pronouns : String
 }

@@ -16,7 +16,7 @@ public struct Clock : PathNodeId, Identifiable {
         case jam = "Jam"
         case intermission = "Intermission"
     }
-    //    let Id : String
+    @ImmutableLeaf public var clockId: String?
 
     @Leaf public var time: Int?
 
@@ -43,6 +43,7 @@ public struct Clock : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.name("Clock", name: kind.rawValue))
 
+        _clockId = parent.leaf("clockId").immutable
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
@@ -52,6 +53,7 @@ public struct Clock : PathNodeId, Identifiable {
         _name = parent.leaf("Name")
         _direction = parent.leaf("Direction")
         _number = parent.leaf("Number")
+        _clockId.parentPath = statePath
         _time.parentPath = statePath
         _invertedTime.parentPath = statePath
         _maximumTime.parentPath = statePath
@@ -65,6 +67,7 @@ public struct Clock : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _clockId = parent.leaf("clockId").immutable
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
@@ -74,6 +77,7 @@ public struct Clock : PathNodeId, Identifiable {
         _name = parent.leaf("Name")
         _direction = parent.leaf("Direction")
         _number = parent.leaf("Number")
+        _clockId.parentPath = statePath
         _time.parentPath = statePath
         _invertedTime.parentPath = statePath
         _maximumTime.parentPath = statePath

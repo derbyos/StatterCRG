@@ -215,6 +215,47 @@ public struct Team : PathNodeId, Identifiable {
     public func advanceFieldings() { connection.set(key: statePath.adding("AdvanceFieldings"), value: .bool(true), kind: .set) }
     public func timeout() { connection.set(key: statePath.adding("Timeout"), value: .bool(true), kind: .set) }
     public func officialReview() { connection.set(key: statePath.adding("OfficialReview"), value: .bool(true), kind: .set) }
+    
+
+    public struct Expulsion : PathNodeId, Identifiable {
+        public var parent: Team
+        public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+        public let statePath: StatePath
+        @ImmutableLeaf public var readonly: Bool?
+
+        @Leaf public var info: String?
+
+        @Leaf public var extraInfo: String?
+
+        @Leaf public var suspension: Bool?
+
+        public init(parent: Team, id: UUID) {
+            self.parent = parent
+            statePath = parent.adding(.id("Expulsion", id: id))
+    
+            _readonly = parent.leaf("Readonly").immutable
+            _info = parent.leaf("Info")
+            _extraInfo = parent.leaf("ExtraInfo")
+            _suspension = parent.leaf("Suspension")
+            _readonly.parentPath = statePath
+            _info.parentPath = statePath
+            _extraInfo.parentPath = statePath
+            _suspension.parentPath = statePath
+        }
+        public init(parent: Team, statePath: StatePath) {
+            self.parent = parent
+            self.statePath = statePath
+            _readonly = parent.leaf("Readonly").immutable
+            _info = parent.leaf("Info")
+            _extraInfo = parent.leaf("ExtraInfo")
+            _suspension = parent.leaf("Suspension")
+            _readonly.parentPath = statePath
+            _info.parentPath = statePath
+            _extraInfo.parentPath = statePath
+            _suspension.parentPath = statePath
+        }
+    }
+    public func expulsion(_ id: UUID) -> Expulsion { .init(parent: self, id: id) }
     public init(parent: Game, team: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Team", param: team))

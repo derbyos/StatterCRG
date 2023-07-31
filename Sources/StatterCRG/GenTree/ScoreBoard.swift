@@ -80,6 +80,33 @@ public struct ScoreBoard : PathSpecified {
 
     @Leaf public var importsInProgress: Bool?
 
+    public struct PenaltyCodes : PathNodeId, Identifiable {
+        public var parent: ScoreBoard
+        public var id: String? { String.from(component: statePath.last)?.1 }
+        public let statePath: StatePath
+        @ImmutableLeaf public var readonly: Bool?
+
+        public typealias Code_Map = MapValueCollection<String, UUID>
+        public var code:Code_Map { .init(connection: connection, statePath: self.adding(.wild("Code"))) }
+
+        public typealias PenaltyCode_Map = MapValueCollection<String, UUID>
+        public var penaltyCode:PenaltyCode_Map { .init(connection: connection, statePath: self.adding(.wild("PenaltyCode"))) }
+
+        public init(parent: ScoreBoard, id: String) {
+            self.parent = parent
+            statePath = parent.adding(.name("PenaltyCodes", name: id))
+    
+            _readonly = parent.leaf("Readonly").immutable
+            _readonly.parentPath = statePath
+        }
+        public init(parent: ScoreBoard, statePath: StatePath) {
+            self.parent = parent
+            self.statePath = statePath
+            _readonly = parent.leaf("Readonly").immutable
+            _readonly.parentPath = statePath
+        }
+    }
+    public func penaltyCodes(_ id: String) -> PenaltyCodes { .init(parent: self, id: id) }
     public init(connection: Connection) {
         self.connection = connection
         let dummy = Leaf<Bool>(connection: connection, component: .wild(""), parentPath: .init(components: []))

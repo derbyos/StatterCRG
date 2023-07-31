@@ -5,8 +5,8 @@
 //
 
 import Foundation
-public struct Official<P:PathSpecified> : PathNodeId, Identifiable {
-    public var parent: P
+public struct Official : PathNodeId, Identifiable {
+    public var parent: Game
     public var id: UUID? { UUID.from(component: statePath.last)?.1 }
     public let statePath: StatePath
     @ImmutableLeaf public var readonly: Bool?
@@ -23,7 +23,7 @@ public struct Official<P:PathSpecified> : PathNodeId, Identifiable {
 
     @Leaf public var swap: Bool?
 
-    public init(parent: P, id: UUID) {
+    public init(parent: Game, id: UUID) {
         self.parent = parent
         statePath = parent.adding(.id("Official", id: id))
 
@@ -42,7 +42,7 @@ public struct Official<P:PathSpecified> : PathNodeId, Identifiable {
         _p1Team.parentPath = statePath
         _swap.parentPath = statePath
     }
-    public init(parent: P, statePath: StatePath) {
+    public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
         _readonly = parent.leaf("Readonly").immutable
@@ -62,8 +62,8 @@ public struct Official<P:PathSpecified> : PathNodeId, Identifiable {
     }
 }
 extension Game {
-    public func nso(_ id: UUID) -> Official<Game> { .init(parent: self, id: id) }
+    public func nso(_ id: UUID) -> Official { .init(parent: self, id: id) }
 }
 extension Game {
-    public func ref(_ id: UUID) -> Official<Game> { .init(parent: self, id: id) }
+    public func ref(_ id: UUID) -> Official { .init(parent: self, id: id) }
 }

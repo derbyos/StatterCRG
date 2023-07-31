@@ -9,20 +9,107 @@ public struct Jam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: P
     public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
+    @ImmutableLeaf public var jamID: UUID?
+
+    @ImmutableLeaf public var readonly: Bool?
+
+    @ImmutableLeaf public var number: Int?
+
+    @ImmutableLeaf public var previous: UUID?
+
+    @ImmutableLeaf public var next: UUID?
+
+    @ImmutableLeaf public var periodNumber: Int?
+
+    @ImmutableLeaf public var starPass: Bool?
+
+    @Leaf public var overtime: Bool?
+
+    @Leaf public var injuryContinuation: Bool?
+
+    @ImmutableLeaf public var duration: Int?
+
+    @Leaf public var periodClockElapsedStart: Int?
+
+    @Leaf public var periodClockElapsedEnd: Int?
+
+    @Leaf public var periodClockDisplayEnd: Int?
+
     @Leaf public var walltimeStart: Int?
 
+    @Leaf public var walltimeEnd: Int?
+
+    public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
+    public func insertBefore() { connection.set(key: statePath.adding("InsertBefore"), value: .bool(true), kind: .set) }
+    public func insertTimeoutAfter() { connection.set(key: statePath.adding("InsertTimeoutAfter"), value: .bool(true), kind: .set) }
     public init(parent: P, jam: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Jam", param: jam))
 
+        _jamID = parent.leaf("jamID").immutable
+        _readonly = parent.leaf("Readonly").immutable
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _periodNumber = parent.leaf("PeriodNumber").immutable
+        _starPass = parent.leaf("StarPass").immutable
+        _overtime = parent.leaf("Overtime")
+        _injuryContinuation = parent.leaf("InjuryContinuation")
+        _duration = parent.leaf("Duration").immutable
+        _periodClockElapsedStart = parent.leaf("PeriodClockElapsedStart")
+        _periodClockElapsedEnd = parent.leaf("PeriodClockElapsedEnd")
+        _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _jamID.parentPath = statePath
+        _readonly.parentPath = statePath
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _periodNumber.parentPath = statePath
+        _starPass.parentPath = statePath
+        _overtime.parentPath = statePath
+        _injuryContinuation.parentPath = statePath
+        _duration.parentPath = statePath
+        _periodClockElapsedStart.parentPath = statePath
+        _periodClockElapsedEnd.parentPath = statePath
+        _periodClockDisplayEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
     }
     public init(parent: P, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _jamID = parent.leaf("jamID").immutable
+        _readonly = parent.leaf("Readonly").immutable
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _periodNumber = parent.leaf("PeriodNumber").immutable
+        _starPass = parent.leaf("StarPass").immutable
+        _overtime = parent.leaf("Overtime")
+        _injuryContinuation = parent.leaf("InjuryContinuation")
+        _duration = parent.leaf("Duration").immutable
+        _periodClockElapsedStart = parent.leaf("PeriodClockElapsedStart")
+        _periodClockElapsedEnd = parent.leaf("PeriodClockElapsedEnd")
+        _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _jamID.parentPath = statePath
+        _readonly.parentPath = statePath
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _periodNumber.parentPath = statePath
+        _starPass.parentPath = statePath
+        _overtime.parentPath = statePath
+        _injuryContinuation.parentPath = statePath
+        _duration.parentPath = statePath
+        _periodClockElapsedStart.parentPath = statePath
+        _periodClockElapsedEnd.parentPath = statePath
+        _periodClockDisplayEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
     }
 }
 extension Period {

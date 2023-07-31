@@ -9,11 +9,42 @@ public struct Period : PathNodeId, Identifiable {
     public var parent: Game
     public var id: Int? { Int.from(component: statePath.last)?.1 }
     public let statePath: StatePath
-    @Leaf public var team1Points: Int?
+    @ImmutableLeaf public var number: Int?
 
-    @Leaf public var team2Points: Int?
+    @ImmutableLeaf public var previous: UUID?
 
-    @Leaf public var currentJamNumber: Int?
+    @ImmutableLeaf public var next: UUID?
+
+    @ImmutableLeaf public var currentJam: UUID?
+
+    @ImmutableLeaf public var currentJamNumber: Int?
+
+    @ImmutableLeaf public var firstJam: UUID?
+
+    @ImmutableLeaf public var firstJamNumber: Int?
+
+    @ImmutableLeaf public var suddenScoring: Bool?
+
+    @ImmutableLeaf public var running: Bool?
+
+    @ImmutableLeaf public var duration: Int?
+
+    @Leaf public var walltimeStart: Int?
+
+    @Leaf public var walltimeEnd: Int?
+
+    @Leaf public var localTimeStart: String?
+
+    public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
+    public func insertBefore() { connection.set(key: statePath.adding("InsertBefore"), value: .bool(true), kind: .set) }
+    public func insertTimeout() { connection.set(key: statePath.adding("InsertTimeout"), value: .bool(true), kind: .set) }
+    @ImmutableLeaf public var team1PenaltyCount: Int?
+
+    @ImmutableLeaf public var tema2PenaltyCount: Int?
+
+    @ImmutableLeaf public var team1Points: Int?
+
+    @ImmutableLeaf public var team2Points: Int?
 
     public init(parent: Game, period: Int? = nil) {
         self.parent = parent
@@ -23,22 +54,78 @@ public struct Period : PathNodeId, Identifiable {
             statePath =  parent.adding(.wild("Period"))
         }
 
-        _team1Points = parent.leaf("Team1Points")
-        _team2Points = parent.leaf("Team2Points")
-        _currentJamNumber = parent.leaf("CurrentJamNumber")
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _currentJam = parent.leaf("CurrentJam").immutable
+        _currentJamNumber = parent.leaf("CurrentJamNumber").immutable
+        _firstJam = parent.leaf("FirstJam").immutable
+        _firstJamNumber = parent.leaf("FirstJamNumber").immutable
+        _suddenScoring = parent.leaf("SuddenScoring").immutable
+        _running = parent.leaf("Running").immutable
+        _duration = parent.leaf("Duration").immutable
+        _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _localTimeStart = parent.leaf("LocalTimeStart")
+        _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
+        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team1Points = parent.leaf("Team1Points").immutable
+        _team2Points = parent.leaf("Team2Points").immutable
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _currentJam.parentPath = statePath
+        _currentJamNumber.parentPath = statePath
+        _firstJam.parentPath = statePath
+        _firstJamNumber.parentPath = statePath
+        _suddenScoring.parentPath = statePath
+        _running.parentPath = statePath
+        _duration.parentPath = statePath
+        _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
+        _localTimeStart.parentPath = statePath
+        _team1PenaltyCount.parentPath = statePath
+        _tema2PenaltyCount.parentPath = statePath
         _team1Points.parentPath = statePath
         _team2Points.parentPath = statePath
-        _currentJamNumber.parentPath = statePath
     }
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _team1Points = parent.leaf("Team1Points")
-        _team2Points = parent.leaf("Team2Points")
-        _currentJamNumber = parent.leaf("CurrentJamNumber")
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _currentJam = parent.leaf("CurrentJam").immutable
+        _currentJamNumber = parent.leaf("CurrentJamNumber").immutable
+        _firstJam = parent.leaf("FirstJam").immutable
+        _firstJamNumber = parent.leaf("FirstJamNumber").immutable
+        _suddenScoring = parent.leaf("SuddenScoring").immutable
+        _running = parent.leaf("Running").immutable
+        _duration = parent.leaf("Duration").immutable
+        _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _localTimeStart = parent.leaf("LocalTimeStart")
+        _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
+        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team1Points = parent.leaf("Team1Points").immutable
+        _team2Points = parent.leaf("Team2Points").immutable
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _currentJam.parentPath = statePath
+        _currentJamNumber.parentPath = statePath
+        _firstJam.parentPath = statePath
+        _firstJamNumber.parentPath = statePath
+        _suddenScoring.parentPath = statePath
+        _running.parentPath = statePath
+        _duration.parentPath = statePath
+        _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
+        _localTimeStart.parentPath = statePath
+        _team1PenaltyCount.parentPath = statePath
+        _tema2PenaltyCount.parentPath = statePath
         _team1Points.parentPath = statePath
         _team2Points.parentPath = statePath
-        _currentJamNumber.parentPath = statePath
     }
 }
 extension Game {

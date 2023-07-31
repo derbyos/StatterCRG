@@ -29,6 +29,10 @@ public struct Skater : PathNodeId, Identifiable {
 
     @Leaf public var pronouns: String?
 
+    // only jammer and pivot
+
+    @Leaf public var color: String?
+
     @Leaf public var rosterNumber: String?
 
     @Leaf public var role: Role?
@@ -44,11 +48,13 @@ public struct Skater : PathNodeId, Identifiable {
         _flags = parent.leaf("Flags")
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
+        _color = parent.leaf("Color")
         _rosterNumber = parent.leaf("RosterNumber")
         _role = parent.leaf("Role")
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
+        _color.parentPath = statePath
         _rosterNumber.parentPath = statePath
         _role.parentPath = statePath
     }
@@ -58,11 +64,13 @@ public struct Skater : PathNodeId, Identifiable {
         _flags = parent.leaf("Flags")
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
+        _color = parent.leaf("Color")
         _rosterNumber = parent.leaf("RosterNumber")
         _role = parent.leaf("Role")
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
+        _color.parentPath = statePath
         _rosterNumber.parentPath = statePath
         _role.parentPath = statePath
     }
