@@ -1,7 +1,7 @@
 # StatterCRG
 
 A stand alone Swift package that talks with the
-CRG Scoreboard.
+CRG Scoreboard (assuming version 2023.0 or newer)
 
 Currently it only supports getting values from
 the server - it does not support sending/changing
@@ -67,19 +67,19 @@ the game data found on the CRG server (2023.3)
 This is some simple SwiftUI that let you quickly put
 together various views from the server
 
-### StatterCRAction
-This extends the ``Connection`` object to make changes
-to the data via various commands and actions, such as
-starting/stopping jams/etc, entering data, and editing
-other values.
 
 ### treemaker
 treemaker is an internal command line executable that translates a
 tree definition file into typesafe Swift extensions
 
-### CreateTree
-CreateTree is an SPM plugin build tool that uses
-the treemaker tool to build the tree definitions
+### GenerateTree
+GenerateTree is an SPM plugin build command tool that uses
+the treemaker tool to build the tree definitions.  Note that it
+must be manually run due to a bug in how Xcode handles multiple
+targets using the same SPM where that SPM has a build tool (since
+it detects that there are multiple ways of creating the output
+file - one for each target's inclusion of the SPM, never mind that
+it is the same invocation)
 
 ## In Depth
 The CRG scoreboard server use a websocket to communicate
@@ -130,6 +130,7 @@ of path components:
 - A `wild` component.  Similar to a `number` component, but (in theory) represents all values.  This is used by the scoreboard in a few places, but it becomes a problem quickly (since you can get multiple things, but not set them)
 - A `name` component.  Similar to a `number` component, but with some sort of enumerated name.  For example `CurrentGame.Clock(Timeout).Time` is the current time on the timeout clock
 - An `id` component.  Some items, such as games, have a unique ID associated with them, which is a UUID (and an optional additional value in some cases that aren't supported yet).  So `ScoreBoard.Game(fa604549-2bd9-450b-8506-9e669b83e098).InJam` refers to a specific game.  Note that UUIDs are in lowercase.
+- An `compound` component.  For things like settings, the name component actually is composed of multipled dotted parts.  This component allows us to model that as a tree rather than a hard coded list of dotted names
 
 ### `PathSpecified`
 `PathSpecified` is a protocol that simply represents
@@ -153,6 +154,17 @@ so it know that, for example, a `jamNumber` is an integer
 and not a string.  It will automatically convert the
 `JSONValue` stored in the data tree into whatever type
 its `wrappedValue` is.
+
+### `ImmutableLeaf`
+A `ImmutableLeaf` is a property wrapper that works just like
+`Leaf` except it is read only (used for read only scoreboard
+data expressed as a `let` statement in the tree definition file)
+
+### `Stat`
+Stat is a property wrapped designed to be used inside views, much
+like `@ObservedObject` would be.  It works with values which are
+`PathNode` types and ensures that the view is updated when the
+server changes those values.
 
 ## TreeDefinition/treemaker
 There is a fair amount of boiler-plate code that is

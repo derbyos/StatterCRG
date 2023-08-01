@@ -39,6 +39,41 @@ root ScoreBoard {
         map Code[UUID] : String
         map PenaltyCode[UUID] : String
     }
+    list Game[UUID] : Game
+    
+    node Rulesets {
+        node Ruleset {
+            key String?
+            let Readonly : Bool
+            // we can't use "parent" because that is needed
+            // for built in stuff
+            @name(Parent) var ParentId : String
+            var Name : String
+            // might be number, time, or boolean encoded as string
+            map Rule[UUID] : String
+        }
+        node RuleDefinition {
+            key String?
+            let Readonly : Bool
+            let Name : String
+            enum RuleType {
+                case Boolean
+                case Integer
+                case Long
+                case String
+                case Time
+            }
+            let Type : RuleType
+            let DefaultValue : String
+            let Description : String
+            let Index : Int
+            // only when Type is Boolean
+            let TrueValue : String
+            // only when Type is Boolean
+            let FalseValue : String
+        }
+        ref CurrentRuleset : Ruleset
+    }
 }
 
 node Period Game {
@@ -151,9 +186,19 @@ node Game ScoreBoard {
     var JsonExists : Bool
     let ExportBlockedBy : String
     
+    map Rule[String] : String
     map PenaltyCode[String] : String
     map Label[UUID] : String
     map EventInfo[UUID] : String
+    list Expulsion[UUID] : Expulsion
+}
+
+node Expulsion Game {
+    key UUID
+    let Readonly : Bool
+    var Info : String
+    var ExtraInfo : String
+    var Suspension : Bool
 }
 
 node Team Game {
@@ -249,13 +294,6 @@ node Team Game {
     action Timeout
     action OfficialReview
     
-    node Expulsion {
-        key UUID
-        let Readonly : Bool
-        var Info : String
-        var ExtraInfo : String
-        var Suspension : Bool
-    }
 }
 
 node Clock Game {
@@ -351,9 +389,6 @@ node Penalty Skater {
     var Served : Bool
     var Code : String
     var Next : String
-}
-
-node Rule Game {
 }
 
 node Settings ScoreBoard {

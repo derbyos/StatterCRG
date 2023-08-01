@@ -108,6 +108,151 @@ public struct ScoreBoard : PathSpecified {
         }
     }
     public func penaltyCodes(_ key: String) -> PenaltyCodes { .init(parent: self, key) }
+    public var games : MapNodeCollection<Self, Game, UUID> { .init(self,"Game") } 
+
+    
+
+    public struct Rulesets : PathNodeId, Identifiable {
+        public var parent: ScoreBoard
+        public var id: StatePath { statePath }
+        public let statePath: StatePath
+        public struct Ruleset : PathNodeId, Identifiable {
+            public var parent: Rulesets
+            public var id: StatePath { statePath }
+            public let statePath: StatePath
+            @ImmutableLeaf public var readonly: Bool?
+
+            // we can't use "parent" because that is needed
+
+            // for built in stuff
+
+            @Leaf public var parentId: String?
+
+            @Leaf public var name: String?
+
+            // might be number, time, or boolean encoded as string
+
+            public typealias Rule_Map = MapValueCollection<String, UUID>
+            public var rule:Rule_Map { .init(connection: connection, statePath: self.adding(.wild("Rule"))) }
+
+            public init(parent: Rulesets, _ key: String? = nil) {
+                self.parent = parent
+                if let key {
+                    statePath = parent.adding(.name("Ruleset", name: key))
+                } else {
+                    statePath =  parent.adding(.wild("Ruleset"))
+                }
+        
+                _readonly = parent.leaf("Readonly").immutable
+                _parentId = parent.leaf("ParentId")
+                _name = parent.leaf("Name")
+                _readonly.parentPath = statePath
+                _parentId.parentPath = statePath
+                _name.parentPath = statePath
+            }
+            public init(parent: Rulesets, statePath: StatePath) {
+                self.parent = parent
+                self.statePath = statePath
+                _readonly = parent.leaf("Readonly").immutable
+                _parentId = parent.leaf("ParentId")
+                _name = parent.leaf("Name")
+                _readonly.parentPath = statePath
+                _parentId.parentPath = statePath
+                _name.parentPath = statePath
+            }
+        }
+        public func ruleset(_ key: String? = nil) -> Ruleset { .init(parent: self, key) }
+        public struct RuleDefinition : PathNodeId, Identifiable {
+            public var parent: Rulesets
+            public var id: StatePath { statePath }
+            public let statePath: StatePath
+            @ImmutableLeaf public var readonly: Bool?
+
+            @ImmutableLeaf public var name: String?
+
+            public enum RuleType: String, EnumStringAsID {
+                case boolean = "Boolean"
+                case integer = "Integer"
+                case long = "Long"
+                case string = "String"
+                case time = "Time"
+            }
+            @ImmutableLeaf public var type: RuleType?
+
+            @ImmutableLeaf public var defaultValue: String?
+
+            @ImmutableLeaf public var description: String?
+
+            @ImmutableLeaf public var index: Int?
+
+            // only when Type is Boolean
+
+            @ImmutableLeaf public var trueValue: String?
+
+            // only when Type is Boolean
+
+            @ImmutableLeaf public var falseValue: String?
+
+            public init(parent: Rulesets, _ key: String? = nil) {
+                self.parent = parent
+                if let key {
+                    statePath = parent.adding(.name("RuleDefinition", name: key))
+                } else {
+                    statePath =  parent.adding(.wild("RuleDefinition"))
+                }
+        
+                _readonly = parent.leaf("Readonly").immutable
+                _name = parent.leaf("Name").immutable
+                _type = parent.leaf("Type").immutable
+                _defaultValue = parent.leaf("DefaultValue").immutable
+                _description = parent.leaf("Description").immutable
+                _index = parent.leaf("Index").immutable
+                _trueValue = parent.leaf("TrueValue").immutable
+                _falseValue = parent.leaf("FalseValue").immutable
+                _readonly.parentPath = statePath
+                _name.parentPath = statePath
+                _type.parentPath = statePath
+                _defaultValue.parentPath = statePath
+                _description.parentPath = statePath
+                _index.parentPath = statePath
+                _trueValue.parentPath = statePath
+                _falseValue.parentPath = statePath
+            }
+            public init(parent: Rulesets, statePath: StatePath) {
+                self.parent = parent
+                self.statePath = statePath
+                _readonly = parent.leaf("Readonly").immutable
+                _name = parent.leaf("Name").immutable
+                _type = parent.leaf("Type").immutable
+                _defaultValue = parent.leaf("DefaultValue").immutable
+                _description = parent.leaf("Description").immutable
+                _index = parent.leaf("Index").immutable
+                _trueValue = parent.leaf("TrueValue").immutable
+                _falseValue = parent.leaf("FalseValue").immutable
+                _readonly.parentPath = statePath
+                _name.parentPath = statePath
+                _type.parentPath = statePath
+                _defaultValue.parentPath = statePath
+                _description.parentPath = statePath
+                _index.parentPath = statePath
+                _trueValue.parentPath = statePath
+                _falseValue.parentPath = statePath
+            }
+        }
+        public func ruleDefinition(_ key: String? = nil) -> RuleDefinition { .init(parent: self, key) }
+        public var currentRuleset: Ruleset { Ruleset(parent: self, statePath: self.adding("CurrentRuleset"))}
+
+        public init(parent: ScoreBoard) {
+            self.parent = parent
+            statePath = parent.adding("Rulesets")
+    
+        }
+        public init(parent: ScoreBoard, statePath: StatePath) {
+            self.parent = parent
+            self.statePath = statePath
+        }
+    }
+    public var rulesets: Rulesets { .init(parent: self) }
     public init(connection: Connection) {
         self.connection = connection
         let dummy = Leaf<Bool>(connection: connection, component: .wild(""), parentPath: .init(components: []))

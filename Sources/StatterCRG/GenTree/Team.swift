@@ -219,45 +219,6 @@ public struct Team : PathNodeId, Identifiable {
     public func officialReview() { connection.set(key: statePath.adding("OfficialReview"), value: .bool(true), kind: .set) }
     
 
-    public struct Expulsion : PathNodeId, Identifiable {
-        public var parent: Team
-        public var id: StatePath { statePath }
-        public let statePath: StatePath
-        @ImmutableLeaf public var readonly: Bool?
-
-        @Leaf public var info: String?
-
-        @Leaf public var extraInfo: String?
-
-        @Leaf public var suspension: Bool?
-
-        public init(parent: Team, _ key: UUID) {
-            self.parent = parent
-            statePath = parent.adding(.id("Expulsion", id: key))
-    
-            _readonly = parent.leaf("Readonly").immutable
-            _info = parent.leaf("Info")
-            _extraInfo = parent.leaf("ExtraInfo")
-            _suspension = parent.leaf("Suspension")
-            _readonly.parentPath = statePath
-            _info.parentPath = statePath
-            _extraInfo.parentPath = statePath
-            _suspension.parentPath = statePath
-        }
-        public init(parent: Team, statePath: StatePath) {
-            self.parent = parent
-            self.statePath = statePath
-            _readonly = parent.leaf("Readonly").immutable
-            _info = parent.leaf("Info")
-            _extraInfo = parent.leaf("ExtraInfo")
-            _suspension = parent.leaf("Suspension")
-            _readonly.parentPath = statePath
-            _info.parentPath = statePath
-            _extraInfo.parentPath = statePath
-            _suspension.parentPath = statePath
-        }
-    }
-    public func expulsion(_ key: UUID) -> Expulsion { .init(parent: self, key) }
     public init(parent: Game, _ key: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Team", param: key))

@@ -115,6 +115,9 @@ public struct Game : PathNodeId, Identifiable {
 
     
 
+    public typealias Rule_Map = MapValueCollection<String, String>
+    public var rule:Rule_Map { .init(connection: connection, statePath: self.adding(.wild("Rule"))) }
+
     public typealias PenaltyCode_Map = MapValueCollection<String, String>
     public var penaltyCode:PenaltyCode_Map { .init(connection: connection, statePath: self.adding(.wild("PenaltyCode"))) }
 
@@ -123,6 +126,8 @@ public struct Game : PathNodeId, Identifiable {
 
     public typealias EventInfo_Map = MapValueCollection<String, UUID>
     public var eventInfo:EventInfo_Map { .init(connection: connection, statePath: self.adding(.wild("EventInfo"))) }
+
+    public var expulsions : MapNodeCollection<Self, Expulsion, UUID> { .init(self,"Expulsion") } 
 
     public init(parent: ScoreBoard, _ key: UUID) {
         self.parent = parent
