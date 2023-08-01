@@ -7,7 +7,7 @@
 import Foundation
 public struct Clock : PathNodeId, Identifiable {
     public var parent: Game
-    public var id: Kind? { Kind.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     public enum Kind: String, EnumStringAsID {
         case timeOut = "Timeout"
@@ -39,9 +39,9 @@ public struct Clock : PathNodeId, Identifiable {
     public func start() { connection.set(key: statePath.adding("Start"), value: .bool(true), kind: .set) }
     public func stop() { connection.set(key: statePath.adding("Stop"), value: .bool(true), kind: .set) }
     public func resetTime() { connection.set(key: statePath.adding("ResetTime"), value: .bool(true), kind: .reset) }
-    public init(parent: Game, kind: Kind) {
+    public init(parent: Game, _ key: Kind) {
         self.parent = parent
-        statePath = parent.adding(.name("Clock", name: kind.rawValue))
+        statePath = parent.adding(.name("Clock", name: key.rawValue))
 
         _clockId = parent.leaf("clockId").immutable
         _time = parent.leaf("Time")
@@ -90,5 +90,5 @@ public struct Clock : PathNodeId, Identifiable {
     }
 }
 extension Game {
-    public func clock(_ kind: Clock.Kind) -> Clock { .init(parent: self, kind: kind) }
+    public func clock(_ key: Clock.Kind) -> Clock { .init(parent: self, key) }
 }

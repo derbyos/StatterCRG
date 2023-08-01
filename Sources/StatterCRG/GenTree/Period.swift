@@ -7,8 +7,10 @@
 import Foundation
 public struct Period : PathNodeId, Identifiable {
     public var parent: Game
-    public var id: Int? { Int.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var periodId: UUID?
+
     @ImmutableLeaf public var number: Int?
 
     @ImmutableLeaf public var previous: UUID?
@@ -46,14 +48,15 @@ public struct Period : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var team2Points: Int?
 
-    public init(parent: Game, period: Int? = nil) {
+    public init(parent: Game, _ key: Int? = nil) {
         self.parent = parent
-        if let period {
-            statePath = parent.adding(.number("Period", param: period))
+        if let key {
+            statePath = parent.adding(.number("Period", param: key))
         } else {
             statePath =  parent.adding(.wild("Period"))
         }
 
+        _periodId = parent.leaf("periodId").immutable
         _number = parent.leaf("Number").immutable
         _previous = parent.leaf("Previous").immutable
         _next = parent.leaf("Next").immutable
@@ -71,6 +74,48 @@ public struct Period : PathNodeId, Identifiable {
         _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
         _team1Points = parent.leaf("Team1Points").immutable
         _team2Points = parent.leaf("Team2Points").immutable
+        _periodId.parentPath = statePath
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _currentJam.parentPath = statePath
+        _currentJamNumber.parentPath = statePath
+        _firstJam.parentPath = statePath
+        _firstJamNumber.parentPath = statePath
+        _suddenScoring.parentPath = statePath
+        _running.parentPath = statePath
+        _duration.parentPath = statePath
+        _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
+        _localTimeStart.parentPath = statePath
+        _team1PenaltyCount.parentPath = statePath
+        _tema2PenaltyCount.parentPath = statePath
+        _team1Points.parentPath = statePath
+        _team2Points.parentPath = statePath
+    }
+    public init(parent: Game, _ key: UUID) {
+        self.parent = parent
+        statePath = parent.adding(.id("Period", id: key))
+
+        _periodId = parent.leaf("periodId").immutable
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _currentJam = parent.leaf("CurrentJam").immutable
+        _currentJamNumber = parent.leaf("CurrentJamNumber").immutable
+        _firstJam = parent.leaf("FirstJam").immutable
+        _firstJamNumber = parent.leaf("FirstJamNumber").immutable
+        _suddenScoring = parent.leaf("SuddenScoring").immutable
+        _running = parent.leaf("Running").immutable
+        _duration = parent.leaf("Duration").immutable
+        _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _localTimeStart = parent.leaf("LocalTimeStart")
+        _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
+        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team1Points = parent.leaf("Team1Points").immutable
+        _team2Points = parent.leaf("Team2Points").immutable
+        _periodId.parentPath = statePath
         _number.parentPath = statePath
         _previous.parentPath = statePath
         _next.parentPath = statePath
@@ -92,6 +137,7 @@ public struct Period : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _periodId = parent.leaf("periodId").immutable
         _number = parent.leaf("Number").immutable
         _previous = parent.leaf("Previous").immutable
         _next = parent.leaf("Next").immutable
@@ -109,6 +155,7 @@ public struct Period : PathNodeId, Identifiable {
         _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
         _team1Points = parent.leaf("Team1Points").immutable
         _team2Points = parent.leaf("Team2Points").immutable
+        _periodId.parentPath = statePath
         _number.parentPath = statePath
         _previous.parentPath = statePath
         _next.parentPath = statePath
@@ -129,5 +176,8 @@ public struct Period : PathNodeId, Identifiable {
     }
 }
 extension Game {
-    public func period(_ period: Int? = nil) -> Period { .init(parent: self, period: period) }
+    public func period(_ key: Int? = nil) -> Period { .init(parent: self, key) }
+}
+extension Game {
+    public func period(_ key: UUID) -> Period { .init(parent: self, key) }
 }

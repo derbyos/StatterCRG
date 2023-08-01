@@ -27,7 +27,7 @@ class AST {
         case node(parent: String?)
         case leaf(String, immutable: Bool)
         case flag
-        case key(String)
+        case key
         case comment // stored in name
         case code // pass through verbatim
         case `enum`
@@ -36,7 +36,7 @@ class AST {
         case map(String, index: String) // like a subscript but maps optional ids
         case action
         case ref(String)
-        case list(String)
+        case list(String, index: String) // like map but contains objects not values
         case `protocol`
     }
     var kind: Kind
@@ -71,7 +71,7 @@ enum Errors : Error {
     case missingNodeName
     case missingLeafType
     case rootNodeNotAtRoot
-    case multipleNodeKeys
+//    case multipleNodeKeys
     case expected(String)
 }
 
@@ -110,8 +110,8 @@ extension String {
     }
 }
 extension AST {
-    var key: AST? {
-        children.first(where: {
+    var keys: [AST] {
+        children.filter( {
             if case .key = $0.kind {
                 return true
             }
@@ -119,8 +119,8 @@ extension AST {
         })
     }
     var keyType: String? {
-        if case let .key(type) = kind {
-            return type
+        if case .key = kind {
+            return name
         }
         return nil
     }
@@ -190,8 +190,8 @@ import Foundation
                 indentBy + "public var statePath: StatePath { .init(components: [.plain(\"\(name)\")])}",
                 "",
             ]
-        case .list(let type):
-            return [indent + "public var \(name.initialLowercase.plural) : MapNodeCollection<Self, \(type)> { .init(self,\"\(name)\") } \n"]
+        case .list(let type, let index):
+            return [indent + "public var \(name.initialLowercase.plural) : MapNodeCollection<Self, \(type), \(index)> { .init(self,\"\(name)\") } \n"]
         case .node(let parent2):
             let fullParent = parent2 ?? parent
             let qname: String
@@ -210,20 +210,28 @@ import Foundation
                 qname = name
                 qparent = fullParent
             }
-            if let key = self.key, key.keyType != nil {
+//            if let key = self.key, key.keyType != nil {
                 protos = "Id, Identifiable"
-            }
+//            }
             lines = [
                 "public struct \(qname) : PathNode\(protos) {",
                 indentBy + "public var parent: \(qparent.split(separator:".").first!)"
             ]
+            // Since we want to support both, say, fetching
+            // Team(1) and Team(20138085-4F92-49C4-B5BF-2ED0DC462625)
+            // we can't have a simple "scalar" ID
             // get non-optional
+            #if nomore
             if let keyType = self.key?.keyType?.trimmingCharacters(in: .punctuationCharacters) {
                 lines += [
                     indentBy + "public var id: \(keyType)? { \(keyType).from(component: statePath.last)?.1 }",
                 ]
             }
-
+            #else
+            lines += [
+                indentBy + "public var id: StatePath { statePath }",
+            ]
+            #endif
             // make statePath be a variable so we can have multiple "containment"
             lines += [
                 indentBy + "public let statePath: StatePath"
@@ -257,7 +265,7 @@ import Foundation
                 indent + "}",
                 indent + "public var \(name.initialLowercase):\(name)_Subscript { .init(connection: connection, statePath: statePath) }"
             ]
-        case .key(_):
+        case .key:
             // this is no longer stored, we make the state path in the init
             return []
 //            return [indent + "public var \(name.initialLowercase) : \(type)\n"]
@@ -294,75 +302,19 @@ import Foundation
             }
         }
 
-        func declareInit(parent2: String?) {
-            let fullParent = String((parent2 ?? parent).split(separator: ".").first!)
-            var parameters = ""
-            if let key = self.key, let keyType = key.keyType {
-                parameters = ", \(key.name.initialLowercase): \(keyType)"
-                if keyType.hasSuffix("?") {
-                    parameters.append(" = nil")
-                }
-            }
-            let qparent: String
-            if fullParent.contains(" ") {
-                qparent = "P"
-            } else {
-                qparent = fullParent
-            }
-            lines.append(indentBy + "public init(parent: \(qparent)\(parameters)) {")
-            lines.append(indentBy + indentBy + "self.parent = parent")
-
-            if let key, let keyType = key.keyType {
-                if keyType.hasSuffix("?") {
-                    lines += [
-                        indentBy + indentBy + "if let \(key.name) {",
-                        indentBy + indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(componentName, name: key.name.initialLowercase)))",
-                        indentBy + indentBy + "} else {",
-                        indentBy + indentBy + indentBy + "statePath =  parent.adding(.wild(\"\(componentName)\"))",
-                        indentBy + indentBy + "}",
-                        "",
-                    ]
-                } else {
-                    lines += [
-                        indentBy + indentBy + "statePath = parent.adding(\(keyType.asPathParam(componentName, name: key.name.initialLowercase)))",
-                        "",
-                    ]
-                }
-            } else {
-                if hasAttribute("compound") {
-                    // start with empty parts
-                    lines += [
-                        indentBy + indentBy + "statePath = parent.adding(.compound(\"\(componentName)\", parts: []))",
-                        "",
-                    ]
-                } else {
-                    lines += [
-                        indentBy + indentBy + "statePath = parent.adding(\"\(componentName)\")",
-                        "",
-                    ]
-                }
-            }
-            
-            declareLeafs()
-            lines.append(indentBy + "}")
-            // now make the generic version
-            lines.append(indentBy + "public init(parent: \(qparent), statePath: StatePath) {")
-            lines.append(indentBy + indentBy + "self.parent = parent")
-            lines.append(indentBy + indentBy + "self.statePath = statePath")
-            declareLeafs()
-            lines.append(indentBy + "}")
-            lines.append("}")
-
+        func declareExtensions(parent2: String?, key: String?) {
             // the declaration in the parent (either in this file or at the root as an extension)
             func addParentVar(indent: String = "", parent: String = "", field: String? = nil) {
-                if let key, let keyType = key.keyType {
-                    let qualified = keyType == "Kind" ? "\(name).Kind" : keyType
-                    let defaultValue = keyType.hasSuffix("?") ? " = nil" : ""
-                    lines.append("\(indent)public func \(field?.initialLowercase ?? name.initialLowercase)(_ \(key.name.initialLowercase): \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, \(key.name.initialLowercase): \(key.name.initialLowercase)) }")
+                if let key {
+                    let qualified = key == "Kind" ? "\(name).Kind" : key
+                    let defaultValue = key.hasSuffix("?") ? " = nil" : ""
+                    lines.append("\(indent)public func \(field?.initialLowercase ?? name.initialLowercase)(_ key: \(qualified)\(defaultValue)) -> \(name)\(parent) { .init(parent: self, key) }")
                 } else {
                     lines.append("\(indent)public var \(field?.initialLowercase ?? name.initialLowercase): \(name)\(parent) { .init(parent: self) }")
                 }
             }
+
+
             if let parent2 {
                 for aParent in parent2.components(separatedBy: " ") {
                     let qparentFull : String
@@ -396,13 +348,96 @@ import Foundation
                     addParentVar()
                 }
             }
+        }
+        func declareGenericInit(parent2: String?) {
+            let fullParent = String((parent2 ?? parent).split(separator: ".").first!)
+            let qparent: String
+            if fullParent.contains(" ") {
+                qparent = "P"
+            } else {
+                qparent = fullParent
+            }
+            // now make the generic version
+            lines.append(indentBy + "public init(parent: \(qparent), statePath: StatePath) {")
+            lines.append(indentBy + indentBy + "self.parent = parent")
+            lines.append(indentBy + indentBy + "self.statePath = statePath")
+            declareLeafs()
+            lines.append(indentBy + "}")
+        }
+        func declareInit(parent2: String?, key: String?) {
+            let fullParent = String((parent2 ?? parent).split(separator: ".").first!)
+            let qparent: String
+            if fullParent.contains(" ") {
+                qparent = "P"
+            } else {
+                qparent = fullParent
+            }
 
+            var parameters = ""
+            if let key {
+                parameters = ", _ key: \(key)"
+                if key.hasSuffix("?") {
+                    parameters.append(" = nil")
+                }
+            }
+            lines.append(indentBy + "public init(parent: \(qparent)\(parameters)) {")
+            lines.append(indentBy + indentBy + "self.parent = parent")
+
+            if let key {
+                if key.hasSuffix("?") {
+                    lines += [
+                        indentBy + indentBy + "if let key {",
+                        indentBy + indentBy + indentBy + "statePath = parent.adding(\(key.asPathParam(componentName, name: "key")))",
+                        indentBy + indentBy + "} else {",
+                        indentBy + indentBy + indentBy + "statePath =  parent.adding(.wild(\"\(componentName)\"))",
+                        indentBy + indentBy + "}",
+                        "",
+                    ]
+                } else {
+                    lines += [
+                        indentBy + indentBy + "statePath = parent.adding(\(key.asPathParam(componentName, name: "key")))",
+                        "",
+                    ]
+                }
+            } else {
+                if hasAttribute("compound") {
+                    // start with empty parts
+                    lines += [
+                        indentBy + indentBy + "statePath = parent.adding(.compound(\"\(componentName)\", parts: []))",
+                        "",
+                    ]
+                } else {
+                    lines += [
+                        indentBy + indentBy + "statePath = parent.adding(\"\(componentName)\")",
+                        "",
+                    ]
+                }
+            }
+            
+            declareLeafs()
+            lines.append(indentBy + "}")
         }
         switch kind {
         case .enum:
             lines.append("}")
         case .node(let parent2):
-            declareInit(parent2: parent2)
+            if keys.isEmpty {
+                declareInit(parent2: parent2, key: nil)
+                declareGenericInit(parent2: parent2)
+                // and close out the struct
+                lines.append("}")
+                declareExtensions(parent2: parent2, key: nil)
+            } else {
+                for key in keys {
+                    declareInit(parent2: parent2, key: key.name)
+                }
+                declareGenericInit(parent2: parent2)
+                // and close out the struct
+                lines.append("}")
+                for key in keys {
+                    declareExtensions(parent2: parent2, key: key.name)
+                }
+            }
         case .root:
             lines.append(indentBy + "public init(connection: Connection) {")
             lines.append(indentBy + indentBy + "self.connection = connection")
@@ -654,11 +689,16 @@ func parseAST(source: String) throws -> [String:AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
+            try expect("[")
+            guard let index = nextToken() else {
+                throw Errors.missingLeafType
+            }
+            try expect("]")
             try expect(":")
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
-            astStack.last?.children.append(.init(kind: .list(type), name: name))
+            astStack.last?.children.append(.init(kind: .list(type, index: index), name: name))
         case "flag":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -692,11 +732,11 @@ func parseAST(source: String) throws -> [String:AST] {
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
             }
-            try expect(":")
-            guard let type = nextToken() else {
-                throw Errors.missingLeafType
-            }
-            astStack.last?.children.append(.init(kind: .key(type), name: name))
+//            try expect(":")
+//            guard let type = nextToken() else {
+//                throw Errors.missingLeafType
+//            }
+            astStack.last?.children.append(.init(kind: .key, name: name))
         case "enum":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

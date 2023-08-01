@@ -9,55 +9,57 @@ public struct WS : PathSpecified {
     public var connection: Connection
     public var statePath: StatePath { .init(components: [.plain("WS")])}
 
-    public struct Device : PathNode {
+    public struct Device : PathNodeId, Identifiable {
         public var parent: WS
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         @Leaf public var name: String?
 
-        @Leaf public var id: UUID?
+        @Leaf public var deviceId: UUID?
 
         public init(parent: WS) {
             self.parent = parent
             statePath = parent.adding("Device")
     
             _name = parent.leaf("Name")
-            _id = parent.leaf("Id")
+            _deviceId = parent.leaf("deviceId")
             _name.parentPath = statePath
-            _id.parentPath = statePath
+            _deviceId.parentPath = statePath
         }
         public init(parent: WS, statePath: StatePath) {
             self.parent = parent
             self.statePath = statePath
             _name = parent.leaf("Name")
-            _id = parent.leaf("Id")
+            _deviceId = parent.leaf("deviceId")
             _name.parentPath = statePath
-            _id.parentPath = statePath
+            _deviceId.parentPath = statePath
         }
     }
     public var device: Device { .init(parent: self) }
-    public struct Client : PathNode {
+    public struct Client : PathNodeId, Identifiable {
         public var parent: WS
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         @Leaf public var remoteAddress: String?
 
-        @Leaf public var id: String?
+        @Leaf public var clientId: String?
 
         public init(parent: WS) {
             self.parent = parent
             statePath = parent.adding("Client")
     
             _remoteAddress = parent.leaf("RemoteAddress")
-            _id = parent.leaf("Id")
+            _clientId = parent.leaf("clientId")
             _remoteAddress.parentPath = statePath
-            _id.parentPath = statePath
+            _clientId.parentPath = statePath
         }
         public init(parent: WS, statePath: StatePath) {
             self.parent = parent
             self.statePath = statePath
             _remoteAddress = parent.leaf("RemoteAddress")
-            _id = parent.leaf("Id")
+            _clientId = parent.leaf("clientId")
             _remoteAddress.parentPath = statePath
-            _id.parentPath = statePath
+            _clientId.parentPath = statePath
         }
     }
     public var client: Client { .init(parent: self) }

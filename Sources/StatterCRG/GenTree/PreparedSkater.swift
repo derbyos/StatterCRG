@@ -7,8 +7,10 @@
 import Foundation
 public struct PreparedSkater : PathNodeId, Identifiable {
     public var parent: PreparedTeam
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var skaterId: UUID?
+
     @ImmutableLeaf public var readonly: Bool?
 
     @Leaf public var name: String?
@@ -21,16 +23,18 @@ public struct PreparedSkater : PathNodeId, Identifiable {
 
     @Leaf public var pronouns: String?
 
-    public init(parent: PreparedTeam, id: UUID) {
+    public init(parent: PreparedTeam, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("PreparedSkater", id: id))
+        statePath = parent.adding(.id("PreparedSkater", id: key))
 
+        _skaterId = parent.leaf("skaterId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name")
         _number = parent.leaf("Number").immutable
         _rosterNumber = parent.leaf("RosterNumber")
         _flags = parent.leaf("Flags")
         _pronouns = parent.leaf("Pronouns")
+        _skaterId.parentPath = statePath
         _readonly.parentPath = statePath
         _name.parentPath = statePath
         _number.parentPath = statePath
@@ -41,12 +45,14 @@ public struct PreparedSkater : PathNodeId, Identifiable {
     public init(parent: PreparedTeam, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _skaterId = parent.leaf("skaterId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name")
         _number = parent.leaf("Number").immutable
         _rosterNumber = parent.leaf("RosterNumber")
         _flags = parent.leaf("Flags")
         _pronouns = parent.leaf("Pronouns")
+        _skaterId.parentPath = statePath
         _readonly.parentPath = statePath
         _name.parentPath = statePath
         _number.parentPath = statePath
@@ -56,5 +62,5 @@ public struct PreparedSkater : PathNodeId, Identifiable {
     }
 }
 extension PreparedTeam {
-    public func skater(_ id: UUID) -> PreparedSkater { .init(parent: self, id: id) }
+    public func skater(_ key: UUID) -> PreparedSkater { .init(parent: self, key) }
 }

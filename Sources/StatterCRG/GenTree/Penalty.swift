@@ -7,7 +7,7 @@
 import Foundation
 public struct Penalty : PathNodeId, Identifiable {
     public var parent: Skater
-    public var id: Int? { Int.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     @Leaf public var number: Int?
 
@@ -23,9 +23,9 @@ public struct Penalty : PathNodeId, Identifiable {
 
     @Leaf public var next: String?
 
-    public init(parent: Skater, number: Int) {
+    public init(parent: Skater, _ key: Int) {
         self.parent = parent
-        statePath = parent.adding(.number("Penalty", param: number))
+        statePath = parent.adding(.number("Penalty", param: key))
 
         _number = parent.leaf("Number")
         _jamNumber = parent.leaf("JamNumber")
@@ -62,5 +62,5 @@ public struct Penalty : PathNodeId, Identifiable {
     }
 }
 extension Skater {
-    public func penalty(_ number: Int) -> Penalty { .init(parent: self, number: number) }
+    public func penalty(_ key: Int) -> Penalty { .init(parent: self, key) }
 }

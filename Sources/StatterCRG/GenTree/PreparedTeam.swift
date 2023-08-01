@@ -7,8 +7,10 @@
 import Foundation
 public struct PreparedTeam : PathNodeId, Identifiable {
     public var parent: ScoreBoard
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var teamId: UUID?
+
     @ImmutableLeaf public var readonly: Bool?
 
     @ImmutableLeaf public var name: String?
@@ -30,16 +32,18 @@ public struct PreparedTeam : PathNodeId, Identifiable {
     public typealias Color_Map = MapValueCollection<String, Team.AlternateName>
     public var color:Color_Map { .init(connection: connection, statePath: self.adding(.wild("Color"))) }
 
-    public init(parent: ScoreBoard, id: UUID) {
+    public init(parent: ScoreBoard, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("PreparedTeam", id: id))
+        statePath = parent.adding(.id("PreparedTeam", id: key))
 
+        _teamId = parent.leaf("teamId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName").immutable
         _leagueName = parent.leaf("LeagueName")
         _teamName = parent.leaf("TeamName")
         _logo = parent.leaf("Logo")
+        _teamId.parentPath = statePath
         _readonly.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
@@ -50,12 +54,14 @@ public struct PreparedTeam : PathNodeId, Identifiable {
     public init(parent: ScoreBoard, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _teamId = parent.leaf("teamId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName").immutable
         _leagueName = parent.leaf("LeagueName")
         _teamName = parent.leaf("TeamName")
         _logo = parent.leaf("Logo")
+        _teamId.parentPath = statePath
         _readonly.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
@@ -65,5 +71,5 @@ public struct PreparedTeam : PathNodeId, Identifiable {
     }
 }
 extension ScoreBoard {
-    public func preparedTeam(_ id: UUID) -> PreparedTeam { .init(parent: self, id: id) }
+    public func preparedTeam(_ key: UUID) -> PreparedTeam { .init(parent: self, key) }
 }

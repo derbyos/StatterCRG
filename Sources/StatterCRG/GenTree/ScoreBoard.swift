@@ -21,19 +21,20 @@ public struct ScoreBoard : PathSpecified {
 
     public var currentGame: Game { Game(parent: self, statePath: self.adding("CurrentGame"))}
 
-    public struct Clients : PathNode {
+    public struct Clients : PathNodeId, Identifiable {
         public var parent: ScoreBoard
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         public struct Device : PathNodeId, Identifiable {
             public var parent: Clients
-            public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+            public var id: StatePath { statePath }
             public let statePath: StatePath
             @Leaf public var comment: String?
 
-            public init(parent: Clients, id: UUID? = nil) {
+            public init(parent: Clients, _ key: UUID? = nil) {
                 self.parent = parent
-                if let id {
-                    statePath = parent.adding(.id("Device", id: id))
+                if let key {
+                    statePath = parent.adding(.id("Device", id: key))
                 } else {
                     statePath =  parent.adding(.wild("Device"))
                 }
@@ -48,7 +49,7 @@ public struct ScoreBoard : PathSpecified {
                 _comment.parentPath = statePath
             }
         }
-        public func device(_ id: UUID? = nil) -> Device { .init(parent: self, id: id) }
+        public func device(_ key: UUID? = nil) -> Device { .init(parent: self, key) }
         public init(parent: ScoreBoard) {
             self.parent = parent
             statePath = parent.adding("Clients")
@@ -82,7 +83,7 @@ public struct ScoreBoard : PathSpecified {
 
     public struct PenaltyCodes : PathNodeId, Identifiable {
         public var parent: ScoreBoard
-        public var id: String? { String.from(component: statePath.last)?.1 }
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         @ImmutableLeaf public var readonly: Bool?
 
@@ -92,9 +93,9 @@ public struct ScoreBoard : PathSpecified {
         public typealias PenaltyCode_Map = MapValueCollection<String, UUID>
         public var penaltyCode:PenaltyCode_Map { .init(connection: connection, statePath: self.adding(.wild("PenaltyCode"))) }
 
-        public init(parent: ScoreBoard, id: String) {
+        public init(parent: ScoreBoard, _ key: String) {
             self.parent = parent
-            statePath = parent.adding(.name("PenaltyCodes", name: id))
+            statePath = parent.adding(.name("PenaltyCodes", name: key))
     
             _readonly = parent.leaf("Readonly").immutable
             _readonly.parentPath = statePath
@@ -106,7 +107,7 @@ public struct ScoreBoard : PathSpecified {
             _readonly.parentPath = statePath
         }
     }
-    public func penaltyCodes(_ id: String) -> PenaltyCodes { .init(parent: self, id: id) }
+    public func penaltyCodes(_ key: String) -> PenaltyCodes { .init(parent: self, key) }
     public init(connection: Connection) {
         self.connection = connection
         let dummy = Leaf<Bool>(connection: connection, component: .wild(""), parentPath: .init(components: []))

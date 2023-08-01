@@ -5,8 +5,9 @@
 //
 
 import Foundation
-public struct Rule : PathNode {
+public struct Rule : PathNodeId, Identifiable {
     public var parent: Game
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     public init(parent: Game) {
         self.parent = parent

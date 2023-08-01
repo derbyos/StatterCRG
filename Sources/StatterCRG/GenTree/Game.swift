@@ -7,8 +7,10 @@
 import Foundation
 public struct Game : PathNodeId, Identifiable {
     public var parent: ScoreBoard
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var gameId: UUID?
+
     @ImmutableLeaf public var readonly: Bool?
 
     
@@ -122,10 +124,11 @@ public struct Game : PathNodeId, Identifiable {
     public typealias EventInfo_Map = MapValueCollection<String, UUID>
     public var eventInfo:EventInfo_Map { .init(connection: connection, statePath: self.adding(.wild("EventInfo"))) }
 
-    public init(parent: ScoreBoard, id: UUID) {
+    public init(parent: ScoreBoard, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("Game", id: id))
+        statePath = parent.adding(.id("Game", id: key))
 
+        _gameId = parent.leaf("gameId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _game = parent.leaf("Game")
         _name = parent.leaf("Name").immutable
@@ -156,6 +159,7 @@ public struct Game : PathNodeId, Identifiable {
         _statsbookExists = parent.leaf("StatsbookExists")
         _jsonExists = parent.leaf("JsonExists")
         _exportBlockedBy = parent.leaf("ExportBlockedBy").immutable
+        _gameId.parentPath = statePath
         _readonly.parentPath = statePath
         _game.parentPath = statePath
         _name.parentPath = statePath
@@ -190,6 +194,7 @@ public struct Game : PathNodeId, Identifiable {
     public init(parent: ScoreBoard, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _gameId = parent.leaf("gameId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _game = parent.leaf("Game")
         _name = parent.leaf("Name").immutable
@@ -220,6 +225,7 @@ public struct Game : PathNodeId, Identifiable {
         _statsbookExists = parent.leaf("StatsbookExists")
         _jsonExists = parent.leaf("JsonExists")
         _exportBlockedBy = parent.leaf("ExportBlockedBy").immutable
+        _gameId.parentPath = statePath
         _readonly.parentPath = statePath
         _game.parentPath = statePath
         _name.parentPath = statePath
@@ -253,5 +259,5 @@ public struct Game : PathNodeId, Identifiable {
     }
 }
 extension ScoreBoard {
-    public func game(_ id: UUID) -> Game { .init(parent: self, id: id) }
+    public func game(_ key: UUID) -> Game { .init(parent: self, key) }
 }

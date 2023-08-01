@@ -5,22 +5,26 @@
 //
 
 import Foundation
-public struct Settings : PathNode {
+public struct Settings : PathNodeId, Identifiable {
     public var parent: ScoreBoard
+    public var id: StatePath { statePath }
     public let statePath: StatePath
-    public struct Setting : PathNode {
+    public struct Setting : PathNodeId, Identifiable {
         public var parent: Settings
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         public enum BoolString: String, EnumStringAsID {
             case _true = "true"
             case _false = "false"
             public var isTrue : Bool { self == ._true }
         }
-        public struct Overlay : PathNode {
+        public struct Overlay : PathNodeId, Identifiable {
             public var parent: Setting
+            public var id: StatePath { statePath }
             public let statePath: StatePath
-            public struct Interactive : PathNode {
+            public struct Interactive : PathNodeId, Identifiable {
                 public var parent: Overlay
+                public var id: StatePath { statePath }
                 public let statePath: StatePath
                 public enum OnOff: String, EnumStringAsID {
                     case on = "On"
@@ -30,8 +34,9 @@ public struct Settings : PathNode {
 
                 @Leaf public var clock: OnOff?
 
-                public struct LowerThird : PathNode {
+                public struct LowerThird : PathNodeId, Identifiable {
                     public var parent: Interactive
+                    public var id: StatePath { statePath }
                     public let statePath: StatePath
                     @Leaf public var line1: String?
 
@@ -137,8 +142,9 @@ public struct Settings : PathNode {
             }
         }
         public var overlay: Overlay { .init(parent: self) }
-        public struct ScoreBoard : PathNode {
+        public struct ScoreBoard : PathNodeId, Identifiable {
             public var parent: Setting
+            public var id: StatePath { statePath }
             public let statePath: StatePath
             public enum AutoStart: String, EnumStringAsID {
                 case empty = ""
@@ -159,8 +165,9 @@ public struct Settings : PathNode {
             }
             @Leaf public var clockAfterTimeout: ClockAfterTimeout?
 
-            public struct Clock : PathNode {
+            public struct Clock : PathNodeId, Identifiable {
                 public var parent: ScoreBoard
+                public var id: StatePath { statePath }
                 public let statePath: StatePath
                 @Leaf public var sync: BoolString?
 
@@ -179,8 +186,9 @@ public struct Settings : PathNode {
                 }
             }
             public var clock: Clock { .init(parent: self) }
-            public struct Game : PathNode {
+            public struct Game : PathNodeId, Identifiable {
                 public var parent: ScoreBoard
+                public var id: StatePath { statePath }
                 public let statePath: StatePath
                 @Leaf public var defaultNameFormat: String?
 
@@ -199,8 +207,9 @@ public struct Settings : PathNode {
                 }
             }
             public var game: Game { .init(parent: self) }
-            public struct Intermission : PathNode {
+            public struct Intermission : PathNodeId, Identifiable {
                 public var parent: ScoreBoard
+                public var id: StatePath { statePath }
                 public let statePath: StatePath
                 @Leaf public var preGame: String?
 
@@ -243,8 +252,9 @@ public struct Settings : PathNode {
                 }
             }
             public var intermission: Intermission { .init(parent: self) }
-            public struct Penalties : PathNode {
+            public struct Penalties : PathNodeId, Identifiable {
                 public var parent: ScoreBoard
+                public var id: StatePath { statePath }
                 public let statePath: StatePath
                 @Leaf public var forcedServed: BoolString?
 

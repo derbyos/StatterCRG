@@ -7,13 +7,20 @@
 import Foundation
 public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: Jam<P>
-    public var id: Int? { Int.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     @Leaf public var teamJamID: UUID?
 
-    public init(parent: Jam<P>, team: Int) {
+    public init(parent: Jam<P>, _ key: Int) {
         self.parent = parent
-        statePath = parent.adding(.number("TeamJam", param: team))
+        statePath = parent.adding(.number("TeamJam", param: key))
+
+        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID.parentPath = statePath
+    }
+    public init(parent: Jam<P>, _ key: UUID) {
+        self.parent = parent
+        statePath = parent.adding(.id("TeamJam", id: key))
 
         _teamJamID = parent.leaf("teamJamID")
         _teamJamID.parentPath = statePath
@@ -26,5 +33,8 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
     }
 }
 extension Jam {
-    public func teamJam(_ team: Int) -> TeamJam<P> { .init(parent: self, team: team) }
+    public func teamJam(_ key: Int) -> TeamJam<P> { .init(parent: self, key) }
+}
+extension Jam {
+    public func teamJam(_ key: UUID) -> TeamJam<P> { .init(parent: self, key) }
 }

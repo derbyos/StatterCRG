@@ -237,10 +237,16 @@ public protocol PathNode : PathSpecified {
 public extension PathNode {
     var connection: Connection { parent.connection }
 }
+#if nomore
 public protocol PathNodeId : PathNode, Identifiable {
     associatedtype IDBase: JSONTypeable
     var id: IDBase? { get }
 }
+#else
+public protocol PathNodeId : PathNode, Identifiable {
+    var id: StatePath { get }
+}
+#endif
 //extension Identifiable where Self: PathNodeId {
 //    public var id: IDBase? { }
 //}

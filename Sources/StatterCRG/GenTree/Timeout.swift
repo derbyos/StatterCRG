@@ -7,8 +7,10 @@
 import Foundation
 public struct Timeout : PathNodeId, Identifiable {
     public var parent: Period
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var timeoutId: UUID?
+
     @ImmutableLeaf public var readonly: Bool?
 
     @Leaf public var owner: String?
@@ -37,10 +39,11 @@ public struct Timeout : PathNodeId, Identifiable {
 
     public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
     public func insertAfter() { connection.set(key: statePath.adding("InsertAfter"), value: .bool(true), kind: .set) }
-    public init(parent: Period, id: UUID) {
+    public init(parent: Period, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("Timeout", id: id))
+        statePath = parent.adding(.id("Timeout", id: key))
 
+        _timeoutId = parent.leaf("timeoutId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _owner = parent.leaf("Owner")
         _review = parent.leaf("Review")
@@ -54,6 +57,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _periodClocEnd = parent.leaf("PeriodClocEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
+        _timeoutId.parentPath = statePath
         _readonly.parentPath = statePath
         _owner.parentPath = statePath
         _review.parentPath = statePath
@@ -71,6 +75,7 @@ public struct Timeout : PathNodeId, Identifiable {
     public init(parent: Period, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _timeoutId = parent.leaf("timeoutId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _owner = parent.leaf("Owner")
         _review = parent.leaf("Review")
@@ -84,6 +89,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _periodClocEnd = parent.leaf("PeriodClocEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
+        _timeoutId.parentPath = statePath
         _readonly.parentPath = statePath
         _owner.parentPath = statePath
         _review.parentPath = statePath
@@ -100,5 +106,5 @@ public struct Timeout : PathNodeId, Identifiable {
     }
 }
 extension Period {
-    public func timeout(_ id: UUID) -> Timeout { .init(parent: self, id: id) }
+    public func timeout(_ key: UUID) -> Timeout { .init(parent: self, key) }
 }

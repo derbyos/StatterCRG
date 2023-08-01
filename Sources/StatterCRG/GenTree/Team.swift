@@ -7,9 +7,11 @@
 import Foundation
 public struct Team : PathNodeId, Identifiable {
     public var parent: Game
-    public var id: Int? { Int.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     @Leaf public var team: Int?
+
+    @ImmutableLeaf public var teamId: UUID?
 
     // was writable before 5.0
 
@@ -103,7 +105,7 @@ public struct Team : PathNodeId, Identifiable {
 
     public struct ScoreAdjustment : PathNodeId, Identifiable {
         public var parent: Team
-        public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         @ImmutableLeaf public var readonly: Bool?
 
@@ -124,9 +126,9 @@ public struct Team : PathNodeId, Identifiable {
         @Leaf public var appliedTo: Bool?
 
         public func discard() { connection.set(key: statePath.adding("Discard"), value: .bool(true), kind: .set) }
-        public init(parent: Team, id: UUID) {
+        public init(parent: Team, _ key: UUID) {
             self.parent = parent
-            statePath = parent.adding(.id("ScoreAdjustment", id: id))
+            statePath = parent.adding(.id("ScoreAdjustment", id: key))
     
             _readonly = parent.leaf("Readonly").immutable
             _amount = parent.leaf("Amount").immutable
@@ -170,7 +172,7 @@ public struct Team : PathNodeId, Identifiable {
             _appliedTo.parentPath = statePath
         }
     }
-    public func scoreAdjustment(_ id: UUID) -> ScoreAdjustment { .init(parent: self, id: id) }
+    public func scoreAdjustment(_ key: UUID) -> ScoreAdjustment { .init(parent: self, key) }
     public var activeScoreAdjustment: ScoreAdjustment { ScoreAdjustment(parent: self, statePath: self.adding("ActiveScoreAdjustment"))}
 
     @Leaf public var activeScoreAdjustmentAmount: Int?
@@ -206,7 +208,7 @@ public struct Team : PathNodeId, Identifiable {
 
     
 
-    public var skaters : MapNodeCollection<Self, Skater> { .init(self,"Skater") } 
+    public var skaters : MapNodeCollection<Self, Skater, UUID> { .init(self,"Skater") } 
 
     
 
@@ -219,7 +221,7 @@ public struct Team : PathNodeId, Identifiable {
 
     public struct Expulsion : PathNodeId, Identifiable {
         public var parent: Team
-        public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+        public var id: StatePath { statePath }
         public let statePath: StatePath
         @ImmutableLeaf public var readonly: Bool?
 
@@ -229,9 +231,9 @@ public struct Team : PathNodeId, Identifiable {
 
         @Leaf public var suspension: Bool?
 
-        public init(parent: Team, id: UUID) {
+        public init(parent: Team, _ key: UUID) {
             self.parent = parent
-            statePath = parent.adding(.id("Expulsion", id: id))
+            statePath = parent.adding(.id("Expulsion", id: key))
     
             _readonly = parent.leaf("Readonly").immutable
             _info = parent.leaf("Info")
@@ -255,12 +257,13 @@ public struct Team : PathNodeId, Identifiable {
             _suspension.parentPath = statePath
         }
     }
-    public func expulsion(_ id: UUID) -> Expulsion { .init(parent: self, id: id) }
-    public init(parent: Game, team: Int) {
+    public func expulsion(_ key: UUID) -> Expulsion { .init(parent: self, key) }
+    public init(parent: Game, _ key: Int) {
         self.parent = parent
-        statePath = parent.adding(.number("Team", param: team))
+        statePath = parent.adding(.number("Team", param: key))
 
         _team = parent.leaf("Team")
+        _teamId = parent.leaf("teamId").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
         _initials = parent.leaf("Initials").immutable
@@ -289,6 +292,70 @@ public struct Team : PathNodeId, Identifiable {
         _activeScoreAdjustmentAmount = parent.leaf("ActiveScoreAdjustmentAmount")
         _logo = parent.leaf("Logo")
         _team.parentPath = statePath
+        _teamId.parentPath = statePath
+        _name.parentPath = statePath
+        _fullName.parentPath = statePath
+        _initials.parentPath = statePath
+        _fileName.parentPath = statePath
+        _leagueName.parentPath = statePath
+        _uniformColor.parentPath = statePath
+        _score.parentPath = statePath
+        _timeouts.parentPath = statePath
+        _officialReviews.parentPath = statePath
+        _inTimeout.parentPath = statePath
+        _inOfficialReview.parentPath = statePath
+        _totalPenalites.parentPath = statePath
+        _retainedOfficialReview.parentPath = statePath
+        _displayLead.parentPath = statePath
+        _jamScore.parentPath = statePath
+        _tripScore.parentPath = statePath
+        _lastScore.parentPath = statePath
+        _lost.parentPath = statePath
+        _lead.parentPath = statePath
+        _calloff.parentPath = statePath
+        _injury.parentPath = statePath
+        _noInitial.parentPath = statePath
+        _starPass.parentPath = statePath
+        _noPivot.parentPath = statePath
+        _starPassTrip.parentPath = statePath
+        _activeScoreAdjustmentAmount.parentPath = statePath
+        _logo.parentPath = statePath
+    }
+    public init(parent: Game, _ key: UUID) {
+        self.parent = parent
+        statePath = parent.adding(.id("Team", id: key))
+
+        _team = parent.leaf("Team")
+        _teamId = parent.leaf("teamId").immutable
+        _name = parent.leaf("Name").immutable
+        _fullName = parent.leaf("FullName")
+        _initials = parent.leaf("Initials").immutable
+        _fileName = parent.leaf("FileName").immutable
+        _leagueName = parent.leaf("LeagueName")
+        _uniformColor = parent.leaf("UniformColor")
+        _score = parent.leaf("Score").immutable
+        _timeouts = parent.leaf("Timeouts").immutable
+        _officialReviews = parent.leaf("OfficialReviews").immutable
+        _inTimeout = parent.leaf("InTimeout").immutable
+        _inOfficialReview = parent.leaf("InOfficialReview").immutable
+        _totalPenalites = parent.leaf("TotalPenalites").immutable
+        _retainedOfficialReview = parent.leaf("RetainedOfficialReview")
+        _displayLead = parent.leaf("DisplayLead").immutable
+        _jamScore = parent.leaf("JamScore").immutable
+        _tripScore = parent.leaf("TripScore")
+        _lastScore = parent.leaf("LastScore").immutable
+        _lost = parent.leaf("Lost")
+        _lead = parent.leaf("Lead")
+        _calloff = parent.leaf("Calloff")
+        _injury = parent.leaf("Injury")
+        _noInitial = parent.leaf("NoInitial")
+        _starPass = parent.leaf("StarPass")
+        _noPivot = parent.leaf("NoPivot")
+        _starPassTrip = parent.leaf("StarPassTrip").immutable
+        _activeScoreAdjustmentAmount = parent.leaf("ActiveScoreAdjustmentAmount")
+        _logo = parent.leaf("Logo")
+        _team.parentPath = statePath
+        _teamId.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
         _initials.parentPath = statePath
@@ -321,6 +388,7 @@ public struct Team : PathNodeId, Identifiable {
         self.parent = parent
         self.statePath = statePath
         _team = parent.leaf("Team")
+        _teamId = parent.leaf("teamId").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
         _initials = parent.leaf("Initials").immutable
@@ -349,6 +417,7 @@ public struct Team : PathNodeId, Identifiable {
         _activeScoreAdjustmentAmount = parent.leaf("ActiveScoreAdjustmentAmount")
         _logo = parent.leaf("Logo")
         _team.parentPath = statePath
+        _teamId.parentPath = statePath
         _name.parentPath = statePath
         _fullName.parentPath = statePath
         _initials.parentPath = statePath
@@ -379,5 +448,8 @@ public struct Team : PathNodeId, Identifiable {
     }
 }
 extension Game {
-    public func team(_ team: Int) -> Team { .init(parent: self, team: team) }
+    public func team(_ key: Int) -> Team { .init(parent: self, key) }
+}
+extension Game {
+    public func team(_ key: UUID) -> Team { .init(parent: self, key) }
 }

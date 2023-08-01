@@ -7,8 +7,10 @@
 import Foundation
 public struct Official : PathNodeId, Identifiable {
     public var parent: Game
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var officialId: UUID?
+
     @ImmutableLeaf public var readonly: Bool?
 
     @Leaf public var role: String?
@@ -23,10 +25,11 @@ public struct Official : PathNodeId, Identifiable {
 
     @Leaf public var swap: Bool?
 
-    public init(parent: Game, id: UUID) {
+    public init(parent: Game, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("Official", id: id))
+        statePath = parent.adding(.id("Official", id: key))
 
+        _officialId = parent.leaf("officialId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _role = parent.leaf("Role")
         _name = parent.leaf("Name")
@@ -34,6 +37,7 @@ public struct Official : PathNodeId, Identifiable {
         _cert = parent.leaf("Cert")
         _p1Team = parent.leaf("P1Team")
         _swap = parent.leaf("Swap")
+        _officialId.parentPath = statePath
         _readonly.parentPath = statePath
         _role.parentPath = statePath
         _name.parentPath = statePath
@@ -45,6 +49,7 @@ public struct Official : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _officialId = parent.leaf("officialId").immutable
         _readonly = parent.leaf("Readonly").immutable
         _role = parent.leaf("Role")
         _name = parent.leaf("Name")
@@ -52,6 +57,7 @@ public struct Official : PathNodeId, Identifiable {
         _cert = parent.leaf("Cert")
         _p1Team = parent.leaf("P1Team")
         _swap = parent.leaf("Swap")
+        _officialId.parentPath = statePath
         _readonly.parentPath = statePath
         _role.parentPath = statePath
         _name.parentPath = statePath
@@ -62,8 +68,8 @@ public struct Official : PathNodeId, Identifiable {
     }
 }
 extension Game {
-    public func nso(_ id: UUID) -> Official { .init(parent: self, id: id) }
+    public func nso(_ key: UUID) -> Official { .init(parent: self, key) }
 }
 extension Game {
-    public func ref(_ id: UUID) -> Official { .init(parent: self, id: id) }
+    public func ref(_ key: UUID) -> Official { .init(parent: self, key) }
 }

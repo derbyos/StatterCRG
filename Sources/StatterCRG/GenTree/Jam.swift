@@ -7,7 +7,7 @@
 import Foundation
 public struct Jam<P:PathSpecified> : PathNodeId, Identifiable {
     public var parent: P
-    public var id: Int? { Int.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     @ImmutableLeaf public var jamID: UUID?
 
@@ -42,9 +42,44 @@ public struct Jam<P:PathSpecified> : PathNodeId, Identifiable {
     public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
     public func insertBefore() { connection.set(key: statePath.adding("InsertBefore"), value: .bool(true), kind: .set) }
     public func insertTimeoutAfter() { connection.set(key: statePath.adding("InsertTimeoutAfter"), value: .bool(true), kind: .set) }
-    public init(parent: P, jam: Int) {
+    public init(parent: P, _ key: Int) {
         self.parent = parent
-        statePath = parent.adding(.number("Jam", param: jam))
+        statePath = parent.adding(.number("Jam", param: key))
+
+        _jamID = parent.leaf("jamID").immutable
+        _readonly = parent.leaf("Readonly").immutable
+        _number = parent.leaf("Number").immutable
+        _previous = parent.leaf("Previous").immutable
+        _next = parent.leaf("Next").immutable
+        _periodNumber = parent.leaf("PeriodNumber").immutable
+        _starPass = parent.leaf("StarPass").immutable
+        _overtime = parent.leaf("Overtime")
+        _injuryContinuation = parent.leaf("InjuryContinuation")
+        _duration = parent.leaf("Duration").immutable
+        _periodClockElapsedStart = parent.leaf("PeriodClockElapsedStart")
+        _periodClockElapsedEnd = parent.leaf("PeriodClockElapsedEnd")
+        _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
+        _walltimeStart = parent.leaf("WalltimeStart")
+        _walltimeEnd = parent.leaf("WalltimeEnd")
+        _jamID.parentPath = statePath
+        _readonly.parentPath = statePath
+        _number.parentPath = statePath
+        _previous.parentPath = statePath
+        _next.parentPath = statePath
+        _periodNumber.parentPath = statePath
+        _starPass.parentPath = statePath
+        _overtime.parentPath = statePath
+        _injuryContinuation.parentPath = statePath
+        _duration.parentPath = statePath
+        _periodClockElapsedStart.parentPath = statePath
+        _periodClockElapsedEnd.parentPath = statePath
+        _periodClockDisplayEnd.parentPath = statePath
+        _walltimeStart.parentPath = statePath
+        _walltimeEnd.parentPath = statePath
+    }
+    public init(parent: P, _ key: UUID) {
+        self.parent = parent
+        statePath = parent.adding(.id("Jam", id: key))
 
         _jamID = parent.leaf("jamID").immutable
         _readonly = parent.leaf("Readonly").immutable
@@ -113,8 +148,14 @@ public struct Jam<P:PathSpecified> : PathNodeId, Identifiable {
     }
 }
 extension Period {
-    public func jam(_ jam: Int) -> Jam<Period> { .init(parent: self, jam: jam) }
+    public func jam(_ key: Int) -> Jam<Period> { .init(parent: self, key) }
 }
 extension Game {
-    public func jam(_ jam: Int) -> Jam<Game> { .init(parent: self, jam: jam) }
+    public func jam(_ key: Int) -> Jam<Game> { .init(parent: self, key) }
+}
+extension Period {
+    public func jam(_ key: UUID) -> Jam<Period> { .init(parent: self, key) }
+}
+extension Game {
+    public func jam(_ key: UUID) -> Jam<Game> { .init(parent: self, key) }
 }

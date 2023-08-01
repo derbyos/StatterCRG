@@ -7,7 +7,7 @@
 import Foundation
 public struct Skater : PathNodeId, Identifiable {
     public var parent: Team
-    public var id: UUID? { UUID.from(component: statePath.last)?.1 }
+    public var id: StatePath { statePath }
     public let statePath: StatePath
     public enum Role: String, EnumStringAsID {
         case bench = "Bench"
@@ -15,6 +15,8 @@ public struct Skater : PathNodeId, Identifiable {
         case pivot = "Pivot"
         case jammer = "Jammer"
     }
+    @ImmutableLeaf public var skaterId: UUID?
+
     public enum Flags: String, EnumStringAsID {
         case skater = ""
         case altSkater = "ALT"
@@ -37,20 +39,22 @@ public struct Skater : PathNodeId, Identifiable {
 
     @Leaf public var role: Role?
 
-    public var penalties : MapNodeCollection<Self, Penalty> { .init(self,"Penalty") } 
+    public var penalties : MapNodeCollection<Self, Penalty, Int> { .init(self,"Penalty") } 
 
     
 
-    public init(parent: Team, id: UUID) {
+    public init(parent: Team, _ key: UUID) {
         self.parent = parent
-        statePath = parent.adding(.id("Skater", id: id))
+        statePath = parent.adding(.id("Skater", id: key))
 
+        _skaterId = parent.leaf("skaterId").immutable
         _flags = parent.leaf("Flags")
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
         _color = parent.leaf("Color")
         _rosterNumber = parent.leaf("RosterNumber")
         _role = parent.leaf("Role")
+        _skaterId.parentPath = statePath
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
@@ -61,12 +65,14 @@ public struct Skater : PathNodeId, Identifiable {
     public init(parent: Team, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _skaterId = parent.leaf("skaterId").immutable
         _flags = parent.leaf("Flags")
         _name = parent.leaf("Name")
         _pronouns = parent.leaf("Pronouns")
         _color = parent.leaf("Color")
         _rosterNumber = parent.leaf("RosterNumber")
         _role = parent.leaf("Role")
+        _skaterId.parentPath = statePath
         _flags.parentPath = statePath
         _name.parentPath = statePath
         _pronouns.parentPath = statePath
@@ -76,5 +82,5 @@ public struct Skater : PathNodeId, Identifiable {
     }
 }
 extension Team {
-    public func skater(_ id: UUID) -> Skater { .init(parent: self, id: id) }
+    public func skater(_ key: UUID) -> Skater { .init(parent: self, key) }
 }

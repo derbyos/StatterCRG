@@ -234,8 +234,8 @@ public struct Flag: PathSpecified, DynamicProperty {
 
 /// An list of leaves, indexed by whatever the type is.  Used, for example,
 /// to declare Skater roster in a team
-public struct MapNodeCollection<Parent:PathSpecified, T:PathNodeId> : PathSpecified where T.Parent == Parent {
-    public typealias I = T.IDBase
+public struct MapNodeCollection<Parent:PathSpecified, T:PathNodeId, I: JSONTypeable> : PathSpecified where T.Parent == Parent {
+//    public typealias I = StatePath
     public var connection: Connection {
         parent.connection
     }

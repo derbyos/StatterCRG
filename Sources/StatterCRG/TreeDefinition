@@ -4,11 +4,11 @@
 root WS {
     node Device {
         var Name : String
-        var Id : UUID
+        @name(Id) var deviceId : UUID
     }
     node Client {
         var RemoteAddress : String
-        var Id : String
+        @name(Id) var clientId : String
     }
 }
 
@@ -21,7 +21,7 @@ root ScoreBoard {
     ref CurrentGame : Game
     node Clients {
         node Device {
-            key id : UUID?
+            key UUID?
             var Comment : String
         }
     }
@@ -34,7 +34,7 @@ root ScoreBoard {
     
     var ImportsInProgress : Bool
     node PenaltyCodes {
-        key Id : String
+        key String
         let Readonly : Bool
         map Code[UUID] : String
         map PenaltyCode[UUID] : String
@@ -42,7 +42,9 @@ root ScoreBoard {
 }
 
 node Period Game {
-    key period : Int?
+    key Int?
+    key UUID
+    @name(Id) let periodId : UUID
     let Number : Int
     let Previous : UUID
     let Next : UUID
@@ -66,7 +68,8 @@ node Period Game {
 }
 
 node Timeout Period {
-    key Id : UUID
+    key UUID
+    @name(Id) let timeoutId : UUID
     let Readonly : Bool
     var Owner : String
     var Review : Bool
@@ -84,7 +87,8 @@ node Timeout Period {
     @version(2023.0) action InsertAfter
 }
 node Game ScoreBoard {
-    key Id : UUID
+    key UUID
+    @name(Id) let gameId : UUID
     let Readonly : Bool
     
     // Only valid in CurrentGame
@@ -153,8 +157,10 @@ node Game ScoreBoard {
 }
 
 node Team Game {
-    key team : Int
+    key Int
+    key UUID
     var Team : Int
+    @name(Id) let teamId : UUID
     // was writable before 5.0
     let Name : String
     var FullName : String
@@ -206,7 +212,7 @@ node Team Game {
     var NoPivot : Bool
     let StarPassTrip : UUID
     @version(2023.0) node ScoreAdjustment {
-        key Id : UUID
+        key UUID
         let Readonly : Bool
         let Amount : Int
         let JamRecorded : UUID
@@ -235,7 +241,7 @@ node Team Game {
 //    flag Timeout
 //    flag OfficialReview
     
-    list Skater : Skater
+    list Skater[UUID] : Skater
 
     action AddTrip
     action RemoveTrip
@@ -244,7 +250,7 @@ node Team Game {
     action OfficialReview
     
     node Expulsion {
-        key Id : UUID
+        key UUID
         let Readonly : Bool
         var Info : String
         var ExtraInfo : String
@@ -260,7 +266,7 @@ node Clock Game {
         case Jam
         case Intermission
     }
-    key kind : Kind
+    key Kind
     @name(Id) let clockId : String
     var Time : Int
     let InvertedTime : Int
@@ -278,7 +284,8 @@ node Clock Game {
 
 
 node Jam <Period Game> {
-    key jam : Int
+    key Int
+    key UUID
     @name(Id) let jamID : UUID
     let Readonly : Bool
     let Number : Int
@@ -300,7 +307,8 @@ node Jam <Period Game> {
 }
 
 node TeamJam Jam<P> {
-    key team : Int
+    key Int
+    key UUID
     @name(Id) var teamJamID : UUID
 }
 
@@ -312,7 +320,8 @@ node Skater Team {
         case Pivot
         case Jammer
     }
-    key Id: UUID
+    key UUID
+    @name(Id) let skaterId : UUID
     enum Flags {
         case Skater = ""
         case AltSkater = "ALT"
@@ -328,13 +337,13 @@ node Skater Team {
     @version(2023.0) var Color : String
     var RosterNumber : String
     var Role : Role
-    list Penalty : Penalty
+    list Penalty[Int] : Penalty
 
 }
 
 
 node Penalty Skater {
-    key Number : Int
+    key Int
     var Number : Int
     var JamNumber : Int
     var PeriodNumber : Int
@@ -455,7 +464,8 @@ node Settings ScoreBoard {
 
 
 @parent(Game) node Official <Game.Nso Game.Ref> {
-    key Id : UUID
+    key UUID
+    @name(Id) let officialId : UUID
     let Readonly : Bool
     var Role : String
     var Name : String
@@ -467,7 +477,8 @@ node Settings ScoreBoard {
 
 
 node PreparedTeam ScoreBoard {
-    key Id : UUID
+    key UUID
+    @name(Id) let teamId : UUID
     let Readonly : Bool
     let Name : String
     let FullName : String
@@ -480,7 +491,8 @@ node PreparedTeam ScoreBoard {
 }
 
 node PreparedSkater PreparedTeam.Skater {
-    key Id : UUID
+    key UUID
+    @name(Id) let skaterId : UUID
     let Readonly : Bool
     var Name : String
     let Number : String
