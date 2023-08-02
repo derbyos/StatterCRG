@@ -160,9 +160,9 @@ public class Connection : ObservableObject, Equatable {
     // Since not everything is SwiftUI, we provide addtional hooks for observing data changes on the scoreboard
     
     public struct StateDataChangeMessage {
-        var path: StatePath
-        var oldValue: JSONValue?
-        var newValue: JSONValue
+        public var path: StatePath
+        public var oldValue: JSONValue?
+        public var newValue: JSONValue
     }
     public var stateDataDidChange : PassthroughSubject<StateDataChangeMessage, Never> = .init()
     ///
@@ -335,6 +335,17 @@ public class Connection : ObservableObject, Equatable {
         send(command: command)
     }
     
+    public func register(statePaths: [StatePath]) {
+        struct RegisterCommand: Codable {
+            var action: String = "Register"
+            var paths: [StatePath]
+        }
+        let command = RegisterCommand(paths: statePaths)
+        registered.formUnion(statePaths)
+        toRegister = []
+        send(command: command)
+    }
+    
     /// Actually send data over the websocket
     /// - Parameter command: <#command description#>
     public func send<Command: Encodable>(command: Command) {
@@ -451,12 +462,7 @@ public class Connection : ObservableObject, Equatable {
             return existing
         }
         if !registered.contains(path) {
-            struct SelfSpecified : PathSpecified {
-                var connection: Connection
-                
-                var statePath: StatePath
-            }
-            register(SelfSpecified(connection: self, statePath: path))
+            register(statePaths: [path])
         }
         async let values = stateDataDidChange.first { msg in
             msg.path == path
@@ -464,4 +470,27 @@ public class Connection : ObservableObject, Equatable {
         let value = await values
         return value[0].newValue
     }
+    
+    /// Get the current value or wait for a new value to appear
+    /// - Parameter path: The state path to fetch
+    /// - Returns: The JSONValue that we get, if possible
+    public func fetch(matching path: StatePath) async -> [JSONValue] {
+//        if let existing = state[path] {
+//            return existing
+//        }
+        if !registered.contains(path) {
+            struct SelfSpecified : PathSpecified {
+                var connection: Connection
+                
+                var statePath: StatePath
+            }
+            register(SelfSpecified(connection: self, statePath: path))
+        }
+        async let values = stateDataDidChange.filter { msg in
+            msg.path == path
+        }.values.reduce(into: []) { $0.append($1) }
+        let value = await values
+        return [] //  for now .init(value)
+    }
+
 }

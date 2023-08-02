@@ -8,7 +8,7 @@
 import Foundation
 import ArgumentParser
 import StatterCRG
-
+import Combine
 
 enum Errors : Error {
     case unableToGetValue
@@ -198,8 +198,52 @@ extension StatCRG {
         static var configuration = CommandConfiguration(abstract: "List a series of values (such as games, skaters, officials)")
         @OptionGroup var serverOptions: ServerOptions
         @OptionGroup var outputOptions: OutputOptions
-        mutating func run() {
-            
+        enum TopLevel : String, RawRepresentable, ExpressibleByArgument {
+            case games // tab separated if needed
+            case refs
+            case nsos
         }
+        @Argument(help: "What to list")
+        var list: TopLevel = .games
+
+        
+        mutating func run() throws {
+            let connection = serverOptions.connection()
+            connection.connect()
+            switch list {
+            case .games:
+//                let games : MapNodeCollection<ScoreBoard, Game, UUID> = .init(connection.scoreBoard, "Game(*)")
+//                let gameIDs : MapValueCollection<UUID, UUID> = .init(connection: connection, statePath: StatePath(from: "ScoreBoard.Game(*)"))
+//                _ = games.allValues()
+                var seenGames:Swift.Set<UUID> = []
+                var update : AnyCancellable? = nil
+                update = connection.stateDataDidChange.sink { msg in
+//                    print("change of \(msg)")
+//                    guard !games.allValues().isEmpty else {
+//                        return
+//                    }
+//                    for game in games.allValues() {
+                    if msg.path.hasPrefix("ScoreBoard") {
+                        if case let .id("Game", id: id) = msg.path.dropFirst().first(where: {_ in true}) {
+                            if !seenGames.contains(id) {
+                                print("Game <\(id.uuidString.lowercased())> : \(msg.newValue.description)")
+                                seenGames.insert(id)
+                                DispatchQueue.main.async {
+                                    update = nil
+                                    StatCRG.Get.exit()
+                                }
+                            }
+                        }
+                    }
+                }
+                connection.register(statePaths:  ["ScoreBoard.Game(*).Name"])
+            case .nsos:
+                break
+            case .refs:
+                break
+            }
+            RunLoop.main.run()
+        }
+
     }
 }

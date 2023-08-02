@@ -18,7 +18,7 @@ import SwiftUI
 ///  - __uuid__ identifier
 ///  - __string__ enumeration
 ///
-public struct StatePath : Codable, Hashable, Sequence {
+public struct StatePath : Codable, Hashable, Sequence, ExpressibleByStringLiteral {
     public typealias Element = StatePath.PathComponent
     internal init(components: [StatePath.PathComponent]) {
         self.components = components
@@ -28,6 +28,9 @@ public struct StatePath : Codable, Hashable, Sequence {
         let container = try decoder.singleValueContainer()
         let fullString = try container.decode(String.self)
         self.init(from: fullString)
+    }
+    public init(stringLiteral value: StringLiteralType) {
+        self.init(from: value)
     }
     public init(from fullString: String) {
         var pos = fullString.startIndex
@@ -176,7 +179,11 @@ public struct StatePath : Codable, Hashable, Sequence {
         return nil
     }
 
-    
+    /// The first component of our path
+    public var first : StatePath.PathComponent? {
+        components.first
+    }
+
     /// The last component of our path
     public var last : StatePath.PathComponent? {
         components.last
