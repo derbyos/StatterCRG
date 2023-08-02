@@ -62,7 +62,7 @@ extension StatCRG {
                         print("<get> requires state path")
                         break
                     }
-                    let statePath = StatePath(from: .init(args[1]))
+                    let statePath = serverOptions.create(statePath:  .init(args[1]))
                     let value = await connection.fetch(path: statePath)
                     if let value {
                         print(value.description)
@@ -74,7 +74,7 @@ extension StatCRG {
                         print("<set> requires state path and value")
                         break
                     }
-                    let statePath = StatePath(from: .init(args[1]))
+                    let statePath = serverOptions.create(statePath: .init(args[1]))
                     guard let data = (args[2 ..< args.count]).joined(separator:" ").data(using: .utf8), let value = try? JSONDecoder().decode(JSONValue.self, from: data) else {
                         print("\(args[2]) invalid JSON value")
                         break
@@ -113,6 +113,28 @@ struct ServerOptions: ParsableArguments {
         }
         return retval
     }
+    
+    /// Create a state path from a string, adding optional prefix for the specified or current game
+    /// - Parameter statePath: The (relative) state path string
+    /// - Returns: A statepath
+    func create(statePath: String) -> StatePath {
+        if statePath.hasPrefix("ScoreBoard.") || statePath.hasPrefix("WS.") {
+            return .init(from: statePath)
+        }
+        if let game {
+            return .init(from: "ScoreBoard.Game(\(game))." + statePath)
+        } else {
+            return .init(from: "ScoreBoard.CurrentGame." + statePath)
+        }
+    }
+    
+    func gameStatePathBase() -> StatePath {
+        if let game {
+            return .init(from: "ScoreBoard.Game(\(game))")
+        } else {
+            return .init(from: "ScoreBoard.CurrentGame")
+        }
+    }
 }
 
 struct OutputOptions: ParsableArguments {
@@ -128,11 +150,6 @@ struct OutputOptions: ParsableArguments {
 }
 
 extension StatCRG {
-    static func parse(specifier: [String]) -> StatePath {
-        .init(from: specifier.joined(separator: "."))
-    }
-}
-extension StatCRG {
     struct Get: ParsableCommand {
         static var configuration = CommandConfiguration(abstract: "Get a single value from the server")
         @OptionGroup var serverOptions: ServerOptions
@@ -142,7 +159,7 @@ extension StatCRG {
         var specifier: String = ""
 
         mutating func run() throws {
-            let statePath = StatCRG.parse(specifier: [specifier])
+            let statePath = serverOptions.create(statePath: specifier)
             let connection = serverOptions.connection()
             connection.connect()
             let continuous = outputOptions.continuous
@@ -173,7 +190,7 @@ extension StatCRG {
         var value: [String] = []
 
         mutating func run() throws {
-            let statePath = StatCRG.parse(specifier: [specifier])
+            let statePath = serverOptions.create(statePath: specifier)
             let connection = serverOptions.connection()
             connection.connect()
             guard let data = (value).joined(separator:" ").data(using: .utf8) else {
@@ -202,6 +219,7 @@ extension StatCRG {
             case games // tab separated if needed
             case refs
             case nsos
+            case teams
         }
         @Argument(help: "What to list")
         var list: TopLevel = .games
@@ -213,7 +231,7 @@ extension StatCRG {
             switch list {
             case .games:
 //                let games : MapNodeCollection<ScoreBoard, Game, UUID> = .init(connection.scoreBoard, "Game(*)")
-//                let gameIDs : MapValueCollection<UUID, UUID> = .init(connection: connection, statePath: StatePath(from: "ScoreBoard.Game(*)"))
+//                let gameIDs : MapValueCollection<UUID, UUID> = .init(connection: connection, statePath: serverOptions.create(statePath: "ScoreBoard.Game(*)"))
 //                _ = games.allValues()
                 var seenGames:Swift.Set<UUID> = []
                 var update : AnyCancellable? = nil
@@ -237,10 +255,73 @@ extension StatCRG {
                     }
                 }
                 connection.register(statePaths:  ["ScoreBoard.Game(*).Name"])
+            case .teams:
+                var seenTeams:Swift.Set<String> = []
+                var update : AnyCancellable? = nil
+                update = connection.stateDataDidChange.sink { msg in
+//                    print("change of \(msg)")
+//                    guard !games.allValues().isEmpty else {
+//                        return
+//                    }
+//                    for game in games.allValues() {
+                    if msg.path.hasPrefix("ScoreBoard") {
+                        if case let .name("PreparedTeam", name: id) = msg.path.dropFirst().first(where: {_ in true}) {
+                            if !seenTeams.contains(id) {
+                                print("Team <\(id)> : \(msg.newValue.description)")
+                                seenTeams.insert(id)
+                                DispatchQueue.main.async {
+                                    update = nil
+                                    StatCRG.Get.exit()
+                                }
+                            }
+                        }
+                    }
+                }
+                connection.register(statePaths:  ["ScoreBoard.PreparedTeam(*).Name"])
             case .nsos:
-                break
+                var officials:[UUID: [String: JSONValue]] = [:]
+                var update : AnyCancellable? = nil
+                let gamePath =  serverOptions.gameStatePathBase()
+                update = connection.stateDataDidChange.sink { msg in
+                    if let next = msg.path.dropping(parent:gamePath) {
+                        if case let .id("Nso", id: id) = next.first(where: {_ in true}) {
+                            if officials[id] == nil {
+                                officials[id] = [:]
+                                DispatchQueue.main.async {
+                                    update = nil
+                                    for official in officials {
+                                        print(official.value)
+                                    }
+                                    StatCRG.Get.exit()
+                                }
+                            }
+                            officials[id]![next.last!.description] = msg.newValue
+                        }
+                    }
+                }
+                connection.register(statePaths:  [serverOptions.create(statePath: "Nso(*)")])
             case .refs:
-                break
+                var officials:[UUID: [String: JSONValue]] = [:]
+                var update : AnyCancellable? = nil
+                let gamePath =  serverOptions.gameStatePathBase()
+                update = connection.stateDataDidChange.sink { msg in
+                    if let next = msg.path.dropping(parent:gamePath) {
+                        if case let .id("Nso", id: id) = next.first(where: {_ in true}) {
+                            if officials[id] == nil {
+                                officials[id] = [:]
+                                DispatchQueue.main.async {
+                                    update = nil
+                                    for official in officials {
+                                        print(official.value)
+                                    }
+                                    StatCRG.Get.exit()
+                                }
+                            }
+                            officials[id]![next.last!.description] = msg.newValue
+                        }
+                    }
+                }
+                connection.register(statePaths:  [serverOptions.create(statePath: "Ref(*)")])
             }
             RunLoop.main.run()
         }
