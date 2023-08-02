@@ -12,6 +12,9 @@
 		3A048C042A714BBA00718410 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A048C032A714BBA00718410 /* Assets.xcassets */; };
 		3A048C072A714BBA00718410 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A048C062A714BBA00718410 /* Preview Assets.xcassets */; };
 		3A048C0C2A714BC600718410 /* StatterCRG in Frameworks */ = {isa = PBXBuildFile; productRef = 3A048C0B2A714BC600718410 /* StatterCRG */; };
+		3A048C142A7A6F9A00718410 /* statcrg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A048C132A7A6F9A00718410 /* statcrg.swift */; };
+		3A048C1A2A7A6FD400718410 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 3A048C192A7A6FD400718410 /* ArgumentParser */; };
+		3A048C1C2A7A761900718410 /* StatterCRG in Frameworks */ = {isa = PBXBuildFile; productRef = 3A048C1B2A7A761900718410 /* StatterCRG */; };
 		3AE2908B2A70174B00F1C771 /* StatterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908A2A70174B00F1C771 /* StatterApp.swift */; };
 		3AE2908D2A70174B00F1C771 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE2908C2A70174B00F1C771 /* ContentView.swift */; };
 		3AE2908F2A70174C00F1C771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AE2908E2A70174C00F1C771 /* Assets.xcassets */; };
@@ -36,6 +39,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		3A048C0F2A7A6F9A00718410 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		3AE290D22A701B2C00F1C771 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -55,6 +67,9 @@
 		3A048C012A714BB800718410 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3A048C032A714BBA00718410 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3A048C062A714BBA00718410 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3A048C112A7A6F9A00718410 /* statcrg */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = statcrg; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A048C132A7A6F9A00718410 /* statcrg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = statcrg.swift; sourceTree = "<group>"; };
+		3A048C1F2A7A83B300718410 /* statcrg.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = statcrg.entitlements; sourceTree = "<group>"; };
 		3AE290872A70174B00F1C771 /* Statter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Statter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE2908A2A70174B00F1C771 /* StatterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatterApp.swift; sourceTree = "<group>"; };
 		3AE2908C2A70174B00F1C771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -76,6 +91,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				3A048C0C2A714BC600718410 /* StatterCRG in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3A048C0E2A7A6F9A00718410 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A048C1A2A7A6FD400718410 /* ArgumentParser in Frameworks */,
+				3A048C1C2A7A761900718410 /* StatterCRG in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +141,15 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		3A048C122A7A6F9A00718410 /* statcrg */ = {
+			isa = PBXGroup;
+			children = (
+				3A048C1F2A7A83B300718410 /* statcrg.entitlements */,
+				3A048C132A7A6F9A00718410 /* statcrg.swift */,
+			);
+			path = statcrg;
+			sourceTree = "<group>";
+		};
 		3AE2907E2A70174B00F1C771 = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +157,7 @@
 				3AE290892A70174B00F1C771 /* Statter */,
 				3AE290C52A701B2B00F1C771 /* StatterWatch Watch App */,
 				3A048BFE2A714BB800718410 /* StatterScreen */,
+				3A048C122A7A6F9A00718410 /* statcrg */,
 				3AE290882A70174B00F1C771 /* Products */,
 				3AE2909D2A70181900F1C771 /* Frameworks */,
 			);
@@ -135,6 +169,7 @@
 				3AE290872A70174B00F1C771 /* Statter.app */,
 				3AE290C42A701B2B00F1C771 /* StatterWatch Watch App.app */,
 				3A048BFD2A714BB800718410 /* StatterScreen.app */,
+				3A048C112A7A6F9A00718410 /* statcrg */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -225,6 +260,27 @@
 			productReference = 3A048BFD2A714BB800718410 /* StatterScreen.app */;
 			productType = "com.apple.product-type.application";
 		};
+		3A048C102A7A6F9A00718410 /* statcrg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A048C152A7A6F9A00718410 /* Build configuration list for PBXNativeTarget "statcrg" */;
+			buildPhases = (
+				3A048C0D2A7A6F9A00718410 /* Sources */,
+				3A048C0E2A7A6F9A00718410 /* Frameworks */,
+				3A048C0F2A7A6F9A00718410 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = statcrg;
+			packageProductDependencies = (
+				3A048C192A7A6FD400718410 /* ArgumentParser */,
+				3A048C1B2A7A761900718410 /* StatterCRG */,
+			);
+			productName = statcrg;
+			productReference = 3A048C112A7A6F9A00718410 /* statcrg */;
+			productType = "com.apple.product-type.tool";
+		};
 		3AE290862A70174B00F1C771 /* Statter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3AE290962A70174C00F1C771 /* Build configuration list for PBXNativeTarget "Statter" */;
@@ -280,6 +336,9 @@
 					3A048BFC2A714BB800718410 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
+					3A048C102A7A6F9A00718410 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					3AE290862A70174B00F1C771 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -297,6 +356,9 @@
 				Base,
 			);
 			mainGroup = 3AE2907E2A70174B00F1C771;
+			packageReferences = (
+				3A048C182A7A6FD400718410 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+			);
 			productRefGroup = 3AE290882A70174B00F1C771 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -304,6 +366,7 @@
 				3AE290862A70174B00F1C771 /* Statter */,
 				3AE290C32A701B2A00F1C771 /* StatterWatch Watch App */,
 				3A048BFC2A714BB800718410 /* StatterScreen */,
+				3A048C102A7A6F9A00718410 /* statcrg */,
 			);
 		};
 /* End PBXProject section */
@@ -345,6 +408,14 @@
 			files = (
 				3A048C022A714BB800718410 /* ContentView.swift in Sources */,
 				3A048C002A714BB800718410 /* StatterScreenApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3A048C0D2A7A6F9A00718410 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A048C142A7A6F9A00718410 /* statcrg.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +503,38 @@
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 16.4;
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3A048C162A7A6F9A00718410 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = statcrg/statcrg.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.statcrg;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3A048C172A7A6F9A00718410 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = statcrg/statcrg.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6V5988PN7B;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gandreas.statcrg;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -697,6 +800,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		3A048C152A7A6F9A00718410 /* Build configuration list for PBXNativeTarget "statcrg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3A048C162A7A6F9A00718410 /* Debug */,
+				3A048C172A7A6F9A00718410 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3AE290822A70174B00F1C771 /* Build configuration list for PBXProject "Statter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -726,8 +838,28 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		3A048C182A7A6FD400718410 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		3A048C0B2A714BC600718410 /* StatterCRG */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StatterCRG;
+		};
+		3A048C192A7A6FD400718410 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A048C182A7A6FD400718410 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+		3A048C1B2A7A761900718410 /* StatterCRG */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = StatterCRG;
 		};

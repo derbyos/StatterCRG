@@ -29,7 +29,7 @@ public struct StatePath : Codable, Hashable, Sequence {
         let fullString = try container.decode(String.self)
         self.init(from: fullString)
     }
-    init(from fullString: String) {
+    public init(from fullString: String) {
         var pos = fullString.startIndex
         components = []
         enum State {

@@ -442,4 +442,26 @@ public class Connection : ObservableObject, Equatable {
     public subscript(path: PathSpecified) -> JSONValue? {
         state[path.statePath]
     }
+    
+    /// Get the current value or wait for a new value to appear
+    /// - Parameter path: The state path to fetch
+    /// - Returns: The JSONValue that we get, if possible
+    public func fetch(path: StatePath) async -> JSONValue? {
+        if let existing = state[path] {
+            return existing
+        }
+        if !registered.contains(path) {
+            struct SelfSpecified : PathSpecified {
+                var connection: Connection
+                
+                var statePath: StatePath
+            }
+            register(SelfSpecified(connection: self, statePath: path))
+        }
+        async let values = stateDataDidChange.first { msg in
+            msg.path == path
+        }.values.reduce(into: []) { $0.append($1) }
+        let value = await values
+        return value[0].newValue
+    }
 }
