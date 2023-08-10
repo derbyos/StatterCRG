@@ -67,6 +67,9 @@ the game data found on the CRG server (2023.3)
 This is some simple SwiftUI that let you quickly put
 together various views from the server
 
+### StatterBook
+This is designed to help with processing game data, allowing
+you to read/write JSON files from the scoreboard's "export game"
 
 ### treemaker
 treemaker is an internal command line executable that translates a
@@ -176,3 +179,5 @@ to create the Swift code that is compiled into the
 library.
 
 
+## StatterBook
+StatterBook is 

@@ -23,6 +23,10 @@ public struct Penalty : PathNodeId, Identifiable {
 
     @Leaf public var next: String?
 
+    // this is normally a UUID if it is available
+
+    @Leaf public var boxTrip: String?
+
     public init(parent: Skater, _ key: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Penalty", param: key))
@@ -34,6 +38,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _served = parent.leaf("Served")
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
+        _boxTrip = parent.leaf("BoxTrip")
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
         _periodNumber.parentPath = statePath
@@ -41,6 +46,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _served.parentPath = statePath
         _code.parentPath = statePath
         _next.parentPath = statePath
+        _boxTrip.parentPath = statePath
     }
     public init(parent: Skater, statePath: StatePath) {
         self.parent = parent
@@ -52,6 +58,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _served = parent.leaf("Served")
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
+        _boxTrip = parent.leaf("BoxTrip")
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
         _periodNumber.parentPath = statePath
@@ -59,6 +66,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _served.parentPath = statePath
         _code.parentPath = statePath
         _next.parentPath = statePath
+        _boxTrip.parentPath = statePath
     }
 }
 extension Skater {

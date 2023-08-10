@@ -320,11 +320,43 @@ node Clock Game {
     @reset action ResetTime
 }
 
+node Fielding <Jam TeamJam> {
+    var Annotation : String
+    var BoxTripSymbols : String
+    var BoxTripSymbolsAfterSP : String
+    var BoxTripSymbolsBeforeSP : String
+    var CurrentBoxTrip : String
+    // Id is uuid + team + position
+    // var Id : String
+    var Next : String
+    var NotFielded : Bool
+    // why is this an int?
+    var Number : Int
+    var PenaltyBox : Bool
+    var Position : String
+    var Previous : String
+    let Readonly : Bool
+    var SitFor3 : Bool
+    var Skater : UUID
+}
 
-node Jam <Period Game> {
-    key Int
+node ScoringTrip  <Jam TeamJam> {
+    var AfterSP : Bool
+    var Annotation : String
+    var Current : Bool
+    var Duration : Int
     key UUID
-    @name(Id) let jamID : UUID
+    @name(Id) let tripId : UUID
+    var JamClockEnd : Int
+    var JamClockStart : Int
+    var Next : UUID
+    key Int
+    var Number : Int
+    var Previous : UUID
+    let Readonly: Bool
+    var Score: Int
+}
+protocol Jamlike {
     let Readonly : Bool
     let Number : Int
     let Previous : UUID
@@ -342,9 +374,42 @@ node Jam <Period Game> {
     action Delete
     action InsertBefore
     action InsertTimeoutAfter
+    @name(Id) let jamId : UUID
+    var NoInitial : Bool
+    var NoPivot : Bool
+    var Lead : Bool
+    var Lost : Bool
+    var Injury : Bool
+    var Calloff : Bool
+    var StarPassTrip : UUID
+    var TotalScore : Int
+    var AfterSPScore : Int
+    var JamScore : Int
+    var LastScore : Int
+    var DisplayLead: Bool
+    var CurrentTrip : Int
+    var OsOffset : Int
+    var OsOffsetReason : String
+    
+    enum Position {
+        case Jammer
+        case Pivot
+        case Blocker1
+        case Blocker2
+        case Blocker3
+    }
+    list Fielding[Position] : Fielding<Self>
+    list ScoringTrips[Int] : ScoringTrip<Self>
 }
 
-node TeamJam Jam<P> {
+node Jam <Period Game> : Jamlike {
+    
+    key Int
+    key UUID
+    @name(Id) let jamID : UUID
+}
+
+node TeamJam Jam<P> : Jamlike {
     key Int
     key UUID
     @name(Id) var teamJamID : UUID
@@ -379,6 +444,29 @@ node Skater Team {
 
 }
 
+node BoxTrip Period {
+    key UUID
+    @name(Id) let boxTripId : UUID
+    // id _ jam _ position
+    var CurrentFielding : String
+    var Duration : Int
+    var EndAfterSP : Bool
+    var EndBetweenJams : Bool
+    var EndFielding : String
+    var EndJamNumber : Int
+    map Fielding[ String ] : String
+    var IsCurrent : Bool
+    var JamClockEnd : Int
+    var JamClockStart : Int
+    map Penalty[ UUID ] : String
+    let ReadOnly : Bool
+    var StartAfterSP : Bool
+    var StartBetweenJams : Bool
+    var StartFielding : String
+    var StartJamNubmer : Int
+    var WalltimeEnd : Int
+    var WalltimeStart : Int
+}
 
 node Penalty Skater {
     key Int
@@ -389,6 +477,8 @@ node Penalty Skater {
     var Served : Bool
     var Code : String
     var Next : String
+    // this is normally a UUID if it is available
+    var BoxTrip : String
 }
 
 node Settings ScoreBoard {

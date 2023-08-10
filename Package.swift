@@ -15,7 +15,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "StatterCRG",
-            targets: ["StatterCRG", "StatterCRGUI"]),
+            targets: ["StatterCRG", "StatterCRGUI","StatterBook"]),
         // these are private to the package
 //        .executable(name: "treemaker", targets: ["treemaker"]),
 //        .plugin(name: "StatterCRGTree", targets: ["CreateTree"]),
@@ -38,6 +38,9 @@ let package = Package(
             dependencies: ["StatterCRG"]),
         .target(
             name: "StatterCRGUI",
+            dependencies: ["StatterCRG"]),
+        .target(
+            name: "StatterBook",
             dependencies: ["StatterCRG"]),
 
 // Until Xcode supports multiple targets in a project
