@@ -27,15 +27,15 @@ public struct Timeout : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var duration: Int?
 
-    @Leaf public var periodClockElapsedStart: Int?
+    @Leaf public var periodClockElapsedStart: PeriodTime?
 
-    @Leaf public var periodClockElapsedEnd: Int?
+    @Leaf public var periodClockElapsedEnd: PeriodTime?
 
-    @Leaf public var periodClocEnd: Int?
+    @Leaf public var periodClockEnd: PeriodTime?
 
-    @Leaf public var walltimeStart: Int?
+    @Leaf public var walltimeStart: WallTime?
 
-    @Leaf public var walltimeEnd: Int?
+    @Leaf public var walltimeEnd: WallTime?
 
     public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
     public func insertAfter() { connection.set(key: statePath.adding("InsertAfter"), value: .bool(true), kind: .set) }
@@ -54,7 +54,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _duration = parent.leaf("Duration").immutable
         _periodClockElapsedStart = parent.leaf("PeriodClockElapsedStart")
         _periodClockElapsedEnd = parent.leaf("PeriodClockElapsedEnd")
-        _periodClocEnd = parent.leaf("PeriodClocEnd")
+        _periodClockEnd = parent.leaf("PeriodClockEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _timeoutId.parentPath = statePath
@@ -68,7 +68,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _duration.parentPath = statePath
         _periodClockElapsedStart.parentPath = statePath
         _periodClockElapsedEnd.parentPath = statePath
-        _periodClocEnd.parentPath = statePath
+        _periodClockEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
         _walltimeEnd.parentPath = statePath
     }
@@ -86,7 +86,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _duration = parent.leaf("Duration").immutable
         _periodClockElapsedStart = parent.leaf("PeriodClockElapsedStart")
         _periodClockElapsedEnd = parent.leaf("PeriodClockElapsedEnd")
-        _periodClocEnd = parent.leaf("PeriodClocEnd")
+        _periodClockEnd = parent.leaf("PeriodClockEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _timeoutId.parentPath = statePath
@@ -100,7 +100,7 @@ public struct Timeout : PathNodeId, Identifiable {
         _duration.parentPath = statePath
         _periodClockElapsedStart.parentPath = statePath
         _periodClockElapsedEnd.parentPath = statePath
-        _periodClocEnd.parentPath = statePath
+        _periodClockEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
         _walltimeEnd.parentPath = statePath
     }

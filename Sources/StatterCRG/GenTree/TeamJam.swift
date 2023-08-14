@@ -27,15 +27,15 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var duration: Int?
 
-    @Leaf public var periodClockElapsedStart: Int?
+    @Leaf public var periodClockElapsedStart: PeriodTime?
 
-    @Leaf public var periodClockElapsedEnd: Int?
+    @Leaf public var periodClockElapsedEnd: PeriodTime?
 
-    @Leaf public var periodClockDisplayEnd: Int?
+    @Leaf public var periodClockDisplayEnd: PeriodTime?
 
-    @Leaf public var walltimeStart: Int?
+    @Leaf public var walltimeStart: WallTime?
 
-    @Leaf public var walltimeEnd: Int?
+    @Leaf public var walltimeEnd: WallTime?
 
     public func delete() { connection.set(key: statePath.adding("Delete"), value: .bool(true), kind: .set) }
     public func insertBefore() { connection.set(key: statePath.adding("InsertBefore"), value: .bool(true), kind: .set) }

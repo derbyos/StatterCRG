@@ -17,4 +17,11 @@ extension Optional where Wrapped == Int {
 }
 
 // for now
-public typealias Duration = String
+public typealias Duration = Int
+
+/// Absolute wall time
+public typealias WallTime = Int
+/// Relative to the current period clock
+public typealias PeriodTime = Int
+/// Relative to the current jam clock
+public typealias JamTime = Int

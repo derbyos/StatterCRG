@@ -89,9 +89,9 @@ node Period Game {
     let FirstJamNumber : Int
     let SuddenScoring : Bool
     let Running : Bool
-    let Duration : Int
-    var WalltimeStart :Int
-    var WalltimeEnd : Int
+    let Duration : Duration
+    var WalltimeStart : WallTime
+    var WalltimeEnd : WallTime
     var LocalTimeStart : String
     action Delete
     action InsertBefore
@@ -113,11 +113,11 @@ node Timeout Period {
     var PrecedingJam : UUID
     let PrecedingJamNumber : Int
     let Duration : Int
-    var PeriodClockElapsedStart : Int
-    var PeriodClockElapsedEnd : Int
-    var PeriodClocEnd : Int
-    var WalltimeStart : Int
-    var WalltimeEnd : Int
+    var PeriodClockElapsedStart : PeriodTime
+    var PeriodClockElapsedEnd : PeriodTime
+    var PeriodClockEnd : PeriodTime
+    var WalltimeStart : WallTime
+    var WalltimeEnd : WallTime
     action Delete
     @version(2023.0) action InsertAfter
 }
@@ -306,10 +306,10 @@ node Clock Game {
     }
     key Kind
     @name(Id) let clockId : String
-    var Time : Int
-    let InvertedTime : Int
-    var MaximumTime : Int
-    var MinimumTime : Int
+    var Time : Duration
+    let InvertedTime : Duration
+    var MaximumTime : Duration
+    var MinimumTime : Duration
     let Readonly : Bool
     var Running : Bool
     var Name : String
@@ -347,8 +347,8 @@ node ScoringTrip  <Jam TeamJam> {
     var Duration : Int
     key UUID
     @name(Id) let tripId : UUID
-    var JamClockEnd : Int
-    var JamClockStart : Int
+    var JamClockEnd : JamTime
+    var JamClockStart : JamTime
     var Next : UUID
     key Int
     var Number : Int
@@ -366,11 +366,11 @@ protocol Jamlike {
     var Overtime : Bool
     var InjuryContinuation : Bool
     let Duration : Int
-    var PeriodClockElapsedStart : Int
-    var PeriodClockElapsedEnd : Int
-    var PeriodClockDisplayEnd : Int
-    var WalltimeStart : Int
-    var WalltimeEnd : Int
+    var PeriodClockElapsedStart : PeriodTime
+    var PeriodClockElapsedEnd : PeriodTime
+    var PeriodClockDisplayEnd : PeriodTime
+    var WalltimeStart : WallTime
+    var WalltimeEnd : WallTime
     action Delete
     action InsertBefore
     action InsertTimeoutAfter
@@ -456,16 +456,16 @@ node BoxTrip Period {
     var EndJamNumber : Int
     map Fielding[ String ] : String
     var IsCurrent : Bool
-    var JamClockEnd : Int
-    var JamClockStart : Int
+    var JamClockEnd : JamTime
+    var JamClockStart : JamTime
     map Penalty[ UUID ] : String
     let ReadOnly : Bool
     var StartAfterSP : Bool
     var StartBetweenJams : Bool
     var StartFielding : String
-    var StartJamNubmer : Int
-    var WalltimeEnd : Int
-    var WalltimeStart : Int
+    var StartJamNumber : Int
+    var WalltimeEnd : WallTime
+    var WalltimeStart : WallTime
 }
 
 node Penalty Skater {

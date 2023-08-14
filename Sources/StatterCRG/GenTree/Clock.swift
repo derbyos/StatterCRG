@@ -18,13 +18,13 @@ public struct Clock : PathNodeId, Identifiable {
     }
     @ImmutableLeaf public var clockId: String?
 
-    @Leaf public var time: Int?
+    @Leaf public var time: Duration?
 
-    @ImmutableLeaf public var invertedTime: Int?
+    @ImmutableLeaf public var invertedTime: Duration?
 
-    @Leaf public var maximumTime: Int?
+    @Leaf public var maximumTime: Duration?
 
-    @Leaf public var minimumTime: Int?
+    @Leaf public var minimumTime: Duration?
 
     @ImmutableLeaf public var readonly: Bool?
 

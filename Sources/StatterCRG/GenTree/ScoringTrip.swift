@@ -19,9 +19,9 @@ public struct ScoringTrip<P:PathSpecified> : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var tripId: UUID?
 
-    @Leaf public var jamClockEnd: Int?
+    @Leaf public var jamClockEnd: JamTime?
 
-    @Leaf public var jamClockStart: Int?
+    @Leaf public var jamClockStart: JamTime?
 
     @Leaf public var next: UUID?
 

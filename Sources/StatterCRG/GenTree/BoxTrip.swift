@@ -30,9 +30,9 @@ public struct BoxTrip : PathNodeId, Identifiable {
 
     @Leaf public var isCurrent: Bool?
 
-    @Leaf public var jamClockEnd: Int?
+    @Leaf public var jamClockEnd: JamTime?
 
-    @Leaf public var jamClockStart: Int?
+    @Leaf public var jamClockStart: JamTime?
 
     public typealias Penalty_Map = MapValueCollection<String, UUID>
     public var penalty:Penalty_Map { .init(connection: connection, statePath: self.adding(.wild("Penalty"))) }
@@ -45,11 +45,11 @@ public struct BoxTrip : PathNodeId, Identifiable {
 
     @Leaf public var startFielding: String?
 
-    @Leaf public var startJamNubmer: Int?
+    @Leaf public var startJamNumber: Int?
 
-    @Leaf public var walltimeEnd: Int?
+    @Leaf public var walltimeEnd: WallTime?
 
-    @Leaf public var walltimeStart: Int?
+    @Leaf public var walltimeStart: WallTime?
 
     public init(parent: Period, _ key: UUID) {
         self.parent = parent
@@ -69,7 +69,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
         _startAfterSP = parent.leaf("StartAfterSP")
         _startBetweenJams = parent.leaf("StartBetweenJams")
         _startFielding = parent.leaf("StartFielding")
-        _startJamNubmer = parent.leaf("StartJamNubmer")
+        _startJamNumber = parent.leaf("StartJamNumber")
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _boxTripId.parentPath = statePath
@@ -86,7 +86,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
         _startAfterSP.parentPath = statePath
         _startBetweenJams.parentPath = statePath
         _startFielding.parentPath = statePath
-        _startJamNubmer.parentPath = statePath
+        _startJamNumber.parentPath = statePath
         _walltimeEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
     }
@@ -107,7 +107,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
         _startAfterSP = parent.leaf("StartAfterSP")
         _startBetweenJams = parent.leaf("StartBetweenJams")
         _startFielding = parent.leaf("StartFielding")
-        _startJamNubmer = parent.leaf("StartJamNubmer")
+        _startJamNumber = parent.leaf("StartJamNumber")
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _boxTripId.parentPath = statePath
@@ -124,7 +124,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
         _startAfterSP.parentPath = statePath
         _startBetweenJams.parentPath = statePath
         _startFielding.parentPath = statePath
-        _startJamNubmer.parentPath = statePath
+        _startJamNumber.parentPath = statePath
         _walltimeEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
     }

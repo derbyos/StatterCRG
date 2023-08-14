@@ -29,11 +29,11 @@ public struct Period : PathNodeId, Identifiable {
 
     @ImmutableLeaf public var running: Bool?
 
-    @ImmutableLeaf public var duration: Int?
+    @ImmutableLeaf public var duration: Duration?
 
-    @Leaf public var walltimeStart: Int?
+    @Leaf public var walltimeStart: WallTime?
 
-    @Leaf public var walltimeEnd: Int?
+    @Leaf public var walltimeEnd: WallTime?
 
     @Leaf public var localTimeStart: String?
 
