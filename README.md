@@ -51,7 +51,33 @@ struct MyView: View {
 }
 ```
 
+or better:
 
+```
+struct TeamName: View {
+    @Stat var team: Team
+    var body: some View {
+        Text(team.name ?? "???")
+            .font(.title)
+    }
+}
+
+struct MyView: View {
+    @EnvironmentObject var connection: Connection
+    var body: some View {
+        HStack {
+            if let game = connection.game {
+                TeamName(team: $game.teamOne)
+                Text("vs")
+                TeamName(team: $game.teamTwo)
+            }
+        }
+    }
+}
+```
+
+(yes, that does say `@Stat` and not `@State` - it is a binding to
+a score board value)
 
 ## The Packages
 

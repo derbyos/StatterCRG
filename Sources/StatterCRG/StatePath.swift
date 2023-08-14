@@ -339,3 +339,53 @@ public struct MapValueCollection<Value: JSONTypeable, Index: JSONTypeable> : Pat
     }
 }
 
+
+
+public extension StatePath {
+    /// Extract the game ID from the path, if possible
+    var gameID: UUID? {
+        components.compactMap { compo in
+            if case let .id("Game", id) = compo {
+                return id
+            }
+            return nil
+        }.first
+    }
+    /// Extract the period number from the path, if possible
+    var periodNumber: Int? {
+        components.compactMap { compo in
+            if case let .number("Period", num) = compo {
+                return num
+            }
+            return nil
+        }.first
+    }
+    /// Extract the jam number from the path, if possible
+    var jamNumber: Int? {
+        components.compactMap { compo in
+            if case let .number("Jam", num) = compo {
+                return num
+            }
+            return nil
+        }.first
+    }
+    /// Extract the team jam number from the path, if possible
+    var teamJamNumber: Int? {
+        components.compactMap { compo in
+            if case let .number("TeamJam", num) = compo {
+                return num
+            }
+            return nil
+        }.first
+    }
+    /// Extract the scoring trip number from the path, if possible
+    var scoringTripNumber: Int? {
+        components.compactMap { compo in
+            if case let .number("ScoringTrip", num) = compo {
+                return num
+            }
+            return nil
+        }.first
+    }
+
+}
