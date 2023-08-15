@@ -306,3 +306,20 @@ public struct MapNodeCollection<Parent:PathSpecified, T:PathNodeId, I: JSONTypea
         return retval
     }
 }
+
+extension ScoreBoard {
+    
+    /// All games in the connection (by ID)
+    public var allGames: [Game] {
+        var retval = [Game]()
+        for kv in self.connection.state {
+            if let rest = kv.key.dropping(parent: self.statePath) {
+                if case let .id("Game", id: gameID) = rest.first {
+                    retval.append(Game(parent: self, gameID))
+                }
+            }
+        }
+        return retval
+    }
+
+}

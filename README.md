@@ -206,4 +206,5 @@ library.
 
 
 ## StatterBook
-StatterBook is 
+StatterBook is module designed to work with exported JSON
+files from the scoreboard (rather that a live connection).

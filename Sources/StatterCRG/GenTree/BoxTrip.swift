@@ -5,8 +5,8 @@
 //
 
 import Foundation
-public struct BoxTrip : PathNodeId, Identifiable {
-    public var parent: Period
+public struct BoxTrip<P:PathSpecified> : PathNodeId, Identifiable {
+    public var parent: P
     public var id: StatePath { statePath }
     public let statePath: StatePath
     @ImmutableLeaf public var boxTripId: UUID?
@@ -51,7 +51,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
 
     @Leaf public var walltimeStart: WallTime?
 
-    public init(parent: Period, _ key: UUID) {
+    public init(parent: P, _ key: UUID) {
         self.parent = parent
         statePath = parent.adding(.id("BoxTrip", id: key))
 
@@ -90,7 +90,7 @@ public struct BoxTrip : PathNodeId, Identifiable {
         _walltimeEnd.parentPath = statePath
         _walltimeStart.parentPath = statePath
     }
-    public init(parent: Period, statePath: StatePath) {
+    public init(parent: P, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
         _boxTripId = parent.leaf("boxTripId").immutable
@@ -130,5 +130,8 @@ public struct BoxTrip : PathNodeId, Identifiable {
     }
 }
 extension Period {
-    public func boxTrip(_ key: UUID) -> BoxTrip { .init(parent: self, key) }
+    public func boxTrip(_ key: UUID) -> BoxTrip<Period> { .init(parent: self, key) }
+}
+extension Team {
+    public func boxTrip(_ key: UUID) -> BoxTrip<Team> { .init(parent: self, key) }
 }

@@ -444,7 +444,8 @@ node Skater Team {
 
 }
 
-node BoxTrip Period {
+// BoxTrip is in the period for live games, and Team(#) for saved games
+node BoxTrip <Period Team> {
     key UUID
     @name(Id) let boxTripId : UUID
     // id _ jam _ position
