@@ -481,6 +481,7 @@ node Penalty Skater {
     var Next : String
     // this is normally a UUID if it is available
     var BoxTrip : String
+    var Time : WallTime
 }
 
 node Settings ScoreBoard {

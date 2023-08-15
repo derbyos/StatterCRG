@@ -57,18 +57,18 @@ extension StatRBook {
                     print("\(format(wallTime: event.time))\t\t\tTrip Start Team \(t.statePath.teamJamNumber ?? 0)")
                 case .scoringTripEnd(let t):
                     print("\(format(wallTime: event.time))\t\t\tTrip End Team \(t.statePath.teamJamNumber ?? 0)")
+                case .penalty(let p):
+                    if let (team, skater, penalty) = p.penaltyId.flatMap({allPenalties[$0]}) {
+                        print("\(format(wallTime: event.time))\t\t\t\(team.fullName ?? "?"), \(skater.rosterNumber ?? "-"): \(penalty.code ?? "?")")
+                    } else {
+                        print("\(format(wallTime: event.time))\t\t\tPenalty \(p.code ?? "?")")
+                    }
                 case .boxTripStart(let t):
                     print("\(format(wallTime: event.time))\t\t\tBox Start")
                     for penaltyMap in t.penalty.allValues() {
-                        if let penalty = allPenalties[penaltyMap.key] {
+                        if let (team, skater, penalty) = allPenalties[penaltyMap.key] {
                             let code = penalty.code ?? "?"
-                            if let skater = penalty.parent.skaterId.flatMap({allSkaters[$0]}) {
-                                print("\t\t\t\t\t\t\(skater.0.fullName ?? "?"), \(skater.1.rosterNumber ?? "-"): \(code)")
-                            } else {
-                                let skater = penalty.parent.rosterNumber ?? "-"
-                                let team = penalty.parent.parent.team ?? 0
-                                print("\t\t\t\t\t\tTeam \(team), Skater \(skater): \(code)")
-                            }
+                            print("\t\t\t\t\t\t\(team.fullName ?? "?"), \(skater.rosterNumber ?? "-"): \(code)")
                         }
                     }
                 case .boxTripEnd(let t):

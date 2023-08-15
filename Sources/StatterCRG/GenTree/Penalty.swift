@@ -29,6 +29,8 @@ public struct Penalty : PathNodeId, Identifiable {
 
     @Leaf public var boxTrip: String?
 
+    @Leaf public var time: WallTime?
+
     public init(parent: Skater, _ key: Int) {
         self.parent = parent
         statePath = parent.adding(.number("Penalty", param: key))
@@ -42,6 +44,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
         _boxTrip = parent.leaf("BoxTrip")
+        _time = parent.leaf("Time")
         _penaltyId.parentPath = statePath
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
@@ -51,6 +54,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code.parentPath = statePath
         _next.parentPath = statePath
         _boxTrip.parentPath = statePath
+        _time.parentPath = statePath
     }
     public init(parent: Skater, statePath: StatePath) {
         self.parent = parent
@@ -64,6 +68,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
         _boxTrip = parent.leaf("BoxTrip")
+        _time = parent.leaf("Time")
         _penaltyId.parentPath = statePath
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
@@ -73,6 +78,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code.parentPath = statePath
         _next.parentPath = statePath
         _boxTrip.parentPath = statePath
+        _time.parentPath = statePath
     }
 }
 extension Skater {

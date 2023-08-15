@@ -59,13 +59,13 @@ public extension Game {
     
     
     /// all penalties in the game, by ID
-    var allPenalties: [UUID: Penalty] {
-        var retval: [UUID: Penalty] = [:]
+    var allPenalties: [UUID: (Team, Skater, Penalty)] {
+        var retval: [UUID: (Team, Skater, Penalty)] = [:]
         for team in [teamOne, teamTwo] {
             for skater in team.skaters.allValues() {
                 for penalty in skater.penalties.allValues() {
                     if let id = penalty.penaltyId {
-                        retval[id] = penalty
+                        retval[id] = (team, skater, penalty)
                     }
                 }
             }

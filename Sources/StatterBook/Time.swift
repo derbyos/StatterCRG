@@ -23,6 +23,7 @@ public struct TimedEvent {
         case scoringTripEnd(ScoringTrip<TeamJam<Period>>)
         case boxTripStart(BoxTrip<Team>)
         case boxTripEnd(BoxTrip<Team>)
+        case penalty(Penalty)
     }
     /// What is the event
     public var event: Event
@@ -32,6 +33,11 @@ public extension Game {
     // Gather
     var timedEvents: [TimedEvent] {
         var retval = [TimedEvent]()
+        for penalty in allPenalties.values {
+            if let time = penalty.2.time {
+                retval.append(.init(time: time, event: .penalty(penalty.2)))
+            }
+        }
         for periodNum in 1 ... 2 {
             let period = self.period(periodNum)
             if let time = period.walltimeStart {
@@ -75,7 +81,7 @@ public extension Game {
                     break
                 }
                 retval.append(.init(time: tstart, event: .boxTripStart(trip)))
-                retval.append(.init(time: tend, event: .boxTripStart(trip)))
+                retval.append(.init(time: tend, event: .boxTripEnd(trip)))
             }
         }
         retval.sort { e1, e2 in
