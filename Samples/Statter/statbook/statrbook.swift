@@ -16,7 +16,7 @@ struct StatRBook: ParsableCommand {
         commandName: "statrbook",
         abstract: "A utility for CRG exported JSON statsbooks",
         version: "0.0.1",
-        subcommands: [Times.self],
+        subcommands: [Times.self, Penalties.self],
         defaultSubcommand: Times.self
     )
 }
@@ -74,6 +74,42 @@ extension StatRBook {
                 case .boxTripEnd(let t):
                     print("\(format(wallTime: event.time))\t\t\tBox End")
                 }
+            }
+        }
+    }
+}
+
+
+extension StatRBook {
+    struct Penalties : ParsableCommand {
+        @Option(name: [.customShort("j"), .customLong("json")], help: "The exported JSON file")
+        var json: String
+
+        mutating func run() throws {
+            let jsonURL = URL(filePath: json)
+            let jsonData = try Data(contentsOf: jsonURL)
+            let connection = try Connection(game: jsonData)
+            guard let game = connection.scoreBoard.games.allValues().first else {
+                throw Errors.noGameInSBJSON
+            }
+            var totals:[StatePath:[String:Int]] = [
+                game.teamOne.statePath : [:],
+                game.teamTwo.statePath : [:],
+            ]
+            for (team,_,penalty) in game.allPenalties.values {
+                let code = penalty.code ?? "?"
+                totals[team.statePath, default: [:]][code, default: 0] += 1
+            }
+            var allPenalties = ["?","A","B","C","D","E","F","G","H","I","L","M","N","P","X"]
+            print("\t\(allPenalties.joined(separator: "\t"))\tTotal")
+            for team in [game.teamOne, game.teamTwo] {
+                let penalties = totals[team.statePath, default:[:]]
+                var retval = [team.name ?? "team"]
+                for code in allPenalties {
+                    retval.append("\(penalties[code, default: 0])")
+                }
+                retval.append("\(penalties.values.reduce(0, {$0 + $1}))")
+                print(retval.joined(separator: "\t"))
             }
         }
     }
