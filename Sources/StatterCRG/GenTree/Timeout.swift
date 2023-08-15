@@ -43,7 +43,7 @@ public struct Timeout : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.id("Timeout", id: key))
 
-        _timeoutId = parent.leaf("timeoutId").immutable
+        _timeoutId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _owner = parent.leaf("Owner")
         _review = parent.leaf("Review")
@@ -75,7 +75,7 @@ public struct Timeout : PathNodeId, Identifiable {
     public init(parent: Period, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _timeoutId = parent.leaf("timeoutId").immutable
+        _timeoutId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _owner = parent.leaf("Owner")
         _review = parent.leaf("Review")

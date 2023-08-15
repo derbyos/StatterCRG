@@ -37,6 +37,8 @@ extension StatRBook {
                 throw Errors.noGameInSBJSON
             }
             let events = game.timedEvents
+            let allSkaters = game.allSkaters
+            let allPenalties = game.allPenalties
             for event in events {
                 switch event.event {
                 case .periodStart(let p):
@@ -55,6 +57,22 @@ extension StatRBook {
                     print("\(format(wallTime: event.time))\t\t\tTrip Start Team \(t.statePath.teamJamNumber ?? 0)")
                 case .scoringTripEnd(let t):
                     print("\(format(wallTime: event.time))\t\t\tTrip End Team \(t.statePath.teamJamNumber ?? 0)")
+                case .boxTripStart(let t):
+                    print("\(format(wallTime: event.time))\t\t\tBox Start")
+                    for penaltyMap in t.penalty.allValues() {
+                        if let penalty = allPenalties[penaltyMap.key] {
+                            let code = penalty.code ?? "?"
+                            if let skater = penalty.parent.skaterId.flatMap({allSkaters[$0]}) {
+                                print("\t\t\t\t\t\t\(skater.0.fullName ?? "?"), \(skater.1.rosterNumber ?? "-"): \(code)")
+                            } else {
+                                let skater = penalty.parent.rosterNumber ?? "-"
+                                let team = penalty.parent.parent.team ?? 0
+                                print("\t\t\t\t\t\tTeam \(team), Skater \(skater): \(code)")
+                            }
+                        }
+                    }
+                case .boxTripEnd(let t):
+                    print("\(format(wallTime: event.time))\t\t\tBox End")
                 }
             }
         }

@@ -43,6 +43,7 @@ class AST {
     var name: String
     var componentName: String {
         if let attr = getAttribute("name"), let name = attr.params.first?.0 {
+            print("Component name for \(self.name) = \(name)")
             return name
         }
         return name
@@ -282,12 +283,12 @@ import Foundation
                 switch child.kind {
                 case .leaf(_, immutable: let immutable):
                     if !immutable {
-                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\")")
+                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.componentName)\")")
                     } else {
-                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.name)\").immutable")
+                        lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).leaf(\"\(child.componentName)\").immutable")
                     }
                 case .flag:
-                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).flag(\"\(child.name)\")")
+                    lines.append(indentBy + indentBy + "_\(child.name.initialLowercase) = \(dummy).flag(\"\(child.componentName)\")")
                 default:
                     break
                 }
@@ -675,7 +676,7 @@ func parseAST(source: String) throws -> [String:AST] {
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
-            astStack.last?.children.append(.init(kind: .leaf(type, immutable: false), name: name))
+            astStack.last?.children.append(.init(kind: .leaf(type, immutable: false), name: name, attributes: preAttributes))
         case "let":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName
@@ -684,7 +685,7 @@ func parseAST(source: String) throws -> [String:AST] {
             guard let type = nextToken() else {
                 throw Errors.missingLeafType
             }
-            astStack.last?.children.append(.init(kind: .leaf(type, immutable: true), name: name))
+            astStack.last?.children.append(.init(kind: .leaf(type, immutable: true), name: name, attributes: preAttributes))
         case "list":
             guard let name = nextToken() else {
                 throw Errors.missingNodeName

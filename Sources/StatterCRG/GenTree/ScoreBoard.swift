@@ -144,7 +144,7 @@ public struct ScoreBoard : PathSpecified {
                 }
         
                 _readonly = parent.leaf("Readonly").immutable
-                _parentId = parent.leaf("ParentId")
+                _parentId = parent.leaf("Parent")
                 _name = parent.leaf("Name")
                 _readonly.parentPath = statePath
                 _parentId.parentPath = statePath
@@ -154,7 +154,7 @@ public struct ScoreBoard : PathSpecified {
                 self.parent = parent
                 self.statePath = statePath
                 _readonly = parent.leaf("Readonly").immutable
-                _parentId = parent.leaf("ParentId")
+                _parentId = parent.leaf("Parent")
                 _name = parent.leaf("Name")
                 _readonly.parentPath = statePath
                 _parentId.parentPath = statePath

@@ -36,7 +36,7 @@ public struct PreparedTeam : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.id("PreparedTeam", id: key))
 
-        _teamId = parent.leaf("teamId").immutable
+        _teamId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName").immutable
@@ -54,7 +54,7 @@ public struct PreparedTeam : PathNodeId, Identifiable {
     public init(parent: ScoreBoard, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _teamId = parent.leaf("teamId").immutable
+        _teamId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName").immutable

@@ -41,7 +41,7 @@ public struct ScoringTrip<P:PathSpecified> : PathNodeId, Identifiable {
         _annotation = parent.leaf("Annotation")
         _current = parent.leaf("Current")
         _duration = parent.leaf("Duration")
-        _tripId = parent.leaf("tripId").immutable
+        _tripId = parent.leaf("Id").immutable
         _jamClockEnd = parent.leaf("JamClockEnd")
         _jamClockStart = parent.leaf("JamClockStart")
         _next = parent.leaf("Next")
@@ -70,7 +70,7 @@ public struct ScoringTrip<P:PathSpecified> : PathNodeId, Identifiable {
         _annotation = parent.leaf("Annotation")
         _current = parent.leaf("Current")
         _duration = parent.leaf("Duration")
-        _tripId = parent.leaf("tripId").immutable
+        _tripId = parent.leaf("Id").immutable
         _jamClockEnd = parent.leaf("JamClockEnd")
         _jamClockStart = parent.leaf("JamClockStart")
         _next = parent.leaf("Next")
@@ -98,7 +98,7 @@ public struct ScoringTrip<P:PathSpecified> : PathNodeId, Identifiable {
         _annotation = parent.leaf("Annotation")
         _current = parent.leaf("Current")
         _duration = parent.leaf("Duration")
-        _tripId = parent.leaf("tripId").immutable
+        _tripId = parent.leaf("Id").immutable
         _jamClockEnd = parent.leaf("JamClockEnd")
         _jamClockStart = parent.leaf("JamClockStart")
         _next = parent.leaf("Next")

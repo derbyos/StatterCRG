@@ -43,7 +43,7 @@ public struct Clock : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.name("Clock", name: key.rawValue))
 
-        _clockId = parent.leaf("clockId").immutable
+        _clockId = parent.leaf("Id").immutable
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")
@@ -67,7 +67,7 @@ public struct Clock : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _clockId = parent.leaf("clockId").immutable
+        _clockId = parent.leaf("Id").immutable
         _time = parent.leaf("Time")
         _invertedTime = parent.leaf("InvertedTime").immutable
         _maximumTime = parent.leaf("MaximumTime")

@@ -9,6 +9,8 @@ public struct Penalty : PathNodeId, Identifiable {
     public var parent: Skater
     public var id: StatePath { statePath }
     public let statePath: StatePath
+    @ImmutableLeaf public var penaltyId: UUID?
+
     @Leaf public var number: Int?
 
     @Leaf public var jamNumber: Int?
@@ -31,6 +33,7 @@ public struct Penalty : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.number("Penalty", param: key))
 
+        _penaltyId = parent.leaf("Id").immutable
         _number = parent.leaf("Number")
         _jamNumber = parent.leaf("JamNumber")
         _periodNumber = parent.leaf("PeriodNumber")
@@ -39,6 +42,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
         _boxTrip = parent.leaf("BoxTrip")
+        _penaltyId.parentPath = statePath
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
         _periodNumber.parentPath = statePath
@@ -51,6 +55,7 @@ public struct Penalty : PathNodeId, Identifiable {
     public init(parent: Skater, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
+        _penaltyId = parent.leaf("Id").immutable
         _number = parent.leaf("Number")
         _jamNumber = parent.leaf("JamNumber")
         _periodNumber = parent.leaf("PeriodNumber")
@@ -59,6 +64,7 @@ public struct Penalty : PathNodeId, Identifiable {
         _code = parent.leaf("Code")
         _next = parent.leaf("Next")
         _boxTrip = parent.leaf("BoxTrip")
+        _penaltyId.parentPath = statePath
         _number.parentPath = statePath
         _jamNumber.parentPath = statePath
         _periodNumber.parentPath = statePath

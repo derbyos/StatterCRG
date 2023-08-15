@@ -224,7 +224,7 @@ public struct Team : PathNodeId, Identifiable {
         statePath = parent.adding(.number("Team", param: key))
 
         _team = parent.leaf("Team")
-        _teamId = parent.leaf("teamId").immutable
+        _teamId = parent.leaf("Id").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
         _initials = parent.leaf("Initials").immutable
@@ -287,7 +287,7 @@ public struct Team : PathNodeId, Identifiable {
         statePath = parent.adding(.id("Team", id: key))
 
         _team = parent.leaf("Team")
-        _teamId = parent.leaf("teamId").immutable
+        _teamId = parent.leaf("Id").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
         _initials = parent.leaf("Initials").immutable
@@ -349,7 +349,7 @@ public struct Team : PathNodeId, Identifiable {
         self.parent = parent
         self.statePath = statePath
         _team = parent.leaf("Team")
-        _teamId = parent.leaf("teamId").immutable
+        _teamId = parent.leaf("Id").immutable
         _name = parent.leaf("Name").immutable
         _fullName = parent.leaf("FullName")
         _initials = parent.leaf("Initials").immutable

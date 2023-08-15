@@ -29,7 +29,7 @@ public struct Official : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.id("Official", id: key))
 
-        _officialId = parent.leaf("officialId").immutable
+        _officialId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _role = parent.leaf("Role")
         _name = parent.leaf("Name")
@@ -49,7 +49,7 @@ public struct Official : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _officialId = parent.leaf("officialId").immutable
+        _officialId = parent.leaf("Id").immutable
         _readonly = parent.leaf("Readonly").immutable
         _role = parent.leaf("Role")
         _name = parent.leaf("Name")

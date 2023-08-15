@@ -21,6 +21,8 @@ public struct TimedEvent {
         case timeoutEnd(Timeout)
         case scoringTripStart(ScoringTrip<TeamJam<Period>>)
         case scoringTripEnd(ScoringTrip<TeamJam<Period>>)
+        case boxTripStart(BoxTrip<Team>)
+        case boxTripEnd(BoxTrip<Team>)
     }
     /// What is the event
     public var event: Event
@@ -65,6 +67,15 @@ public extension Game {
                         retval.append(.init(time: tend + jtime, event: .scoringTripEnd(trip)))
                     }
                 }
+            }
+        }
+        for team in [self.teamOne, self.teamTwo] {
+            for trip in team.allBoxTrips {
+                guard let tstart = trip.walltimeStart, let tend = trip.walltimeEnd else {
+                    break
+                }
+                retval.append(.init(time: tstart, event: .boxTripStart(trip)))
+                retval.append(.init(time: tend, event: .boxTripStart(trip)))
             }
         }
         retval.sort { e1, e2 in

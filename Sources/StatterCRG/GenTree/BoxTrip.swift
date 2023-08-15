@@ -55,7 +55,7 @@ public struct BoxTrip<P:PathSpecified> : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.id("BoxTrip", id: key))
 
-        _boxTripId = parent.leaf("boxTripId").immutable
+        _boxTripId = parent.leaf("Id").immutable
         _currentFielding = parent.leaf("CurrentFielding")
         _duration = parent.leaf("Duration")
         _endAfterSP = parent.leaf("EndAfterSP")
@@ -93,7 +93,7 @@ public struct BoxTrip<P:PathSpecified> : PathNodeId, Identifiable {
     public init(parent: P, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _boxTripId = parent.leaf("boxTripId").immutable
+        _boxTripId = parent.leaf("Id").immutable
         _currentFielding = parent.leaf("CurrentFielding")
         _duration = parent.leaf("Duration")
         _endAfterSP = parent.leaf("EndAfterSP")

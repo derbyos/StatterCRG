@@ -56,7 +56,7 @@ public struct Period : PathNodeId, Identifiable {
             statePath =  parent.adding(.wild("Period"))
         }
 
-        _periodId = parent.leaf("periodId").immutable
+        _periodId = parent.leaf("Id").immutable
         _number = parent.leaf("Number").immutable
         _previous = parent.leaf("Previous").immutable
         _next = parent.leaf("Next").immutable
@@ -97,7 +97,7 @@ public struct Period : PathNodeId, Identifiable {
         self.parent = parent
         statePath = parent.adding(.id("Period", id: key))
 
-        _periodId = parent.leaf("periodId").immutable
+        _periodId = parent.leaf("Id").immutable
         _number = parent.leaf("Number").immutable
         _previous = parent.leaf("Previous").immutable
         _next = parent.leaf("Next").immutable
@@ -137,7 +137,7 @@ public struct Period : PathNodeId, Identifiable {
     public init(parent: Game, statePath: StatePath) {
         self.parent = parent
         self.statePath = statePath
-        _periodId = parent.leaf("periodId").immutable
+        _periodId = parent.leaf("Id").immutable
         _number = parent.leaf("Number").immutable
         _previous = parent.leaf("Previous").immutable
         _next = parent.leaf("Next").immutable

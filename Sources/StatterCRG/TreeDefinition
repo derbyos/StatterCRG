@@ -412,7 +412,7 @@ node Jam <Period Game> : Jamlike {
 node TeamJam Jam<P> : Jamlike {
     key Int
     key UUID
-    @name(Id) var teamJamID : UUID
+    @name(Id) let teamJamID : UUID
 }
 
 
@@ -471,6 +471,7 @@ node BoxTrip <Period Team> {
 
 node Penalty Skater {
     key Int
+    @name(Id) let penaltyId: UUID
     var Number : Int
     var JamNumber : Int
     var PeriodNumber : Int

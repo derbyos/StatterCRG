@@ -85,19 +85,18 @@ public extension Jam where P == Period {
 
 public extension Team {
     var allBoxTrips: [BoxTrip<Team>] {
-        var retval = [BoxTrip<Team>]()
+        var retval = [UUID:BoxTrip<Team>]()
         for kv in self.connection.state {
             if let rest = kv.key.dropping(parent: self.statePath) {
                 if case let .id("BoxTrip", id: tripID) = rest.first {
-                    retval.append(BoxTrip(parent: self, tripID))
+                    retval[tripID] = BoxTrip(parent: self, tripID)
                 }
             }
         }
         // and sort by wall time starts
-        retval.sort { t1, t2 in
+        return retval.values.sorted { t1, t2 in
             (t1.walltimeStart ?? 0) < (t2.walltimeStart ?? 0)
         }
-        return retval
     }
 
 }

@@ -85,7 +85,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
 
     public var scoringTripss : MapNodeCollection<Self, ScoringTrip<Self>, Int> { .init(self,"ScoringTrips") } 
 
-    @Leaf public var teamJamID: UUID?
+    @ImmutableLeaf public var teamJamID: UUID?
 
     public init(parent: Jam<P>, _ key: Int) {
         self.parent = parent
@@ -105,7 +105,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
-        _jamId = parent.leaf("jamId").immutable
+        _jamId = parent.leaf("Id").immutable
         _noInitial = parent.leaf("NoInitial")
         _noPivot = parent.leaf("NoPivot")
         _lead = parent.leaf("Lead")
@@ -121,7 +121,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _currentTrip = parent.leaf("CurrentTrip")
         _osOffset = parent.leaf("OsOffset")
         _osOffsetReason = parent.leaf("OsOffsetReason")
-        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID = parent.leaf("Id").immutable
         _readonly.parentPath = statePath
         _number.parentPath = statePath
         _previous.parentPath = statePath
@@ -172,7 +172,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
-        _jamId = parent.leaf("jamId").immutable
+        _jamId = parent.leaf("Id").immutable
         _noInitial = parent.leaf("NoInitial")
         _noPivot = parent.leaf("NoPivot")
         _lead = parent.leaf("Lead")
@@ -188,7 +188,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _currentTrip = parent.leaf("CurrentTrip")
         _osOffset = parent.leaf("OsOffset")
         _osOffsetReason = parent.leaf("OsOffsetReason")
-        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID = parent.leaf("Id").immutable
         _readonly.parentPath = statePath
         _number.parentPath = statePath
         _previous.parentPath = statePath
@@ -238,7 +238,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _periodClockDisplayEnd = parent.leaf("PeriodClockDisplayEnd")
         _walltimeStart = parent.leaf("WalltimeStart")
         _walltimeEnd = parent.leaf("WalltimeEnd")
-        _jamId = parent.leaf("jamId").immutable
+        _jamId = parent.leaf("Id").immutable
         _noInitial = parent.leaf("NoInitial")
         _noPivot = parent.leaf("NoPivot")
         _lead = parent.leaf("Lead")
@@ -254,7 +254,7 @@ public struct TeamJam<P:PathSpecified> : PathNodeId, Identifiable {
         _currentTrip = parent.leaf("CurrentTrip")
         _osOffset = parent.leaf("OsOffset")
         _osOffsetReason = parent.leaf("OsOffsetReason")
-        _teamJamID = parent.leaf("teamJamID")
+        _teamJamID = parent.leaf("Id").immutable
         _readonly.parentPath = statePath
         _number.parentPath = statePath
         _previous.parentPath = statePath

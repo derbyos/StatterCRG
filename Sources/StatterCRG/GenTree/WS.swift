@@ -22,7 +22,7 @@ public struct WS : PathSpecified {
             statePath = parent.adding("Device")
     
             _name = parent.leaf("Name")
-            _deviceId = parent.leaf("deviceId")
+            _deviceId = parent.leaf("Id")
             _name.parentPath = statePath
             _deviceId.parentPath = statePath
         }
@@ -30,7 +30,7 @@ public struct WS : PathSpecified {
             self.parent = parent
             self.statePath = statePath
             _name = parent.leaf("Name")
-            _deviceId = parent.leaf("deviceId")
+            _deviceId = parent.leaf("Id")
             _name.parentPath = statePath
             _deviceId.parentPath = statePath
         }
@@ -49,7 +49,7 @@ public struct WS : PathSpecified {
             statePath = parent.adding("Client")
     
             _remoteAddress = parent.leaf("RemoteAddress")
-            _clientId = parent.leaf("clientId")
+            _clientId = parent.leaf("Id")
             _remoteAddress.parentPath = statePath
             _clientId.parentPath = statePath
         }
@@ -57,7 +57,7 @@ public struct WS : PathSpecified {
             self.parent = parent
             self.statePath = statePath
             _remoteAddress = parent.leaf("RemoteAddress")
-            _clientId = parent.leaf("clientId")
+            _clientId = parent.leaf("Id")
             _remoteAddress.parentPath = statePath
             _clientId.parentPath = statePath
         }
