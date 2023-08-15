@@ -314,13 +314,6 @@ public struct MapValueCollection<Value: JSONTypeable, Index: JSONTypeable> : Pat
         }
         self.statePath = statePath
     }
-    public subscript(id: Index) -> Value? {
-        if let value = connection.state[statePath] {
-            return Value(value)
-        }
-        //            connection.register(path: )
-        return nil
-    }
     public func allValues() -> [Index: Value] {
         connection.register(self) // always re-register, in case
         var retval: [Index:Value] = [:]
@@ -338,7 +331,17 @@ public struct MapValueCollection<Value: JSONTypeable, Index: JSONTypeable> : Pat
         return retval
     }
 }
-
+public extension MapValueCollection where Index == String {
+    subscript(id: Index) -> Value? {
+        var subStatePath = statePath.dropLast()
+        subStatePath.append(.name(lastComponentName, name: id))
+        if let value = connection.state[.init(components: subStatePath)] {
+            return Value(value)
+        }
+        //            connection.register(path: )
+        return nil
+    }
+}
 
 
 public extension StatePath {

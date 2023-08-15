@@ -100,8 +100,11 @@ extension StatRBook {
                 let code = penalty.code ?? "?"
                 totals[team.statePath, default: [:]][code, default: 0] += 1
             }
-            var allPenalties = ["?","A","B","C","D","E","F","G","H","I","L","M","N","P","X"]
-            print("\t\(allPenalties.joined(separator: "\t"))\tTotal")
+            let allPenalties = game.penaltyCode.allValues().keys.sorted()
+            let names = allPenalties.map { code in
+                game.penaltyCode[code]?.split(separator: ",").first ?? "\(code)"
+            }
+            print("\t\(names.joined(separator: "\t"))\tTotal")
             for team in [game.teamOne, game.teamTwo] {
                 let penalties = totals[team.statePath, default:[:]]
                 var retval = [team.name ?? "team"]
