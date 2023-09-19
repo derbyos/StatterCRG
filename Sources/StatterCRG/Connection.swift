@@ -51,6 +51,13 @@ public class Connection : ObservableObject, Equatable {
     public convenience init(connection: ConnectionRecord, source: Connection.Source = .root, urlSession: URLSession = .shared, webSocketFailedHandler: (() -> Void)? = nil) {
         self.init(host: connection.host, port: connection.port, operatorName: connection.operatorName, source: source, urlSession: urlSession, webSocketFailedHandler: webSocketFailedHandler)
     }
+    /// Change the configuration record
+    /// - Parameter record: The new configuration record
+    public func configure(record: ConnectionRecord) {
+        self.host = record.host
+        self.port = record.port
+        self.operatorName = record.operatorName
+    }
     public static func == (lhs: Connection, rhs: Connection) -> Bool {
         lhs.webSocket == rhs.webSocket && lhs.webSocketURL == rhs.webSocketURL
     }
