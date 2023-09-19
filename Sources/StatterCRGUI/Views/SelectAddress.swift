@@ -16,7 +16,7 @@ struct ScannerView: UIViewRepresentable {
         var previewLayer: AVCaptureVideoPreviewLayer?
         override func layoutSubviews() { // so the preview layer resizes since we can't use autoresize
             previewLayer?.frame = self.bounds
-            previewLayer?.connection?.videoOrientation = UIDevice.current.orientation == .landscapeRight ? AVCaptureVideoOrientation.landscapeLeft : AVCaptureVideoOrientation.landscapeRight
+            previewLayer?.connection?.videoOrientation = .portrait
         }
     }
 
@@ -129,64 +129,65 @@ public struct SelectAddress: View {
     #endif
     public var body: some View {
         Form {
-            Text("Server Connection Info")
-            TextField("Host Name/Address", text: $connection.host)
-            TextField("Port", value: $connection.port, formatter: NumberFormatter())
-            TextField("Operator Name", text: $connection.operatorName)
-            #if os(iOS)
-            Button {
-                showScanner.toggle()
-            } label: {
-                Label("Scan QR Code", systemImage: "qrcode.viewfinder")
-            }
-            .disabled(permissionGranted == false)
-            .onAppear(perform: {
-                #if targetEnvironment(simulator)
-                #else
-                AVCaptureDevice.requestAccess(for: .video, completionHandler: {accessGranted in
-                    DispatchQueue.main.async {
-                        self.permissionGranted = accessGranted
-                    }
+            Section("Server Connection Info") {
+                TextField("Host Name/Address", text: $connection.host)
+                TextField("Port", value: $connection.port, formatter: NumberFormatter())
+                TextField("Operator Name", text: $connection.operatorName)
+#if os(iOS)
+                Button {
+                    showScanner.toggle()
+                } label: {
+                    Label("Scan QR Code", systemImage: "qrcode.viewfinder")
+                }
+                .disabled(permissionGranted == false)
+                .onAppear(perform: {
+#if targetEnvironment(simulator)
+#else
+                    AVCaptureDevice.requestAccess(for: .video, completionHandler: {accessGranted in
+                        DispatchQueue.main.async {
+                            self.permissionGranted = accessGranted
+                        }
+                    })
+#endif
                 })
-                #endif
-            })
-            .sheet(isPresented: $showScanner) {
-                ZStack {
-                    ScannerView() {
-                        if let code = $0 {
-                            message = "Found Code"
-                            if showScanner, let url = URL(string: code), let host = url.host() {
-                                connection.port = url.port ?? 8000
-                                connection.host = host
-                                showScanner = false
+                .sheet(isPresented: $showScanner) {
+                    ZStack {
+                        ScannerView() {
+                            if let code = $0 {
+                                message = "Found Code"
+                                if showScanner, let url = URL(string: code), let host = url.host() {
+                                    connection.port = url.port ?? 8000
+                                    connection.host = host
+                                    showScanner = false
+                                } else {
+                                    message = "Code '\(code)' Not Recognized"
+                                }
                             } else {
-                                message = "Code '\(code)' Not Recognized"
-                            }
-                        } else {
-                            if message != nil {
-                                message = nil
+                                if message != nil {
+                                    message = nil
+                                }
                             }
                         }
-                    }
-                    VStack {
-                        Text("Scan QR Code for Server")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.gray.opacity(0.5))
-                        Spacer()
-                        if let message {
-                            Text(message)
+                        VStack {
+                            Text("Scan QR Code for Server")
                                 .foregroundColor(.white)
                                 .padding()
                                 .background(Color.gray.opacity(0.5))
-                        }
-                        Button("Cancel") {
-                            showScanner.toggle()
+                            Spacer()
+                            if let message {
+                                Text(message)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.5))
+                            }
+                            Button("Cancel") {
+                                showScanner.toggle()
+                            }
                         }
                     }
                 }
+#endif
             }
-            #endif
         }
     }
 }

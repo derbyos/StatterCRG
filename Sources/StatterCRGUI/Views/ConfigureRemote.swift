@@ -68,6 +68,33 @@ public struct ConfigureRemote<Action:RemoteControlAction> : View {
     }
 }
 
+public struct LabelForAction<Title:View, Action: RemoteControlAction> : View {
+    public init(@ViewBuilder title: ()->Title, action: Action) {
+        self.title = title()
+        self.action = action
+    }
+    var title: Title
+    @EnvironmentObject var remote: RemoteControl<Action>
+    var action: Action
+    public var body: some View {
+        HStack {
+            title
+            Spacer()
+            if let button = remote.event(for: action), let icon = remote.icons[button] {
+                Image(systemName: icon)
+                    .imageScale(.large)
+            }
+        }
+    }
+}
+
+extension LabelForAction where Title == Text {
+    public init(_ title: String, action: Action) {
+        self.title = Text(title)
+        self.action = action
+    }
+
+}
 fileprivate enum TestAction : String, RemoteControlAction {
     var description: String { rawValue }
     
