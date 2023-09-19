@@ -12,13 +12,25 @@ import Combine
 //@dynamicMemberLookup
 /// The primary connection with the scoreboard server
 public class Connection : ObservableObject, Equatable {
+    
+    public struct ConnectionRecord : Equatable, Codable {
+        public init(host: String, port: Int = 8000, operatorName: String = "operator") {
+            self.host = host
+            self.port = port
+            self.operatorName = operatorName
+        }
+        
+        public var host: String
+        public var port: Int = 8000
+        public var operatorName: String
+    }
     /// Create a connection to a scoreboard server.  The connection won't
     /// be active until ``connect()`` is called
     /// - Parameters:
     ///   - host: The scoreboard server host
     ///   - port: The scoreboard server port
     ///   - operatorName: The scoreboard server name
-    ///   - source: The starting source refrence
+    ///   - source: The starting source reference
     ///   - urlSession: A custom urlSession
     ///   - webSocketFailedHandler: A handler to call if websockets fail
     public init(host: String? = "10.0.0.10", port: Int = 8000, operatorName: String = "statter", source: Connection.Source = .root, urlSession: URLSession = .shared, webSocketFailedHandler: (() -> Void)? = nil) {
@@ -30,6 +42,15 @@ public class Connection : ObservableObject, Equatable {
         self.webSocketFailedHandler = webSocketFailedHandler
     }
     
+    /// Initialize via a ConnectionRecord
+    /// - Parameters:
+    ///   - connection: Connection record
+    ///   - source: The starting source reference
+    ///   - urlSession: A custom urlSession
+    ///   - webSocketFailedHandler: A handler to call if websockets fail
+    public convenience init(connection: ConnectionRecord, source: Connection.Source = .root, urlSession: URLSession = .shared, webSocketFailedHandler: (() -> Void)? = nil) {
+        self.init(host: connection.host, port: connection.port, operatorName: connection.operatorName, source: source, urlSession: urlSession, webSocketFailedHandler: webSocketFailedHandler)
+    }
     public static func == (lhs: Connection, rhs: Connection) -> Bool {
         lhs.webSocket == rhs.webSocket && lhs.webSocketURL == rhs.webSocketURL
     }
