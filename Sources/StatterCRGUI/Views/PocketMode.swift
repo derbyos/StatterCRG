@@ -9,8 +9,8 @@ import SwiftUI
 
 /// A wrapper view that includes the ability to "lock" the screen (and also handles dimming?) so
 /// the app can be put in a pocket yet still be kept live
-struct PocketMode<Content:View>: View {
-    init(lockWidth: CGFloat = 300, @ViewBuilder content: @escaping (Bool) -> Content) {
+public struct PocketMode<Content:View>: View {
+    public init(lockWidth: CGFloat = 300, @ViewBuilder content: @escaping (Bool) -> Content) {
         self.lockWidth = lockWidth
         self.content = content
     }
@@ -41,7 +41,7 @@ struct PocketMode<Content:View>: View {
         }
     }
     #endif
-    var body: some View {
+    public var body: some View {
         VStack {
             content(isUnlocked)
                 .disabled(isUnlocked == false)
