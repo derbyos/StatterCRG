@@ -97,7 +97,7 @@ node Period Game {
     action InsertBefore
     action InsertTimeout
     @version(2023.1) let Team1PenaltyCount : Int
-    @version(2023.1) let Tema2PenaltyCount : Int
+    @version(2023.1) let Team2PenaltyCount : Int
     @version(2023.1) let Team1Points : Int
     @version(2023.1) let Team2Points : Int
 }

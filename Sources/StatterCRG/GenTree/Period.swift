@@ -42,7 +42,7 @@ public struct Period : PathNodeId, Identifiable {
     public func insertTimeout() { connection.set(key: statePath.adding("InsertTimeout"), value: .bool(true), kind: .set) }
     @ImmutableLeaf public var team1PenaltyCount: Int?
 
-    @ImmutableLeaf public var tema2PenaltyCount: Int?
+    @ImmutableLeaf public var team2PenaltyCount: Int?
 
     @ImmutableLeaf public var team1Points: Int?
 
@@ -71,7 +71,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _localTimeStart = parent.leaf("LocalTimeStart")
         _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
-        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team2PenaltyCount = parent.leaf("Team2PenaltyCount").immutable
         _team1Points = parent.leaf("Team1Points").immutable
         _team2Points = parent.leaf("Team2Points").immutable
         _periodId.parentPath = statePath
@@ -89,7 +89,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd.parentPath = statePath
         _localTimeStart.parentPath = statePath
         _team1PenaltyCount.parentPath = statePath
-        _tema2PenaltyCount.parentPath = statePath
+        _team2PenaltyCount.parentPath = statePath
         _team1Points.parentPath = statePath
         _team2Points.parentPath = statePath
     }
@@ -112,7 +112,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _localTimeStart = parent.leaf("LocalTimeStart")
         _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
-        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team2PenaltyCount = parent.leaf("Team2PenaltyCount").immutable
         _team1Points = parent.leaf("Team1Points").immutable
         _team2Points = parent.leaf("Team2Points").immutable
         _periodId.parentPath = statePath
@@ -130,7 +130,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd.parentPath = statePath
         _localTimeStart.parentPath = statePath
         _team1PenaltyCount.parentPath = statePath
-        _tema2PenaltyCount.parentPath = statePath
+        _team2PenaltyCount.parentPath = statePath
         _team1Points.parentPath = statePath
         _team2Points.parentPath = statePath
     }
@@ -152,7 +152,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd = parent.leaf("WalltimeEnd")
         _localTimeStart = parent.leaf("LocalTimeStart")
         _team1PenaltyCount = parent.leaf("Team1PenaltyCount").immutable
-        _tema2PenaltyCount = parent.leaf("Tema2PenaltyCount").immutable
+        _team2PenaltyCount = parent.leaf("Team2PenaltyCount").immutable
         _team1Points = parent.leaf("Team1Points").immutable
         _team2Points = parent.leaf("Team2Points").immutable
         _periodId.parentPath = statePath
@@ -170,7 +170,7 @@ public struct Period : PathNodeId, Identifiable {
         _walltimeEnd.parentPath = statePath
         _localTimeStart.parentPath = statePath
         _team1PenaltyCount.parentPath = statePath
-        _tema2PenaltyCount.parentPath = statePath
+        _team2PenaltyCount.parentPath = statePath
         _team1Points.parentPath = statePath
         _team2Points.parentPath = statePath
     }
