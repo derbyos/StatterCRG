@@ -338,6 +338,7 @@ node Fielding <Jam TeamJam> {
     let Readonly : Bool
     var SitFor3 : Bool
     var Skater : UUID
+    var skaterNumber : String
 }
 
 node ScoringTrip  <Jam TeamJam> {

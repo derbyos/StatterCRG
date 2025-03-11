@@ -41,7 +41,7 @@ public extension Game {
         for periodNum in 1 ... 2 {
             let period = self.period(periodNum)
             if let time = period.walltimeStart {
-                retval.append(.init(time: time, event: .periodEnd(period)))
+                retval.append(.init(time: time, event: .periodStart(period)))
             }
             if let time = period.walltimeEnd {
                 retval.append(.init(time: time, event: .periodEnd(period)))
